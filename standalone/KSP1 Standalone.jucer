@@ -183,7 +183,7 @@
              androidSDKPath="${user.home}/SDKs/android-sdk" androidNDKPath="${user.home}/SDKs/android-ndk"
              androidMinimumSDK="8" androidInternetNeeded="1" androidKeyStore="${user.home}/.android/debug.keystore"
              androidKeyStorePass="android" androidKeyAlias="androiddebugkey"
-             androidKeyAliasPass="android">
+             androidKeyAliasPass="android" androidCpp11="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" androidArchitectures="armeabi armeabi-v7a" isDebug="1"
                        optimisation="1" targetName="KSP1 Standalone"/>
