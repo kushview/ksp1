@@ -26,8 +26,16 @@ namespace KSP1 {
     KeyItem::KeyItem()
         : ObjectModel (Tags::key)
     {
-        setMissingProperties();
         nlayers = 0;
+        setMissingProperties();
+    }
+
+    KeyItem::KeyItem (const int note)
+        : ObjectModel (Tags::key),
+          nlayers (0)
+    {
+        objectData.setProperty (Slugs::note, note, nullptr);
+        setMissingProperties();
     }
 
     KeyItem::KeyItem (const ValueTree& k)
@@ -35,7 +43,7 @@ namespace KSP1 {
 
     {
         setMissingProperties();
-        countLayers();
+        nlayers = countLayers();
     }
 
     LayerItem KeyItem::addLayer (const File& file)

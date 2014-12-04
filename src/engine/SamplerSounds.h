@@ -90,6 +90,8 @@ namespace KSP1 {
 
         void setProperty (const URIs& uris, const PatchSet& set);
 
+        void restoreFromJSON (const var& json);
+
         /** Set the sounds default length. This is the longest of all layers */
         inline void setDefaultLength() {
             setLength (0);

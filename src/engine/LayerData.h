@@ -45,14 +45,23 @@ namespace KSP1 {
         LayerData (SampleCache&, int layerId);
         ~LayerData();
 
+        /** Create a DynamicObject representing this LayerData */
+        DynamicObject::Ptr createDynamicObject() const;
+
         /** Returns the audio file this data was loaded from if any */
         const File& getAudioFile() const { return currentFile; }
+
+        /** Get the parent SamplerSound's ID for this LayerData */
+        const uint32& getParent() const { return parent; }
 
         /** Load an audio file into memory and set the render buffer */
         bool loadAudioFile (const File& audioFile);
 
-        /** Reset properties */
+        /** Reset properties to default values */
         void reset();
+
+        /** Restore properties from a JSON formatted var */
+        void restoreFromJSON (const var& json);
 
         /** Restore properties from an XmlElement */
         void restoreFromXml (const XmlElement& e);
@@ -66,10 +75,14 @@ namespace KSP1 {
         /** Set all properties contained within the given atom object */
         void setAtomObject (const URIs& uris, const lvtk::AtomObject& object, bool realtime = true);
 
-        DynamicObject::Ptr createDynamicObject() const;
+        /** Set the volume of this Layer */
+        void setVolume (const double vol);
 
+        /** Write Layer properties to an AtomObject */
         ForgeRef writeAtomObject (Forge& forge);
 
+
+    protected:
         AtomicDouble gain;
         AtomicDouble pitch;
         AtomicDouble panning;
@@ -78,24 +91,20 @@ namespace KSP1 {
         AtomicFrame  in, out;
         Range<double> velocityRange;
 
-        const uint32& getParent() const { return parent; }
-
-    protected:
-
+        /** Set the type (URID) of this Layer (unused) */
         void setType (const LV2_URID t) { type = t; }
 
     private:
-
         friend class SampleCache;
         friend class SamplerSound;
         friend class SamplerSynth;
         friend class SamplerVoice;
 
         SampleCache&    cache;
-        LV2_URID type;
-        int64  lengthInSamples;
-        uint32 numChannels;
-        double sampleRate;
+        LV2_URID        type;
+        int64           lengthInSamples;
+        uint32          numChannels;
+        double          sampleRate;
 
         const int32  id;
         uint32       parent;

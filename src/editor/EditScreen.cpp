@@ -195,6 +195,9 @@ public:
     void setKey (const KeyItem& item)
     {
         key = new KeyItem (item);
+        Instrument i (key->node().getParent());
+        i.sortKeys();
+
         removeClips();
         if (key && key->isValid()) {
             for (int i = key->countLayers(); --i >= 0;)

@@ -23,6 +23,45 @@
 
 namespace KSP1 {
 
+    struct KeySorter
+    {
+        explicit KeySorter (bool asc = false) : ascending (asc) { }
+
+        int compareElements (const ValueTree& left, const ValueTree& right)
+        {
+            if ((left.hasType (Tags::key)) && (! right.hasType (Tags::key))) {
+                return 1;
+            } else if ((! left.hasType (Tags::key)) && (right.hasType (Tags::key))) {
+                return -1;
+            } else if ((! left.hasType (Tags::key)) && (! right.hasType (Tags::key))) {
+                return -1;
+            }
+
+            const int noteL = left.getProperty (Slugs::note);
+            const int noteR = right.getProperty (Slugs::note);
+
+            if (noteL < noteR)
+                return (ascending) ? 1 : -1;
+            else if (noteL > noteR)
+                return (ascending) ? -1 : 1;
+
+            jassert (noteL == noteR);
+
+            const int lenL  = left.getProperty (Slugs::length);
+            const int lenR  = right.getProperty (Slugs::length);
+
+            if (lenL < lenR)
+                return -1;
+            else if (lenL > lenR)
+                return 1;
+
+            return 0;
+        }
+
+    private:
+        bool ascending;
+    };
+
     Instrument::Instrument (const String& name)
         : MediaObject ("instrument")
     {
@@ -74,8 +113,11 @@ namespace KSP1 {
             item.setMissingProperties();
         }
         
-        if (key.isValid())
+        if (key.isValid()) {
             objectData.addChild (key, noteNumber, nullptr);
+            KeySorter sorter;
+            objectData.sort (sorter, nullptr, true);
+        }
 
         return item;
     }
@@ -86,6 +128,9 @@ namespace KSP1 {
         file = File::nonexistent;
     }
 
+    void Instrument::sortKeys() {
+        KeySorter s; objectData.sort (s, nullptr, true);
+    }
 
     String Instrument::getName() const
     {

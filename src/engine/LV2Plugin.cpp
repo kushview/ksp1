@@ -333,18 +333,89 @@ WorkerStatus LV2Plugin::work_response (uint32_t size, const void* body)
     return WORKER_SUCCESS;
 }
 
-StateStatus LV2Plugin::save (StateStore &store, uint32_t flags, const FeatureVec &features)
+StateStatus LV2Plugin::save (StateStore &store, uint32_t /*flags*/, const FeatureVec &features)
 {
+    LV2_State_Make_Path* make_path = nullptr;
+    LV2_State_Map_Path* map_path = nullptr;
+
+    for (const LV2_Feature* f : features)
+    {
+        if (0 == strcmp (LV2_STATE__makePath, f->URI)) {
+            make_path = reinterpret_cast<LV2_State_Make_Path*> (f->data);
+        }
+
+        if (0 == strcmp (LV2_STATE__mapPath, f->URI)) {
+            map_path = reinterpret_cast<LV2_State_Map_Path*> (f->data);
+        }
+    }
+
     var json;
-    if (sampler->getNestedVariant (json)) {
-        const String data = JSON::toString (json, true);
-        store (uris->ksp1_SamplerSynth, data.toRawUTF8(), data.length() + 1, forge->String, STATE_IS_POD);
+    if (sampler->getNestedVariant (json))
+    {
+        if (map_path && make_path)
+        {
+            if (char* absolute = make_path->path (make_path->handle, "data.json")) {
+                if (char* abstract = map_path->abstract_path (map_path->handle, absolute)) {
+                    const File file (String::fromUTF8 (absolute));
+                    FileOutputStream fos (file);
+                    JSON::writeToStream (fos, json);
+                    store (uris->slugs_file, abstract, strlen (abstract) + 1, forge->Path, STATE_IS_POD);
+                    std::free (abstract);
+                }
+                std::free (absolute);
+            }
+        }
+        else
+        {
+            const String data = JSON::toString (json, true);
+            store (uris->ksp1_SamplerSynth, data.toRawUTF8(), data.length() + 1, forge->String, STATE_IS_POD);
+        }
     }
 
     return STATE_SUCCESS;
 }
 
-StateStatus LV2Plugin::restore (StateRetrieve &retrieve, uint32_t flags, const FeatureVec &features) { return STATE_SUCCESS; }
+StateStatus LV2Plugin::restore (StateRetrieve &retrieve, uint32_t flags, const FeatureVec &features)
+{
+    LV2_State_Make_Path* make_path = nullptr;
+    LV2_State_Map_Path* map_path = nullptr;
+
+    for (const LV2_Feature* f : features)
+    {
+        if (0 == strcmp (LV2_STATE__makePath, f->URI)) {
+            make_path = reinterpret_cast<LV2_State_Make_Path*> (f->data);
+        }
+
+        if (0 == strcmp (LV2_STATE__mapPath, f->URI)) {
+            map_path = reinterpret_cast<LV2_State_Map_Path*> (f->data);
+        }
+    }
+    if (! map_path)
+        return lvtk::STATE_ERR_UNKNOWN;
+
+    size_t size; uint32_t type; uint32_t rflags;
+    if (const void* data = retrieve (uris->slugs_file, &size, &type, &rflags))
+    {
+        if (type == uris->atom_Path)
+        {
+            const char* abstract = (const char*) data;
+            if (char* absolute = map_path->absolute_path (map_path->handle, abstract))
+            {
+                const File file (String::fromUTF8 (absolute));
+                sampler->loadFile (file);
+            }
+        }
+    }
+    else if (const void* data = retrieve (uris->ksp1_SamplerSynth, &size, &type, &rflags))
+    {
+        const String jsonStr (String::fromUTF8 ((const char*) data));
+        const var json = JSON::parse (jsonStr);
+
+        DBG (JSON::toString(json));
+    }
+
+    return STATE_SUCCESS;
+}
 
 SampleCache& LV2Plugin::get_sample_cache()
 {

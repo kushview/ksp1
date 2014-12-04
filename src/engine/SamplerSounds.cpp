@@ -209,6 +209,16 @@ namespace KSP1 {
         key.adsr.setRelease (len);
     }
 
+    void SamplerSound::restoreFromJSON (const var &json)
+    {
+        key.volume = (float) json.getProperty (Slugs::volume, 0.0);
+        key.gain = Decibels::decibelsToGain (key.volume);
+        key.length = (int) json.getProperty (Slugs::length, key.length);
+        key.note = (int) json.getProperty (Slugs::note, key.note);
+        key.voiceGroup = (int) json.getProperty (Tags::voiceGroup, -1);
+        key.triggerMode = (int) json.getProperty (Tags::triggerMode, (int) TriggerMode::Retrigger);
+    }
+
     void SamplerSound::setRootNote (int n)
     {
         jassert (isPositiveAndBelow (n, 128));

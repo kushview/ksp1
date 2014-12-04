@@ -321,7 +321,8 @@ namespace KSP1 {
     public:
 
         KeyItem();
-        KeyItem(const ValueTree& k);
+        KeyItem (const int note);
+        KeyItem (const ValueTree& k);
 
         bool isValid() const { return objectData.isValid(); }
         bool isNotValid() const { return ! isValid(); }
@@ -419,6 +420,8 @@ namespace KSP1 {
         void print() {
             DBG (objectData.toXmlString());
         }
+
+        void sortKeys();
 
     private:
         File file;

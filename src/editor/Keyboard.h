@@ -20,7 +20,8 @@
 #ifndef KSP1_KEYBOARD_WIDGET_H
 #define KSP1_KEYBOARD_WIDGET_H
 
-#include "MidiKeyboardComponent.h"
+#include "editor/MidiKeyboardComponent.h"
+#include "editor/ComponentMixin.h"
 
 namespace KSP1 {
 namespace Gui {

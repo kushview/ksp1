@@ -55,7 +55,7 @@ namespace KSP1 {
             virtual bool createSounds() =0;
 
         protected:
-            SamplerSound* createSound (int note);
+            SamplerSound* createSound (int note, int id = 0);
             LayerData* createLayerData (SamplerSound& sound);
             OwnedArray<SamplerSound> sounds;
             Array<LayerData*> layers;
@@ -64,7 +64,7 @@ namespace KSP1 {
 
         };
 
-        /** Create a new Sampler with a given sample cache */
+        /** Create a new Sampler with an external sample cache */
         static SamplerSynth* create (SampleCache& cache);
 
         /** Create a synth using the internal cache */
@@ -77,7 +77,7 @@ namespace KSP1 {
 
         void setVolume (const double val);
         inline void setGain (const double val) { masterGain.set (val); }
-        inline const double& gain() const { return masterGain.get(); }
+        inline const double& getGain() const { return masterGain.get(); }
 
         /** Get the current MIDI channel this sampler operates on */
         const int& getMidiChannel() const { return midiChannel.get(); }
@@ -85,9 +85,11 @@ namespace KSP1 {
         /** Set the current operating MIDI channel */
         void setMidiChannel (int chan);
 
+        bool insertLayerData (uint32 soundId, LayerData* data);
+        bool loadFile (const File& file);
         bool loadValueTreeXml (const XmlElement& xml);
 
-        bool insertLayerData (uint32 soundId, LayerData* data);
+
 
         SampleCache& getSampleCache() const { return cache; }
 

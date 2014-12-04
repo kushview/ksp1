@@ -49,13 +49,11 @@ void KeyboardWidget::itemDropped (const SourceDetails& details)
     SamplerView* view = findParentComponentOfClass<SamplerView>();
     SamplerDisplay* display = view->getDisplay();
     InstrumentPtr inst = display->getInstrument();
-    int note (findNoteAt (details.localPosition));
+    const int note (findNoteAt (details.localPosition));
 
     KeyItem key (inst->getOrCreateKey (note));
     if (key.isNotValid())
         return;
-
-    DBG (key.node().toXmlString());
 
     key.clearLayers();
 
@@ -65,7 +63,7 @@ void KeyboardWidget::itemDropped (const SourceDetails& details)
         LayerItem layer (key.addLayer (file));
     }
 
-    display->selectNote (note, true);
+    view->getDisplay()->selectNote (note, true);
 }
 
 bool KeyboardWidget::shouldDrawDragImageWhenOver()

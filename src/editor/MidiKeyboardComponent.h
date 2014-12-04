@@ -34,6 +34,8 @@ namespace KSP1 {
 
 //==============================================================================
 /**
+    This is a modified copy of JUCE's juce::MidiKeyboardComponent
+
     A component that displays a piano keyboard, whose notes can be clicked on.
 
     This component will mimic a physical midi keyboard, showing the current state of

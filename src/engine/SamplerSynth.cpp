@@ -32,7 +32,6 @@ namespace KSP1 {
     static ScopedPointer<SampleCache> sSampleCache;
     static Array<SamplerSynth*> sCacheUsers;
 
-
     struct ZoneSorter {
         static int compareElements (const SamplerSound* first, const SamplerSound* second)
         {
@@ -48,6 +47,46 @@ namespace KSP1 {
         }
     };
 
+    class JSONSynthLoader : public SamplerSynth::DataLoader
+    {
+    public:
+        JSONSynthLoader (const var& json, SampleCache& c)
+            : SamplerSynth::DataLoader (c), data (json)
+        { }
+
+        bool createSounds() override
+        {
+//            for (int i = 0; i < data.size(); ++i)
+            {
+                const var sounds = data.getProperty ("sounds", var::null);
+
+                for (int si = 0; si < sounds.size(); ++ si)
+                {
+                    const var sound = sounds [si];
+                    SamplerSound* ssound = createSound (sound.getProperty (Slugs::note, -1),
+                                                        sound.getProperty (Slugs::id, 0));
+                    if (! ssound)
+                        continue;
+
+                    ssound->restoreFromJSON (sound);
+
+                    const var layers = sound.getProperty ("layers", var::null);
+                    for (int li = 0; li < layers.size(); ++li) {
+                        const var layer (layers [li]);
+                        LayerData* ld = createLayerData (*ssound);
+                        ld->restoreFromJSON (layer);
+                    }
+
+                    ssound->setDefaultLength();
+                }
+            }
+
+            return true;
+        }
+
+    private:
+        const var& data;
+    };
 
     class ValueTreeXmlSynthLoader : public SamplerSynth::DataLoader
     {
@@ -124,9 +163,9 @@ namespace KSP1 {
         layers.clear();
     }
 
-    SamplerSound* SamplerSynth::DataLoader::createSound (int note)
+    SamplerSound* SamplerSynth::DataLoader::createSound (int note, int id)
     {
-        if (SamplerSound* s = new SamplerSound (note, 0))
+        if (SamplerSound* s = new SamplerSound (note, id))
             return sounds.add (s);
         return nullptr;
     }
@@ -245,6 +284,23 @@ namespace KSP1 {
                 if (iter.getValue())
                     iter.getValue()->setMidiChannel (chan);
             }
+    }
+
+    bool SamplerSynth::loadFile (const File &file)
+    {
+        if (file.hasFileExtension (".xml")) {
+            if (ScopedXml xml =XmlDocument::parse(file))
+                return loadValueTreeXml (*xml);
+        }
+        else if (file.hasFileExtension (".json"))
+        {
+            var json = JSON::parse (file);
+            JSONSynthLoader loader (json, getSampleCache());
+            if (loader.createSounds())
+                return installLoadedData (loader);
+        }
+
+        return false;
     }
 
     bool SamplerSynth::loadValueTreeXml (const XmlElement& e)

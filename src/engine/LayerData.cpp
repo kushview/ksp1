@@ -163,6 +163,24 @@ namespace KSP1 {
            scratch.reset();
     }
 
+    void LayerData::restoreFromJSON (const var& json)
+    {
+        index = json.getProperty (Slugs::index, index);
+        note = json.getProperty (Slugs::note, note);
+        setVolume ((double) json.getProperty (Slugs::volume, 0.0));
+        panning.set (json.getProperty (Tags::panning, panning.get()));
+        pitch.set (json.getProperty (Slugs::pitch, pitch.get()));
+        velocityRange.setStart (json.getProperty ("velocityLower", 0.0));
+        velocityRange.setEnd (json.getProperty ("velocityUpper", 1.0));
+        const File file (json.getProperty (Slugs::file, String::empty).toString());
+        if (file.existsAsFile()) {
+            loadAudioFile (file);
+        }
+
+        in.set (sampleRate * (double) json.getProperty (Slugs::start, 0));
+        out.set (in.get() + (sampleRate * (double) json.getProperty (Slugs::length, 0)));
+    }
+
     void LayerData::restoreFromXml (const XmlElement& e)
     {
         index = e.getIntAttribute ("index", -1);
@@ -182,6 +200,11 @@ namespace KSP1 {
         }
     }
 
+    void LayerData::setVolume (const double vol)
+    {
+        gain.set (Decibels::decibelsToGain (vol));
+    }
+
     ForgeRef LayerData::writeAtomObject (Forge& forge)
     {
         const URIs& uris (forge.uris);
@@ -192,7 +215,7 @@ namespace KSP1 {
         forge.write_key (uris.slugs_volume); forge.write_double (Decibels::gainToDecibels ((double) gain.get()));
         forge.write_key (uris.slugs_pitch); forge.write_double (pitch.get());
         forge.write_key (uris.slugs_panning); forge.write_double (panning.get());
-        forge.write_key (uris.slugs_start); forge.write_double ((double) 0.0);
+        forge.write_key (uris.slugs_start); forge.write_double ((double) in.get() / sampleRate);
         forge.write_key (uris.slugs_length); forge.write_double ((double)(out.get() - in.get()) / sampleRate);
         forge.write_key (uris.slugs_offset); forge.write_double (in.get());
         forge.pop_frame (frame);

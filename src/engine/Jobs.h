@@ -126,7 +126,7 @@ struct ObjectRef : public lvtk::Atom
         p_class_ptr = (intptr_t) ptr;
     }
 
-    /** Read an ObjectRef from an AtomObject struct */
+    /** Read an ObjectRef from an AtomObject */
     ObjectRef (const URIs& uris, const lvtk::AtomObject& object)
         : lvtk::Atom (object)
     {
