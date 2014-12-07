@@ -160,9 +160,9 @@ namespace KSP1 {
 
         /** Set the master volume (in decibels) for this sound */
         inline void
-        setVolume (float vol)
+        setVolume (const double vol)
         {
-            float gain = Decibels::decibelsToGain (vol);
+            const double gain = Decibels::decibelsToGain (vol);
 
             Lock lock (*this);
             key.volume = vol;

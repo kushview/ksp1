@@ -48,7 +48,9 @@ struct PatchGet : public PatchMessage
     PatchGet (const URIs& u, const lvtk::AtomObject& o)
         : PatchMessage (u, o)
     {
-
+        lv2_atom_object_get (o,
+            uris.patch_subject, &subject,
+        0);
     }
 };
 

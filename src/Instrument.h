@@ -205,12 +205,17 @@ namespace KSP1 {
                 setProperty (Slugs::note, value.as_int());
             } else if (prop == uris.slugs_volume) {
                 setProperty (Slugs::volume, value.as_double());
+            } else if (prop == uris.slugs_pitch) {
+                setProperty (Slugs::pitch, value.as_double());
             } else if (prop == uris.slugs_start) {
                 setProperty (Slugs::start, value.as_double());
             } else if (prop == uris.slugs_length) {
                 setProperty (Slugs::length, value.as_double());
             } else if (prop == uris.slugs_offset) {
                 setProperty (Slugs::offset, value.as_double());
+            } else if (prop == uris.slugs_file) {
+                const File file (String::fromUTF8 (value.as_string()));
+                setFile (file);
             }
         }
 
@@ -320,8 +325,8 @@ namespace KSP1 {
     {
     public:
 
-        KeyItem();
-        KeyItem (const int note);
+        explicit KeyItem (bool setMissing = true);
+        KeyItem (const int note, const bool setMissing = true);
         KeyItem (const ValueTree& k);
 
         bool isValid() const { return objectData.isValid(); }

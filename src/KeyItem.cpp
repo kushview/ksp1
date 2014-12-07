@@ -23,19 +23,21 @@
 
 namespace KSP1 {
 
-    KeyItem::KeyItem()
+    KeyItem::KeyItem (bool setMissing)
         : ObjectModel (Tags::key)
     {
         nlayers = 0;
-        setMissingProperties();
+        if (setMissing)
+            setMissingProperties();
     }
 
-    KeyItem::KeyItem (const int note)
+    KeyItem::KeyItem (const int note, const bool setMissing)
         : ObjectModel (Tags::key),
           nlayers (0)
     {
         objectData.setProperty (Slugs::note, note, nullptr);
-        setMissingProperties();
+        if (setMissing)
+            setMissingProperties();
     }
 
     KeyItem::KeyItem (const ValueTree& k)
@@ -55,6 +57,7 @@ namespace KSP1 {
         layerNode.setProperty (Slugs::file, file.getFullPathName(), nullptr);
         layerNode.setProperty (Slugs::name, file.getFileNameWithoutExtension(), nullptr);
         layerNode.setProperty (Slugs::note, getNote(), nullptr);
+
         LayerItem layer (layerNode);
         objectData.addChild (layerNode, layerIndex, nullptr);
 
@@ -152,7 +155,7 @@ namespace KSP1 {
         stabilizePropertyPOD (Slugs::id, rand.nextInt (Range<int> (1, std::numeric_limits<int>::max())));
         stabilizePropertyPOD (Slugs::note, (int) -1);
         stabilizePropertyPOD (Slugs::length, (int) 0);
-        stabilizePropertyPOD (Slugs::volume, (double) 1.0f);
+        stabilizePropertyPOD (Slugs::volume, (double) 0.0f);
         stabilizePropertyPOD (Tags::triggerMode, (int) TriggerMode::Retrigger);
         stabilizePropertyPOD (Tags::voiceGroup, (int) -1);
         stabilizePropertyPOD (Slugs::attack, (double) 0.05);

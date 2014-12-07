@@ -39,7 +39,7 @@ namespace KSP1 {
         ~SampleCache();
 
         LayerData* getLayerData (const URIs& uris, const lvtk::AtomObject& layer, bool realtime);
-        LayerData* getLayerData ();
+        LayerData* getLayerData (const bool createIfNeeded = false);
 
         /** Returns true if the cache can load a given file in one way
             or the other */

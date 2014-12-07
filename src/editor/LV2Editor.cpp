@@ -54,6 +54,42 @@ using std::placeholders::_2;
 using std::placeholders::_3;
 using std::placeholders::_4;
 
+
+class KeyboardGetter :  private Timer
+{
+public:
+    KeyboardGetter (SamplerInterface& i)
+        : iface(i), note (-1)
+    {
+        getKeyboard();
+    }
+
+    void getKeyboard()
+    {
+        if (isTimerRunning())
+            return;
+
+        note = 0;
+        startTimer (30);
+    }
+
+private:
+    SamplerInterface& iface;
+    int note;
+    void timerCallback()
+    {
+        if (isPositiveAndBelow (note, 128))
+            iface.getKeyForNote (note);
+
+        if (note < 0 || ++note == 128) {
+            stopTimer();
+            note = -1;
+        }
+    }
+
+};
+
+
 static Array<LV2Editor*> editors;
 
 class LV2EditorInit : public DeletedAtShutdown {
@@ -97,6 +133,8 @@ LV2Editor::LV2Editor (const char* plugin)
         runLoop = true;
 
     editors.add (this);
+
+    keyboard = new KeyboardGetter (*interface);
 }
 
 LV2Editor::~LV2Editor()
@@ -122,7 +160,6 @@ LV2Editor::~LV2Editor()
             ed->runLoop = false;
         editors.getFirst()->runLoop = true;
     }
-
 }
 
 int LV2Editor::idle()
@@ -136,10 +173,12 @@ int LV2Editor::idle()
 
 void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void const* buffer)
 {
-
-
     if (port == Port::AtomOutput && format == uris->atom_eventTransfer)
     {
+        if (const char* uri = this->unmap (90)) {
+            DBG (uri);
+        }
+
         interface->setFrozen (true);
         const lvtk::Atom atom (buffer);
 
@@ -154,7 +193,7 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
             const Atom body, request, sequenceNumber;
             lv2_atom_object_get (object, uris->patch_body, &body,
                                          uris->patch_request, &request,
-                                         uris->patch_sequenceNumber,
+                                         uris->patch_sequenceNumber, &sequenceNumber,
                                  0);
             DBG ("Got a patch_Response from the plugin");
         }
@@ -172,7 +211,7 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
         }
 
         else if (atom.has_object_type (uris->ksp1_SamplerSynth)) {
-
+            interface->getInstrument()->clear();
         }
 
         else if (atom.type() == 100100)

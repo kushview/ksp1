@@ -33,6 +33,11 @@ PortWriterInterface::~PortWriterInterface()
 {
 }
 
+void PortWriterInterface::getKeyForNote (const int note)
+{
+    writer.getKey (note, 0);
+}
+
 void PortWriterInterface::handleMidi (const MidiMessage &midi) {
     if (frozen)
         return;

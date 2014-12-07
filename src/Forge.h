@@ -60,9 +60,9 @@ namespace KSP1 {
         ForgeRef write_patch_get (const LV2_Atom* subject, uint32_t id = 0, uint32_t context = 0)
         {
             ForgeFrame frame;
-            ForgeRef atom (write_blank (frame, id, uris.patch_Get));
+            ForgeRef atom (write_object (frame, id, uris.patch_Get));
 
-            write_property_head (uris.patch_subject, context);
+            write_key (uris.patch_subject);
             write_primitive (subject);
             pop_frame (frame);
 

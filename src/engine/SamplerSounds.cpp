@@ -24,9 +24,9 @@
 
 namespace KSP1 {
 
-    static int32 lastSoundId = 0;
+    static int32 lastSoundIdSeed = 0;
     SamplerSound::SamplerSound (int keyid, int soundID)
-        : id ((soundID != 0) ? soundID : generateObjectID (++lastSoundId))
+        : id ((soundID != 0) ? soundID : generateObjectID (++lastSoundIdSeed))
     {
         duration.set (0);
         zerostruct (key);
@@ -36,7 +36,8 @@ namespace KSP1 {
         key.length  = 0;
         key.muted   = false;
         key.reverse = false;
-        key.gain    = 1.0f;
+        key.gain    = 1.0;
+        key.pitch   = 0.0;
         key.voiceGroup = -1;
         key.volume  = Decibels::gainToDecibels (key.gain);
         key.triggerMode = TriggerMode::Retrigger;
@@ -58,8 +59,12 @@ namespace KSP1 {
             key.triggerMode = set.value.as_int();
         } else if (uris.slugs_length == prop) {
             key.length = set.value.as_int();
-        } else if (uris.slugs_note) {
-
+        } else if (prop == uris.slugs_note) {
+            key.note = set.value.as_int();
+        } else if (prop == uris.slugs_pitch) {
+            key.pitch = set.value.as_double();
+        } else if (prop == uris.slugs_volume) {
+            setVolume (set.value.as_double());
         }
     }
 
@@ -97,6 +102,7 @@ namespace KSP1 {
 
         dataLock.lock();
         activeLayers.add (data);
+        data->parent = static_cast<uint32> (id);
         data->note = key.note;
         data->index = activeLayers.size() - 1;
         dataLock.unlock();
@@ -105,15 +111,13 @@ namespace KSP1 {
         return true;
     }
 
-    bool
-    SamplerSound::appliesToNote (const int note)
+    bool SamplerSound::appliesToNote (const int note)
     {
         const bool res = note >= key.note && note <= (key.note + key.length);
         return res;
     }
 
-    bool
-    SamplerSound::appliesToChannel (const int chan)
+    bool SamplerSound::appliesToChannel (const int chan)
     {
         if (chan <= 0 || chan > 16) {
             return true;
@@ -215,6 +219,7 @@ namespace KSP1 {
         key.gain = Decibels::decibelsToGain (key.volume);
         key.length = (int) json.getProperty (Slugs::length, key.length);
         key.note = (int) json.getProperty (Slugs::note, key.note);
+        key.pitch = (double) json.getProperty (Slugs::pitch, key.pitch);
         key.voiceGroup = (int) json.getProperty (Tags::voiceGroup, -1);
         key.triggerMode = (int) json.getProperty (Tags::triggerMode, (int) TriggerMode::Retrigger);
     }
@@ -238,12 +243,15 @@ namespace KSP1 {
         const URIs& uris (forge.uris);
         ForgeFrame frame;
 
-        ForgeRef ref = forge.write_object (frame, (uint32_t) id, uris.ksp1_SamplerSound);
+        ForgeRef ref = forge.write_object (frame, static_cast<uint32_t> (id), uris.ksp1_SamplerSound);
         forge.write_key (uris.slugs_note); forge.write_int (key.note);
         forge.write_key (uris.slugs_length); forge.write_int (key.length);
-        forge.write_key (uris.slugs_volume); forge.write_int (key.volume);
-
+        forge.write_key (uris.slugs_volume); forge.write_double (key.volume);
+        forge.write_key (uris.slugs_pitch); forge.write_double (key.pitch);
+        forge.write_key (uris.slugs_triggerMode); forge.write_int (static_cast<int> (key.triggerMode));
+        forge.write_key (uris.slugs_voiceGroup); forge.write_int (key.voiceGroup);
         forge.pop_frame (frame);
+
         return ref;
     }
 }

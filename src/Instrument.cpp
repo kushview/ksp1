@@ -155,7 +155,8 @@ namespace KSP1 {
         for (int i = 0; i < root.getNumChildren(); ++i)
         {
             ValueTree child (root.getChild(i));
-            if (child.hasType (Tags::key)) {
+            if (child.hasType (Tags::key))
+            {
                 KeyItem key (child);
                 key.setMissingProperties();
             }
@@ -164,6 +165,20 @@ namespace KSP1 {
 
     void Instrument::updateKeyItem (const URIs& uris, const lvtk::AtomObject &object)
     {
+        if (object.id() != 0)
+        {
+            KeyItem key (objectData.getChildWithProperty (Slugs::id, static_cast<int> (object.id())));
+            if (key.isNotValid()) {
+                key = KeyItem (false);
+                objectData.addChild (key.node(), 0, nullptr);
+            }
+
+            if (key.isValid())
+                key.setAtomObject (uris, object);
+
+            return;
+        }
+
         const lvtk::Atom note;
         lv2_atom_object_get (object, uris.slugs_note, &note, 0);
         if (note)
@@ -179,6 +194,53 @@ namespace KSP1 {
 
     void Instrument::updateLayerItem (const URIs& uris, const lvtk::AtomObject &object)
     {
+        const int layerId = static_cast<int> (object.id());
+        const lvtk::Atom parent;
+        lv2_atom_object_get (object, uris.slugs_parent, &parent, 0);
+
+        if (layerId != 0 && ! parent)
+        {
+            for (int i = 0; i < objectData.getNumChildren(); ++i)
+            {
+                ValueTree keyData = objectData.getChild (i);
+                ValueTree layerData = keyData.getChildWithProperty(Slugs::id, layerId);
+                if (layerData.hasType (Tags::layer))
+                {
+                    LayerItem layer (layerData);
+                    layer.setAtomObject (uris, object);
+                }
+            }
+
+            return;
+        }
+        else if (layerId != 0 && parent)
+        {
+            KeyItem key (objectData.getChildWithProperty (Slugs::id, parent.as_int()));
+            if (key.isValid())
+            {
+                ValueTree layerData = key.node().getChildWithProperty (Slugs::id, layerId);
+                if (! layerData.isValid())
+                {
+
+                    layerData = ValueTree (Tags::layer);
+                    layerData.setProperty (Slugs::id, layerId, nullptr);
+                    key.node().addChild (layerData, 0, nullptr);
+                    LayerItem layer (layerData);
+                    layer.setAtomObject (uris, object);
+                }
+                else
+                {
+                    LayerItem layer (layerData);
+                    layer.setAtomObject (uris, object);
+                }
+            }
+
+            return;
+        }
+
+        jassertfalse; //TODO: the following is old code, left for reference
+
+#if 0
         const lvtk::Atom index, note;
         lv2_atom_object_get (object, uris.slugs_index, &index,
                                      uris.slugs_note, &note, 0);
@@ -192,6 +254,7 @@ namespace KSP1 {
         {
             DBG ("can't update layer item");
         }
+#endif
     }
 
     KeyItem Instrument::getKey (int32 noteNumber, bool setMissing) const

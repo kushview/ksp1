@@ -150,15 +150,36 @@ void LV2Plugin::run (uint32_t nframes)
     lastGain = sampler->getMasterGain();
 }
 
-void LV2Plugin::handle_patch_get (const PatchGet &obj)
-{
 
-}
 
 WorkerStatus LV2Plugin::end_run()
 {
     forge->pop (notifyFrame);
     return WORKER_SUCCESS;
+}
+
+void LV2Plugin::handle_patch_get (const PatchGet &obj)
+{
+    if (! obj.subject) {
+        DBG ("patch get with null subject");
+        return;
+    }
+
+    if (obj.subject.has_object_type (uris->ksp1_Key))
+    {
+        if (SamplerSound* sound = sampler->getSound (*uris, obj.subject.as_object()))
+        {
+            forge->frame_time (0);
+            sound->writeAtomObject (*forge);
+            for (LayerData* layer : *sound) {
+                forge->frame_time (0);
+                layer->writeAtomObject (*forge);
+            }
+        }
+    }
+    else if (obj.subject.type() == uris->atom_URID) {
+
+    }
 }
 
 void LV2Plugin::do_patch_set_root_level (const PatchSet& set) {

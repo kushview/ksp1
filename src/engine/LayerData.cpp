@@ -52,6 +52,7 @@ namespace KSP1 {
 
     void LayerData::setAtomObject (const URIs& uris, const lvtk::AtomObject& object, bool realtime)
     {
+        jassert (id == static_cast<int> (object.id()));
         for (const auto& p : object)
             setProperty (uris, p.key, lvtk::Atom(&p.value), realtime);
     }
@@ -117,7 +118,7 @@ namespace KSP1 {
             index = value.as_int();
         }
         else if (prop == uris.slugs_parent) {
-            parent = value.as_urid();
+            parent = static_cast<uint32> (value.as_int());
         }
         else {
             DBG ("unhandled property urid: " << (int)prop);
@@ -159,6 +160,7 @@ namespace KSP1 {
     void LayerData::reset()
     {
         note = index = -1;
+        parent = 0;
         if (renderBuffer.set (nullptr))
            scratch.reset();
     }
@@ -210,6 +212,7 @@ namespace KSP1 {
         const URIs& uris (forge.uris);
         ForgeFrame frame;
         ForgeRef ref (forge.write_object (frame, (uint32) id, forge.uris.ksp1_LayerData));
+        forge.write_key (uris.slugs_parent); forge.write_int (static_cast<int> (parent));
         forge.write_key (uris.slugs_index); forge.write_int (index);
         forge.write_key (uris.slugs_note); forge.write_int (note);
         forge.write_key (uris.slugs_volume); forge.write_double (Decibels::gainToDecibels ((double) gain.get()));
@@ -218,6 +221,14 @@ namespace KSP1 {
         forge.write_key (uris.slugs_start); forge.write_double ((double) in.get() / sampleRate);
         forge.write_key (uris.slugs_length); forge.write_double ((double)(out.get() - in.get()) / sampleRate);
         forge.write_key (uris.slugs_offset); forge.write_double (in.get());
+
+        if (currentFile != File::nonexistent) {
+            // not sure if doing this is realtime-safe
+            forge.write_key (uris.slugs_file);
+            lv2_atom_forge_path (&forge, currentFile.getFullPathName().toRawUTF8(),
+                                         currentFile.getFullPathName().length());
+        }
+
         forge.pop_frame (frame);
         return ref;
     }
@@ -236,6 +247,7 @@ namespace KSP1 {
         object->setProperty (Slugs::start, (double) in.get() / sampleRate);
         object->setProperty (Slugs::length, (double)(out.get() - in.get()) / sampleRate);
         object->setProperty (Slugs::file, currentFile.getFullPathName());
+        object->setProperty (Slugs::name, currentFile.getFileNameWithoutExtension());
         return object;
     }
 

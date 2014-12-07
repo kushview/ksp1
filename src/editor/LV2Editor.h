@@ -34,6 +34,7 @@ namespace KSP1 {
 class PortWriterInterface;
 namespace Gui {
 
+class KeyboardGetter;
 class SamplerView;
 
 class LV2Editor;
@@ -62,7 +63,7 @@ private:
 
     ScopedPointer<Forge> forge;
     ScopedPointer<KSP1::URIs>  uris;
-
+    ScopedPointer<KeyboardGetter> keyboard;
     Element::Style style;
     ScopedPointer<PortWriter> writer;
     ScopedPointer<SamplerView> view;

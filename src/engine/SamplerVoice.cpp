@@ -159,7 +159,7 @@ return;
     adsr.processBuffer (numSamples, adsrGain);
    #endif
 
-    const float keyPitch = sound->getPitchOffsetForNote (this->note);
+    const float keyPitch = static_cast<float> (key.pitch) + sound->getPitchOffsetForNote (this->note);
 
     uint32 renderFrame = 0;
     while (--numSamples >= 0)
@@ -199,8 +199,8 @@ return;
              float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha)
                                         : l;
 
-             l *= layer->gain.get();
-             r *= layer->gain.get();
+             l *= (key.gain * layer->gain.get());
+             r *= (key.gain * layer->gain.get());
 
             #if KSP1_USE_PANNING
              const float pr = std::sqrt (layer->panning.get());

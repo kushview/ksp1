@@ -73,8 +73,8 @@ namespace KSP1 {
                     const var layers = sound.getProperty ("layers", var::null);
                     for (int li = 0; li < layers.size(); ++li) {
                         const var layer (layers [li]);
-                        LayerData* ld = createLayerData (*ssound);
-                        ld->restoreFromJSON (layer);
+                        if (LayerData* ld = createLayerData (*ssound))
+                            ld->restoreFromJSON (layer);
                     }
 
                     ssound->setDefaultLength();
@@ -172,7 +172,7 @@ namespace KSP1 {
 
     LayerData* SamplerSynth::DataLoader::createLayerData (SamplerSound &sound)
     {
-        if (LayerData* source = cache.getLayerData())
+        if (LayerData* source = cache.getLayerData (true))
         {
             layers.add (source);
             source->note = sound.getRootNote();
@@ -214,7 +214,8 @@ namespace KSP1 {
 
     SamplerSynth* SamplerSynth::create (SampleCache& c)
     {
-        try {
+        try
+        {
             SamplerSynth* synth = new SamplerSynth (c);
             sCacheUsers.add (synth);
             return synth;
@@ -231,27 +232,10 @@ namespace KSP1 {
         return SamplerSynth::create (*sSampleCache);
     }
 
-    void SamplerSynth::dumpSounds()
-    {
-        for (int i = 0; i < getNumSounds(); ++i)
-        {
-            SamplerSound* s = dynamic_cast<SamplerSound*> (Synthesiser::getSound (i));
-            if (! s)
-                continue;
-
-            DBG ("NOTE: " << s->getRootNote());
-
-            for (LayerData* l : *s) {
-                DBG ("  Layer: gain: " << l->gain.get());
-            }
-
-        }
-    }
-
     bool SamplerSynth::insertLayerData (uint32 soundId, LayerData *data)
     {
         jassert (data);
-        if (SamplerSound* sound = getSoundByObjectId (soundId))
+        if (SamplerSound* sound = getSoundForObjectId (soundId))
         {
             if (sound->insertLayerData (data))
             {
@@ -359,18 +343,26 @@ namespace KSP1 {
         }
     }
 
-    SamplerSound* SamplerSynth::getSound (const URIs& uris, const lvtk::AtomObject& key) {
-
-        if (SamplerSound* s = getSoundByObjectId (key.id()))
+    SamplerSound* SamplerSynth::getSound (const URIs& uris, const lvtk::AtomObject& key)
+    {
+        if (SamplerSound* s = getSoundForObjectId (key.id()))
             return s;
 
-        jassertfalse;
-
         const lvtk::Atom note;
-        if (0 == lv2_atom_object_get (key, uris.slugs_note, &note, 0))
+        lv2_atom_object_get (key, uris.slugs_note, &note, 0);
+        if (! note) {
             return nullptr;
+        }
 
-        return getSound (note.as_int(), false);
+        const int noteNumber = note.as_int();
+        for (int i = getNumSounds(); --i >= 0;)
+        {
+            SynthesiserSound* s = Synthesiser::getSound (i);
+            if (s->appliesToNote (noteNumber))
+                return dynamic_cast<SamplerSound*> (s);
+        }
+
+        return nullptr;
     }
 
     void SamplerSynth::recycleLayerData (LayerData* data)
@@ -389,9 +381,9 @@ namespace KSP1 {
         return true;
     }
 
-    SamplerSound* SamplerSynth::getSoundByObjectId (uint32_t oid) const
+    SamplerSound* SamplerSynth::getSoundForObjectId (uint32_t oid) const
     {
-        return soundMap [static_cast<int> (oid)];
+        return (oid != 0) ? soundMap [static_cast<int> (oid)] : nullptr;
     }
 
     void SamplerSynth::noteOn (const int channel, const int note, const float velocity)
@@ -428,7 +420,7 @@ namespace KSP1 {
 
     SamplerSound* SamplerSynth::moveSound (uint32_t oid, int newNote)
     {
-        if (SamplerSound* sound = getSoundByObjectId (oid))
+        if (SamplerSound* sound = getSoundForObjectId (oid))
         {
             sound->setRootNote (newNote);
             return sound;
@@ -443,14 +435,14 @@ namespace KSP1 {
         return nullptr;
     }
 
-    LayerData* SamplerSynth::getLayerDataByObjectId (uint32_t oid) const
+    LayerData* SamplerSynth::getLayerDataForObjectId (uint32_t oid) const
     {
-        return layerMap [static_cast<int> (oid)];
+        return (oid != 0) ? layerMap [static_cast<int> (oid)] : nullptr;
     }
 
     LayerData* SamplerSynth::getLayerData (const URIs& uris, const lvtk::AtomObject& obj)
     {
-        if (LayerData* layer = layerMap [static_cast<int> (obj.id())])
+        if (LayerData* layer = getLayerDataForObjectId (obj.id()))
             return layer;
 
         const lvtk::Atom index, parent;
@@ -460,7 +452,7 @@ namespace KSP1 {
         0);
 
         if (parent && index) {
-            if (SamplerSound* sound = getSoundByObjectId (parent.as_urid()))
+            if (SamplerSound* sound = getSoundForObjectId (parent.as_urid()))
                 if (LayerData* layer = sound->getLayer (index.as_int()))
                     return layer;
         }
@@ -484,9 +476,11 @@ namespace KSP1 {
         var sound;
         SoundIterator iter (soundMap);
         while (iter.next())
+        {
             if (SamplerSound* s = iter.getValue())
                 if (DynamicObject::Ptr d = s->createDynamicObject())
                     sound.append (d.get());
+        }
 
         if (sound.size() > 0)
             synth->setProperty ("sounds", sound);

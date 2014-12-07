@@ -402,14 +402,17 @@ void SamplerView::paint (Graphics& g)
 
 void SamplerView::resized()
 {
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     layerKeyButton->setBounds (188, getHeight() - 179, 18, 18);
     articulationGroup->setBounds ((getWidth() / 2) + -43, getHeight() - 198, 201, 78);
     volLabel->setBounds (getWidth() - 113, getHeight() - 129, 71, 16);
     layerVolume->setBounds (207, getHeight() - 178, 56, 56);
-    voiceGroup->setBounds (((getWidth() / 2) + -43) + 103, (getHeight() - 198) + (78) - 24, 85, 13);
+    voiceGroup->setBounds (((getWidth() / 2) + -43) + 103, (getHeight() - 198) + 78 - 24, 85, 13);
     layersLabel->setBounds (4, getHeight() - 152, 172, 24);
     layersListBox->setBounds (4, getHeight() - 132, 172, 128);
-    triggerMode->setBounds (((getWidth() / 2) + -43) + 103, (getHeight() - 198) + (78) - 43, 85, 13);
+    triggerMode->setBounds (((getWidth() / 2) + -43) + 103, (getHeight() - 198) + 78 - 43, 85, 13);
     meter->setBounds (getWidth() - 28, getHeight() - 183, 20, 177);
     dbScale->setBounds (getWidth() - 29, getHeight() - 4 - 179, 21, 179);
     volume->setBounds (getWidth() - 112, getHeight() - 177, 61, 58);
@@ -430,7 +433,7 @@ void SamplerView::resized()
     fx1Label4->setBounds (getWidth() - 159, getHeight() - 141, 31, 18);
     keyboard->setBounds (187, getHeight() - 4 - 101, getWidth() - 223, 101);
     display->setBounds (186, 27, getWidth() - 188, getHeight() - 212);
-    keyLength->setBounds (((getWidth() / 2) + -43) + (201) / 2 + -84, (getHeight() - 198) + (78) - 25, 80, 13);
+    keyLength->setBounds (((getWidth() / 2) + -43) + 201 / 2 + -84, (getHeight() - 198) + 78 - 25, 80, 13);
     propsButton->setBounds (getWidth() - 55, 4, 49, 18);
     editButton->setBounds (getWidth() - 107, 4, 49, 18);
     //[UserResized] Add your own custom resize handling here..
@@ -604,8 +607,12 @@ void SamplerView::onKeyboardMidi (const MidiMessage& midi)
 void SamplerView::onKeySelected (int k)
 {
     display->selectNote (k, true);
-    layersListBox->setKeyItem (display->selectedKey());
+    const KeyItem item (display->selectedKey());
+    layersListBox->setKeyItem (item);
     updateControls (dontSendNotification);
+    if (interface) {
+        interface->getKeyForNote (k);
+    }
 }
 
 void

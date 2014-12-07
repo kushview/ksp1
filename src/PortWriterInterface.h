@@ -33,7 +33,9 @@ public:
     ~PortWriterInterface();
 
     void setFrozen (const bool freeze) { frozen = freeze; }
-    void handleMidi (const MidiMessage &midi);
+    void handleMidi (const MidiMessage &midi) override;
+
+    void getKeyForNote (const int note) override;
 
 protected:
     bool addKey (const KeyItem&) override;

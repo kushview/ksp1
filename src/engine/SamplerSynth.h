@@ -85,15 +85,20 @@ namespace KSP1 {
         /** Set the current operating MIDI channel */
         void setMidiChannel (int chan);
 
+        /** Insert some LayerData for a given SamplerSound::id */
         bool insertLayerData (uint32 soundId, LayerData* data);
+
+        /** Insert a SamplerSound for processing */
+        bool insertSound (SamplerSound* sound);
+
+        /** Load a sampler from a file */
         bool loadFile (const File& file);
+
+        /** Load the sampler from XML create with ValueTree::toXmlString() */
         bool loadValueTreeXml (const XmlElement& xml);
 
-
-
+        /** Returns the SampleCache used by this SamplerSynth */
         SampleCache& getSampleCache() const { return cache; }
-
-        void dumpSounds();
 
         float getMasterGain() const { return masterGain.get(); }
 
@@ -110,14 +115,20 @@ namespace KSP1 {
 
         void recycleLayerData (LayerData* data);
 
-        bool insertSound (SamplerSound* sound);
-
+        /** Change/move a sound to a new root note number */
         SamplerSound* moveSound (uint32_t objectId, int newNote);
-        SamplerSound* getSoundByObjectId (uint32_t oid) const;
-        LayerData* getLayerDataByObjectId (uint32_t oid) const;
 
+        /** Find a sound by object id */
+        SamplerSound* getSoundForObjectId (uint32_t oid) const;
+
+        /** Find layer data by object id */
+        LayerData* getLayerDataForObjectId (uint32_t oid) const;
+
+        /** Creates a var object representation that is suitable to use
+            as JSON serializing and parsing */
         bool getNestedVariant (var& output);
 
+        /** Triggers a note-on event */
         void noteOn (const int midiChannel, const int midiNoteNumber, const float velocity) override;
 
     protected:
@@ -129,6 +140,7 @@ namespace KSP1 {
             @param createIt create the sound if it doesn't exists
          */
         SamplerSound* getSound (int note, bool createIt = true);
+
         friend class DataLoader;
 
     private:

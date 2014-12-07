@@ -25,6 +25,7 @@
 #include "KSP1.h"
 #include "Forge.h"
 #include "Ports.h"
+#include "Instrument.h"
 
 namespace KSP1 {
 
@@ -173,12 +174,14 @@ namespace KSP1 {
         inline void
         getKey (int keyid, uint32_t context)
         {
-            if (keyid >= 0)
-            {
-                ++keyid;
-            //    patchGet (sampler_Key, (uint32_t) keyid, context);
-                getLayers (keyid, context);
-            }
+            if (! isPositiveAndBelow (keyid, 128))
+                return;
+
+            prepareForge();
+            const KeyItem tempKey (keyid, false);
+            const lvtk::Atom subject (tempKey.writeAtomSubject (forge));
+            const lvtk::Atom get (forge.write_patch_get (subject.cobj(), 0, 0));
+            writeAtom  (Port::AtomInput, get);
         }
 
     private:

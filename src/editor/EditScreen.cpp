@@ -33,7 +33,7 @@ public:
 
     void timelineBodyClicked (const MouseEvent& ev, int track)
     {
-        DBG ("body clicked");
+
     }
 
     int getNumTracks() const override
@@ -88,6 +88,12 @@ public:
 
     }
 
+    void clipClicked (TimelineClip *clip, const MouseEvent& /*ev*/) override
+    {
+        clip->setSelected (! clip->isSelected());
+        clip->repaint();
+    }
+
 private:
     InstrumentPtr instrument;
     ComponentDragger dragger;
@@ -139,8 +145,15 @@ private:
             String n1 (MidiMessage::getMidiNoteName (key.getNote(), true, true, 3));
             String n2 (MidiMessage::getMidiNoteName (key.getNote() + (int) key.getProperty(Slugs::length), true, true, 3));
 
-            g.setColour (Colours::white);
+            if (isSelected())
+                g.setColour (Colours::teal);
+            else
+                g.setColour (Colours::white);
+
             g.fillAll();
+
+            g.setColour (Colours::black);
+            g.drawRect(0, 0, getWidth(), getHeight(), 1);
 
             g.setColour (Colours::black);
             g.drawText (n1, 0, 0, letterSpace, getHeight(), Justification::centred);

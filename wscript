@@ -217,6 +217,7 @@ def build (bld):
                'ALSA', 'FREETYPE2', 'GL', 'EGL', 'GLESV2', 'XCB'],
         cxxflags = ['-DKSP1_STANDALONE=1'],
         linkflags = ['-lpthread'],
+        install_path = plugin_dir,
         env = plugin_environ
     )
 

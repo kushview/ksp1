@@ -21,6 +21,9 @@
 
 namespace KSP1 {
 
+
+void SamplerInterface::getKeyForNote (const int note) { }
+
 void SamplerInterface::setInstrument (InstrumentPtr i)
 {
     instrument = i;

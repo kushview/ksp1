@@ -260,6 +260,9 @@ void SamplerDisplay::paint (Graphics& g)
 
 void SamplerDisplay::resized()
 {
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     comboBox->setBounds (6, 4, 48, 16);
     title->setBounds (57, -1, 223, 24);
     noteLabel->setBounds (getWidth() - 6 - 59, 0, 59, 24);

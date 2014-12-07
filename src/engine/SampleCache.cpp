@@ -174,22 +174,32 @@ namespace KSP1 {
         return nullptr;
     }
 
-    LayerData* SampleCache::getLayerData()
+    LayerData* SampleCache::getLayerData (const bool createIfNeeded)
     {
         for (LayerData* l : layers) {
             if (l && l->note < 0 && l->index < 0)
                 return l;
         }
 
-        return layers.add (new LayerData (*this, 0));
+        return (createIfNeeded) ? layers.add (new LayerData (*this, 0)) : nullptr;
     }
 
     LayerData* SampleCache::getLayerData (const URIs& uris, const lvtk::AtomObject& layer, bool realtime)
     {
-        LayerData* data = getLayerData(); //findLayerData (layer.id());
+        const int layerId = static_cast<int> (layer.id());
+        LayerData* data = nullptr; //getLayerData(); //findLayerData (layer.id());
+
+        if (! data) {
+            for (LayerData* l : layers) {
+                if (l && l->id == layerId) {
+                    data = l;
+                    break;
+                }
+            }
+        }
 
         if (! data && ! realtime) {
-            data = layers.add (new LayerData (*this, static_cast<int> (layer.id())));
+            data = layers.add (new LayerData (*this, layerId));
         }
 
         if (data) {

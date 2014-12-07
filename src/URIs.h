@@ -88,6 +88,7 @@ namespace KSP1 {
               ksp1_Layer          (map (KSP1__Layer)),
               ksp1_LayerData      (map (KSP1__LayerData)),
               ksp1_SamplerSound   (map (NS_KSP1 "SamplerSound")),
+              ksp1_SqlQuery       (map (NS_KSP1 "SqlQuery")),
               ksp1_SamplerSynth   (map (KSP1__SamplerSynth)),
               slugs_file          (map (KSP1_SLUGS__file)),
               jobs_Disposable     (map (KSP1_JOBS__Disposable)),
@@ -95,6 +96,7 @@ namespace KSP1 {
               jobs_installObject  (map (KSP1_JOBS__installObject)),
               jobs_disposeObject  (map (KSP1_JOBS__disposeObject)),
               jobs_finalizeJob    (map (KSP1_JOBS__finalizeJob)),
+
               slugs_volume        (map (KSP1_SLUGS__volume)),
               slugs_key           (map (KSP1_SLUGS__key)),
               slugs_start         (map (KSP1_SLUGS__start)),
@@ -115,6 +117,7 @@ namespace KSP1 {
               slugs_offset          (map (KSP1_SLUGS__offset)),
               slugs_name            (map (KSP1_SLUGS__name)),
               slugs_parent          (map (NS_SLUGS "parent")),
+              slugs_sql             (map (NS_SLUGS "sql")),
               midi_MidiEvent        (map (LV2_MIDI__MidiEvent)),
               patch_add             (map (LV2_PATCH__add)),
               patch_body            (map (LV2_PATCH__body)),
@@ -145,6 +148,7 @@ namespace KSP1 {
         const uint32_t ksp1_LayerData;
         const uint32_t ksp1_SamplerSound;
         const uint32_t ksp1_SamplerSynth;
+        const uint32_t ksp1_SqlQuery;
 
         const uint32_t jobs_Disposable;
         const uint32_t jobs_ObjectRef;
@@ -174,6 +178,7 @@ namespace KSP1 {
         const uint32_t slugs_resonance;
         const uint32_t slugs_offset;
         const uint32_t slugs_name;
+        const uint32_t slugs_sql;
 
         const uint32_t midi_MidiEvent;
 

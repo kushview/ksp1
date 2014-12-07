@@ -95,9 +95,14 @@ namespace Gui {
             Array<PropertyComponent*> props;
             ValueTree n = key.node();
 
+#if JUCE_DEBUG
+            props.add (new TextPropertyComponent (n.getPropertyAsValue (Slugs::id, nullptr), "Object ID", 64, false));
+            props.getLast()->setEnabled (false);
+#endif
             props.add (new MidiNoteSliderPropertyComponent (n.getPropertyAsValue (Slugs::note, nullptr), "Root Note"));
             props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::length, nullptr), "Key Span (semitones)", 0, 127, 1));
             props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::volume, nullptr), "Volume (dB)", -70, 12, 0.001));
+            props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::pitch, nullptr), "Pitch (semitones)", -12, 12, 0.01));
             props.add (new SliderPropertyComponent (n.getPropertyAsValue (Tags::voiceGroup, nullptr), "Voice Group", -1, 7, 1));
             for (int i = 0; i < TriggerMode::numModes; ++i)
             {
@@ -108,6 +113,7 @@ namespace Gui {
             props.add (new ChoicePropertyComponent (n.getPropertyAsValue (Tags::triggerMode, nullptr),
                                                     "Trigger Mode", choices, values));
 
+#if KSP1_ARTICULATION
             n = n.getChildWithName (Tags::articulation);
 
             choices.clearQuick(); values.clearQuick();
@@ -116,16 +122,35 @@ namespace Gui {
             choices.add ("Roll"); values.add ("roll");
             props.add (new ChoicePropertyComponent (n.getPropertyAsValue (Slugs::type, nullptr),
                                                   "Stroke Type", choices, values));
-
-            n = key.node();
-            getPanel().addSection ("Pad Properties", props);
-
+#endif
+            getPanel().addSection ("Sound Properties", props);
             props.clearQuick();
-            n = key.getLayer(0).node();
-            props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::volume, nullptr), "Volume (dB)", -40, 24, 0.01));
-            props.add (new SliderPropertyComponent (n.getPropertyAsValue (Tags::panning, nullptr), "Panning (0 hard left, 1 hard right)", 0.0, 1.0, 0.01));
-            props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::pitch, nullptr), "Pitch (semitones)", -12, 12, 0.01));
-            getPanel().addSection ("Layer Properties", props);
+
+            const int nlayers = key.countLayers();
+            for (int i = 0; i < nlayers; ++i)
+            {
+                n = key.getLayer(i).node();
+                if (! n.isValid())
+                    continue;
+
+               #if JUCE_DEBUG
+                props.add (new TextPropertyComponent (n.getPropertyAsValue (Slugs::id, nullptr), "Object ID", 64, false));
+                props.getLast()->setEnabled (false);
+               #endif
+                if (n.hasProperty(Slugs::file)) {
+                    props.add (new TextPropertyComponent (n.getPropertyAsValue (Slugs::file, nullptr), "File", 256, false));
+                    props.getLast()->setEnabled (false); // don't allow changing file (yet)
+                                                         // to do this we need a custom PropertyComponent
+                                                         // that contains a filechooser box
+                }
+                props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::volume, nullptr), "Volume (dB)", -40, 24, 0.01));
+                props.add (new SliderPropertyComponent (n.getPropertyAsValue (Tags::panning, nullptr), "Panning (0 hard left, 1 hard right)", 0.0, 1.0, 0.01));
+                props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::pitch, nullptr), "Pitch (semitones)", -12, 12, 0.01));
+
+                String labelText ("Layer "); labelText << i << " Properties";
+                getPanel().addSection (labelText, props);
+                props.clearQuick();
+            }
         }
     };
 
@@ -134,7 +159,7 @@ namespace Gui {
 KitScreen::KitScreen (SamplerDisplay& d)
     : Screen (d, "Kit / Instrument", Screen::kitScreen)
 {
-    addPage ("Pad", new KeyPropertyPage ());
+    addPage ("All", new KeyPropertyPage ());
 }
 
 KitScreen::~KitScreen() { }

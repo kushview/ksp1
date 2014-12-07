@@ -43,6 +43,8 @@ namespace KSP1 {
         virtual void handleMidi (const MidiMessage&) { }
         virtual void loadFile (const File&) { }
 
+        virtual void getKeyForNote (const int note);
+
     protected:
         SamplerInterface()
             : state (ValueTree::invalid)
