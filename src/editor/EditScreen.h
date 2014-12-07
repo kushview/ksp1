@@ -48,7 +48,7 @@ public:
     void paint (Graphics& g);
     void resized();
     void buttonClicked (Button* buttonThatWasClicked);
-
+    Screen::ID type() const { return Screen::editScreen; }
 
 private:
     OwnedArray<AudioThumbnail>   peaks;

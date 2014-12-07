@@ -21,6 +21,7 @@
 
 //[Headers]
 #include "editor/Screens.h"
+#include "editor/ScreenManager.h"
 #include "InstrumentLoader.h"
 #include "Locations.h"
 //[/Headers]
@@ -209,6 +210,8 @@ SamplerDisplay::SamplerDisplay ()
 
 
     //[UserPreSize]
+    screens = new ScreenManager();
+    currentScreen = nullptr;
     models = new Models();
     models->setInstrument (0, new Instrument ("New Instrument"));
     //[/UserPreSize]
@@ -219,12 +222,10 @@ SamplerDisplay::SamplerDisplay ()
     //[Constructor]
     progressBar->setVisible (false);
     title->addMouseListener (this, false);
-    screen = (Component*) Screen::create (*this, Screen::patternScreen);
-    addAndMakeVisible (screen);
     currentLayer = 0;
     setNote (24);
     startTimer (1500);
-    //dispatch = new SamplerDisplay::Dispatch (*this);
+    setScreen (Screen::editScreen);
     //[/Constructor]
 }
 
@@ -269,6 +270,8 @@ void SamplerDisplay::resized()
     screen->setBounds (0, 24, getWidth() - 0, getHeight() - 24);
     progressBar->setBounds ((getWidth() / 2) + -183, (getHeight() / 2) + -22, 368, 41);
     //[UserResized] Add your own custom resize handling here..
+    if (currentScreen)
+        currentScreen->setBounds (0, 24, getWidth() - 0, getHeight() - 24);
     //[/UserResized]
 }
 
@@ -367,8 +370,8 @@ void
 SamplerDisplay::selectNote (int32 note, bool notify)
 {
     KeyItem item = getInstrument()->getKey (note);
-    if (Screen* s = dynamic_cast<Screen*> (screen.get()))
-        if (notify) s->keySelectedEvent (item);
+    if (currentScreen && notify)
+        currentScreen->keySelectedEvent (item);
 
     setNote (note);
 }
@@ -396,9 +399,13 @@ SamplerDisplay::setNote (int32 n)
 void
 SamplerDisplay::setScreen (Screen::ID s)
 {
-    removeChildComponent (screen);
-    this->screen = (Component*) Screen::create (*this, s);
-    addAndMakeVisible (screen);
+    if (currentScreen)
+        removeChildComponent (currentScreen);
+    this->currentScreen = screens->getScreen (*this, (int) s);
+    if (currentScreen)
+    {
+        addAndMakeVisible (currentScreen);
+    }
     resized();
 }
 

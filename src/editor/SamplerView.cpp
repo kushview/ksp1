@@ -300,13 +300,21 @@ SamplerView::SamplerView ()
     addAndMakeVisible (propsButton = new TextButton ("propsButton"));
     propsButton->setButtonText (TRANS("PROPS"));
     propsButton->addListener (this);
+    propsButton->setColour (TextButton::buttonColourId, Colour (0xfffffed9));
+    propsButton->setColour (TextButton::buttonOnColourId, Colour (0xfffce828));
+    propsButton->setColour (TextButton::textColourOnId, Colours::white);
+    propsButton->setColour (TextButton::textColourOffId, Colours::black);
 
     addAndMakeVisible (editButton = new TextButton ("editButton"));
     editButton->setButtonText (TRANS("EDIT"));
     editButton->addListener (this);
+    editButton->setColour (TextButton::buttonColourId, Colour (0xffffe9bb));
+    editButton->setColour (TextButton::buttonOnColourId, Colour (0xffff9433));
+    editButton->setColour (TextButton::textColourOnId, Colours::white);
 
 
     //[UserPreSize]
+
     display->connectUpdateClient (*this);
     keyboard->signalMidi().connect (boost::bind (&SamplerView::onKeyboardMidi, this, ::_1));
     keyboard->signalKeySelected().connect (boost::bind (&SamplerView::onKeySelected, this, ::_1));
@@ -460,15 +468,25 @@ void SamplerView::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == propsButton)
     {
         //[UserButtonCode_propsButton] -- add your button handler code here..
-        display->setScreen (Screen::kitScreen);
-        display->selectNote (display->selectedNote(), true);
+        if (! propsButton->getToggleState())
+        {
+            propsButton->setToggleState (true, dontSendNotification);
+            editButton->setToggleState (false, dontSendNotification);
+            display->setScreen (Screen::kitScreen);
+            display->selectNote (display->selectedNote(), true);
+        }
         //[/UserButtonCode_propsButton]
     }
     else if (buttonThatWasClicked == editButton)
     {
         //[UserButtonCode_editButton] -- add your button handler code here..
-        display->setScreen (Screen::editScreen);
-        display->selectNote (display->selectedNote(), true);
+        if (! editButton->getToggleState())
+        {
+            propsButton->setToggleState (false, dontSendNotification);
+            editButton->setToggleState (true, dontSendNotification);
+            display->setScreen (Screen::editScreen);
+            display->selectNote (display->selectedNote(), true);
+        }
         //[/UserButtonCode_editButton]
     }
 
@@ -922,11 +940,13 @@ BEGIN_JUCER_METADATA
           min="0" max="127" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"/>
   <TEXTBUTTON name="propsButton" id="3e804b5eb108fcd1" memberName="propsButton"
-              virtualName="" explicitFocusOrder="0" pos="55R 4 49 18" buttonText="PROPS"
+              virtualName="" explicitFocusOrder="0" pos="55R 4 49 18" bgColOff="fffffed9"
+              bgColOn="fffce828" textCol="ffffffff" textColOn="ff000000" buttonText="PROPS"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="editButton" id="8f50f14524c81d76" memberName="editButton"
-              virtualName="" explicitFocusOrder="0" pos="107R 4 49 18" buttonText="EDIT"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="107R 4 49 18" bgColOff="ffffe9bb"
+              bgColOn="ffff9433" textCol="ffffffff" buttonText="EDIT" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

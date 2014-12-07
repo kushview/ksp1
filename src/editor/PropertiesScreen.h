@@ -31,7 +31,7 @@ namespace Gui {
         KitScreen (SamplerDisplay& d);
         ~KitScreen();
         void keySelectedEvent (const KeyItem& key);
-
+        Screen::ID type() const { return Screen::kitScreen; }
     };
 
 }}

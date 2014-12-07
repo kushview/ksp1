@@ -33,6 +33,7 @@
 namespace KSP1 {
     class SamplerInterface;
 namespace Gui {
+    class ScreenManager;
     class DisplayProgressBar;
 }}
 
@@ -113,6 +114,8 @@ private:
     friend class Models;
     ScopedPointer<Models> models;
 
+    ScopedPointer<ScreenManager> screens;
+    Screen* currentScreen;
     friend class ContentComponent;
     //[/UserVariables]
 

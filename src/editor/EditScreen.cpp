@@ -212,6 +212,8 @@ public:
         i.sortKeys();
 
         removeClips();
+        DBG (this->getPixelOffset ());
+
         if (key && key->isValid()) {
             for (int i = key->countLayers(); --i >= 0;)
                 addTimelineClip (new LayerClip (*this, key->getLayer(i)));

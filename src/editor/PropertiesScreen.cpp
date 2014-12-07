@@ -95,10 +95,10 @@ namespace Gui {
             Array<PropertyComponent*> props;
             ValueTree n = key.node();
 
-#if JUCE_DEBUG
+           #if JUCE_DEBUG
             props.add (new TextPropertyComponent (n.getPropertyAsValue (Slugs::id, nullptr), "Object ID", 64, false));
             props.getLast()->setEnabled (false);
-#endif
+           #endif
             props.add (new MidiNoteSliderPropertyComponent (n.getPropertyAsValue (Slugs::note, nullptr), "Root Note"));
             props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::length, nullptr), "Key Span (semitones)", 0, 127, 1));
             props.add (new SliderPropertyComponent (n.getPropertyAsValue (Slugs::volume, nullptr), "Volume (dB)", -70, 12, 0.001));

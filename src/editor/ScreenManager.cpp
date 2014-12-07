@@ -1,5 +1,5 @@
 /*
-    MutableAtom.h - This file is part of KSP1
+    ScreenManager.cpp - This file is part of KSP1
     Copyright (C) 2014  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -16,21 +16,31 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef KSP1_MUTABLE_ATOM_H
-#define KSP1_MUTABLE_ATOM_H
 
-#include <stdint.h>
-#include "../../libs/lvtk/lvtk/ext/atom.hpp"
+#include "editor/Screens.h"
+#include "editor/ScreenManager.h"
 
 namespace KSP1 {
+namespace Gui {
 
-    class MutableAtom {
-    public:
+    ScreenManager::ScreenManager() { }
+    ScreenManager::~ScreenManager() { }
 
-    private:
-       intptr_t ptr;
-    };
+    void ScreenManager::clear()
+    {
+        screens.clearQuick (true);
+    }
 
-}
+    Screen* ScreenManager::getScreen (SamplerDisplay& d, const int screenType)
+    {
+        for (Screen* screen : screens)
+            if (screenType == (int) screen->type())
+                return screen;
 
-#endif // KSP1_MUTABLE_ATOM_H
+        if (screenType < Screen::numScreens)
+            return screens.add (Screen::create (d, (Screen::ID) screenType));
+
+        return nullptr;
+    }
+
+}}
