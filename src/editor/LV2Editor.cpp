@@ -212,6 +212,8 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
 
         else if (atom.has_object_type (uris->ksp1_SamplerSynth)) {
             interface->getInstrument()->clear();
+            view->stabilizeView();
+            this->keyboard->getKeyboard();
         }
 
         else if (atom.type() == 100100)

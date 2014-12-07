@@ -42,7 +42,8 @@ static Array<LV2Plugin*> sPlugins;
 
 LV2Plugin::LV2Plugin (double _sampleRate)
     : LV2PluginType (2),
-      sampleRate (_sampleRate), lastGain (1.0f)
+      sampleRate (_sampleRate), lastGain (1.0f),
+      wasRestored (0)
 {
     sampler = SamplerSynth::create();
     retainer = SamplerSynth::create();
@@ -98,9 +99,22 @@ void LV2Plugin::deactivate()
 
 void LV2Plugin::run (uint32_t nframes)
 {
+
     const lvtk::AtomSequence seq (p<LV2_Atom_Sequence*> (Port::AtomInput));
     forge->set_buffer ((uint8_t*)notifyPort, notifyPort->atom.size);
     forge->sequence_head (notifyFrame, 0);
+
+    if (wasRestored.get() != 0)
+    {
+        if (wasRestored.set (0))
+        {
+            forge->frame_time(0);
+            ForgeFrame frame;
+            forge->write_object (frame, 1, uris->ksp1_SamplerSynth);
+            forge->write_key (uris->slugs_index); forge->write_int (1);
+            forge->pop_frame (frame);
+        }
+    }
 
     MidiBuffer buf;
     AudioSampleBuffer audio (audioOuts, 2, nframes);
@@ -435,6 +449,7 @@ StateStatus LV2Plugin::restore (StateRetrieve &retrieve, uint32_t flags, const F
         DBG (JSON::toString(json));
     }
 
+    while (! wasRestored.set (1)) { }
     return STATE_SUCCESS;
 }
 

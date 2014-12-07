@@ -170,7 +170,7 @@ namespace KSP1 {
             KeyItem key (objectData.getChildWithProperty (Slugs::id, static_cast<int> (object.id())));
             if (key.isNotValid()) {
                 key = KeyItem (false);
-                objectData.addChild (key.node(), 0, nullptr);
+                objectData.addChild (key.node(), -1, nullptr);
             }
 
             if (key.isValid())
@@ -179,6 +179,7 @@ namespace KSP1 {
             return;
         }
 
+        jassertfalse; // this is old code
         const lvtk::Atom note;
         lv2_atom_object_get (object, uris.slugs_note, &note, 0);
         if (note)
