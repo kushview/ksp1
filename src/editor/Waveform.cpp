@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "editor/AudioPeak.h"
+#include "editor/AudioPeaks.h"
 #include "editor/Waveform.h"
 #include "InstrumentLoader.h"
 

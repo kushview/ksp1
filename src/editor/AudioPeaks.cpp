@@ -1,5 +1,5 @@
 /*
-    AudioPeak.h - This file is part of KSP1
+    AudioPeaks.cpp - This file is part of KSP1
     Copyright (C) 2014  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,33 +17,17 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_AUDIO_PEAK_H
-#define KSP1_AUDIO_PEAK_H
-
-#include "KSP1.h"
+#include "editor/AudioPeaks.h"
 
 namespace KSP1 {
 namespace Gui {
 
-class AudioPeakFactory {
-public:
-    AudioPeakFactory() { }
-    ~AudioPeakFactory() { }
-};
-
-class AudioPeak :  public AudioThumbnail,
-                   public ReferenceCountedObject
+AudioPeakFactory::AudioPeakFactory()
+    : AudioThumbnailCache (32)
 {
-public:
+    formats.registerBasicFormats();
+}
 
-    AudioPeak (AudioFormatManager& m, AudioThumbnailCache& c)
-        : AudioThumbnail (128, m, c)
-    { }
+AudioPeakFactory::~AudioPeakFactory() { }
 
-};
-
-typedef ReferenceCountedObjectPtr<AudioPeak> AudioPeakPtr;
-
-}} /* namespace KSP1::Gui */
-
-#endif // KSP1_AUDIO_PEAK_H
+}}

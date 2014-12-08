@@ -19,6 +19,7 @@
 
 #include <functional>
 
+#include "editor/AudioPeaks.h"
 #include "LV2Editor.h"
 #include "PortWriterInterface.h"
 #include "PortWriter.h"
@@ -112,6 +113,8 @@ LV2Editor::LV2Editor (const char* plugin)
     if (! editor_init)
         editor_init = new LV2EditorInit ();
 
+    peaks = new AudioPeakFactory();
+
     // setup the forge and URIs objects
     URIs::MapFunc map = std::bind (&LV2Editor::map, this, _1);
     uris  = new URIs (map);
@@ -149,6 +152,8 @@ LV2Editor::~LV2Editor()
         interface = nullptr;
     }
 
+    peaks = nullptr;
+
     if (editors.size() == 0)
     {
         shutdownJuce_GUI();
@@ -175,10 +180,6 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
 {
     if (port == Port::AtomOutput && format == uris->atom_eventTransfer)
     {
-        if (const char* uri = this->unmap (90)) {
-            DBG (uri);
-        }
-
         interface->setFrozen (true);
         const lvtk::Atom atom (buffer);
 

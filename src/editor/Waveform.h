@@ -21,7 +21,7 @@
 #define KSP1_WAVEFORM_H
 
 #include "KSP1.h"
-#include "AudioPeak.h"
+#include "AudioPeaks.h"
 
 namespace KSP1 {
 namespace Gui {

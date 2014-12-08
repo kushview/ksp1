@@ -35,6 +35,7 @@ class PortWriterInterface;
 namespace Gui {
 
 class KeyboardGetter;
+class AudioPeakFactory;
 class SamplerView;
 
 class LV2Editor;
@@ -61,6 +62,7 @@ private:
     intptr_t xwin, xwin_parent;
     bool runLoop;
 
+    ScopedPointer<AudioPeakFactory> peaks;
     ScopedPointer<Forge> forge;
     ScopedPointer<KSP1::URIs>  uris;
     ScopedPointer<KeyboardGetter> keyboard;

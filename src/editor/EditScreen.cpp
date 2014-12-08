@@ -233,15 +233,26 @@ public:
         g.drawText (txt, area, Justification::centred);
     }
 
+    AudioPeakFactory& getPeaks() { return peaks; }
+
 private:
+    AudioPeakFactory peaks;
     ScopedPointer<KeyItem> key;
     class LayerClip : public Element::TimelineClip
     {
     public:
-        LayerClip (Element::TimelineBase& tl, const LayerItem& item)
+        LayerClip (LayersTimeline& tl, const LayerItem& item)
             : Element::TimelineClip (tl),
               layer (item)
         {
+            const File file (item.fileString());
+            DBG (item.fileString());
+            if (file.existsAsFile())
+            {
+                peak = new AudioPeak (tl.getPeaks());
+                if (peak->setSource (new FileInputSource (file)))
+                    DBG ("Loaded Peak");
+            }
         }
 
         virtual bool moveable() const { return true; }
@@ -260,7 +271,7 @@ private:
 
         virtual void setClipRange (const ClipRange<double>& loc) {
             layer.setStartTime (loc.getStart());
-            layer.setEndTime (loc.getEnd());
+            layer.setEndTime (loc.getEnd());            
             layer.node().setProperty (Slugs::offset, (double) loc.getOffset(), 0);
         }
 
@@ -271,6 +282,18 @@ private:
         {
             g.setColour (Colours::white);
             g.fillAll();
+
+            if (peak)
+            {
+                ClipRange<double> range;
+                getClipRange (range);
+                g.setColour (Colours::red);
+
+                DBG ("offset: " << range.getOffset());
+
+                peak->drawChannels (g, getBounds().reduced (1, 1), range.getOffset(),
+                                    range.getOffset() + range.getLength(), 1.0);
+            }
 
             g.setColour (Colours::black);
             String txt ("Pos: ");
@@ -298,6 +321,9 @@ private:
         {
             return trackIndex();
         }
+
+    private:
+        AudioPeakPtr peak;
     };
 
 };
