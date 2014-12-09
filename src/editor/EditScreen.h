@@ -32,7 +32,6 @@ namespace Gui {
 
 class LayersTimeline;
 class SoundsTimeline;
-class WaveTrimmer;
 
 class EditScreen  : public Screen,
                     public Timer,
@@ -59,7 +58,6 @@ private:
     class Updater;
     friend class Updater;
     ScopedPointer<Updater> updater;
-    ScopedPointer<WaveTrimmer> wave;
     ScopedPointer<LayersTimeline> timeline;
     ScopedPointer<SoundsTimeline> sounds;
 

@@ -14,11 +14,13 @@
 namespace KSP1 {
 namespace Gui {
 
-class SoundsTimeline : public Element::TimelineBase {
+
+class SoundsTimeline : public TimelineComponent
+{
 public:
 
     SoundsTimeline()
-        : Element::TimelineBase()
+        : TimelineComponent()
     {
         setTrackWidth (64);
         const_cast<TimeScale&> (timeScale()).setPixelsPerBeat (32);
@@ -28,7 +30,7 @@ public:
     ~SoundsTimeline() { }
 
     void mouseDown (const MouseEvent& ev) {
-        TimelineBase::mouseDown (ev);
+        TimelineComponent::mouseDown (ev);
     }
 
     void timelineBodyClicked (const MouseEvent& ev, int track)
@@ -101,8 +103,8 @@ private:
     class KeyItemClip : public Element::TimelineClip
     {
     public:
-        KeyItemClip (Element::TimelineBase& tl, const KeyItem& item)
-            : Element::TimelineClip (tl),
+        KeyItemClip (SoundsTimeline& timeline, const KeyItem& item)
+            : Element::TimelineClip (timeline),
               key (item)
         {
         }
@@ -157,7 +159,8 @@ private:
 
             g.setColour (Colours::black);
             g.drawText (n1, 0, 0, letterSpace, getHeight(), Justification::centred);
-            if ((int) key.getProperty(Slugs::length) > 0) {
+            if ((int) key.getProperty (Slugs::length) > 0)
+            {
                 g.drawText (n2, getWidth() - (letterSpace + 1), 0,
                             letterSpace, getHeight(), Justification::centred);
             }
@@ -184,11 +187,12 @@ private:
     };
 };
 
-class LayersTimeline : public Element::TimelineBase {
+
+class LayersTimeline : public TimelineComponent {
 public:
 
     LayersTimeline()
-        : Element::TimelineBase(),
+        : Element::TimelineComponent(),
           key (nullptr)
     {
         //setTrackHeightsOffset (120, false);
@@ -246,12 +250,10 @@ private:
               layer (item)
         {
             const File file (item.fileString());
-            DBG (item.fileString());
             if (file.existsAsFile())
             {
                 peak = new AudioPeak (tl.getPeaks());
-                if (peak->setSource (new FileInputSource (file)))
-                    DBG ("Loaded Peak");
+                peak->setSource (new FileInputSource (file));
             }
         }
 
@@ -283,16 +285,25 @@ private:
             g.setColour (Colours::white);
             g.fillAll();
 
+            //g.setColour (Colours::lightgrey);
+            //g.drawLine (0, getHeight() / 2, getWidth(), getHeight() / 2, 1.0);
+
             if (peak)
             {
-                ClipRange<double> range;
-                getClipRange (range);
+                ClipRange<double> range; getClipRange (range);
+                double start = range.getOffset();
+                double end = range.getOffset() + range.getLength();
+                Rectangle<int> r (getLocalBounds());
+
+                if (start < 0.0)
+                {
+                    r.setX (timeline().timeToWidth (std::fabs (start)));
+                    r.setWidth (r.getWidth() - r.getX());
+                    start = 0.0;
+                }
+
                 g.setColour (Colours::red);
-
-                DBG ("offset: " << range.getOffset());
-
-                peak->drawChannels (g, getBounds().reduced (1, 1), range.getOffset(),
-                                    range.getOffset() + range.getLength(), 1.0);
+                peak->drawChannels (g, r, start, end, 0.95f);
             }
 
             g.setColour (Colours::black);
@@ -300,7 +311,7 @@ private:
             txt << roundDoubleToInt (layer.offset() * timeline().timeScale().getSampleRate())
                 << " -" << roundDoubleToInt (layer.start() * timeline().timeScale().getSampleRate())
                 << " - " << roundDoubleToInt (layer.end() * timeline().timeScale().getSampleRate());
-            g.drawText (txt, 0, 0, getWidth(), getHeight(), Justification::centred);
+            g.drawText (txt, 1, 1, getWidth(), getHeight(), Justification::topLeft);
         }
 
         LayerItem layer;
@@ -327,6 +338,7 @@ private:
     };
 
 };
+
 
 class EditScreen::Updater : public Timer
 {
@@ -367,192 +379,6 @@ private:
 
 };
 
-class WaveTrimmer :  public Component
-    {
-    public:
-
-        WaveTrimmer()
-        {
-            addAndMakeVisible (&wave);
-            addAndMakeVisible (inpoint  = new Indicator (*this, "in-point"));
-            addAndMakeVisible (outpoint = new Indicator (*this, "out-point"));
-        }
-
-        virtual ~WaveTrimmer()
-        {
-            removeChildComponent (&wave);
-        }
-
-        void clear()
-        {
-            currentLayer = LayerItem();
-            wave.setAudioPeak (nullptr);
-            wave.repaint();
-        }
-
-        virtual void paint (Graphics &g)
-        {
-            g.fillAll (Colours::black);
-        }
-
-        virtual void resized()
-        {
-            Rectangle<int> r (getLocalBounds());
-            //wave.setBounds (r.removeFromBottom (getHeight() - 18));
-            wave.setBounds (r.reduced (2));
-
-        }
-
-        void setLayer (const LayerItem& next)
-        {
-#if 0
-            //FIXME:
-            currentLayer = next;
-            if (! currentLayer.isEmpty())
-            {
-                AudioPeakPtr peak (data.createPeak (File (currentLayer.fileString())));
-                wave.setAudioPeak (peak);
-                resized();
-            }
-            else
-            {
-                clear();
-                resized();
-            }
-
-            inpoint->parentSizeChanged();
-            outpoint->parentSizeChanged();
-            wave.repaint();
-#endif
-        }
-
-        LayerItem& layer() { return currentLayer; }
-
-    private:
-
-        Waveform wave;
-        LayerItem currentLayer;
-
-
-        class Indicator : public Component
-        {
-        public:
-            Indicator (WaveTrimmer& parent, const String& layerProp)
-                : wave (parent.wave), trimmer (parent), property (layerProp)
-            {
-                color = Colours::blue;
-                setSize (3, wave.getHeight());
-                setMouseCursor (MouseCursor::LeftRightResizeCursor);
-                pos = 0;
-            }
-
-            virtual ~Indicator() { }
-
-            void setColour (const Colour& c) { color = c; }
-
-            void paint (Graphics& g)
-            {
-                g.setColour (Colours::black);
-                g.setOpacity (0.30);
-                g.drawVerticalLine (0, 0, getHeight());
-                g.drawVerticalLine (2, 0, getHeight());
-
-                g.setColour (color);
-                g.setOpacity (0.98);
-                g.drawVerticalLine (1, 0, getHeight());
-            }
-
-
-            void mouseDown (const MouseEvent& ev)
-            {
-                dragger.startDraggingComponent (this, ev);
-            }
-
-            void mouseDrag (const MouseEvent& ev)
-            {
-                dragger.dragComponent (this, ev, nullptr);
-
-                Range<double> trim;
-                trimmer.layer().getRange (trim);
-
-                if (property == Identifier ("in-point"))
-                {
-                    trim.setStart (getTime());
-                }
-                else if (property == Identifier ("out-point"))
-                {
-                    trim.setEnd (getTime());
-                }
-
-                trimmer.layer().setRange (trim);
-                setBounds (timeToX (getTime()), 2, 3, wave.getHeight());
-            }
-
-            void parentSizeChanged()
-            {
-                if (trimmer.layer().isValid())
-                {
-                    Range<double> trim;
-                    trimmer.layer().getRange (trim);
-                    double theTime = (property == Identifier ("in-point"))
-                                       ? trim.getStart() : trim.getEnd();
-                    setBounds (timeToX (theTime), 2, 3, wave.getHeight());
-                }
-            }
-
-            double getPosition() const { return pos; }
-
-        private:
-
-            Waveform&        wave;
-            WaveTrimmer&     trimmer;
-            Identifier       property;
-            ComponentBoundsConstrainer constrain;
-            ComponentDragger dragger;
-            Colour           color;
-            LayerItem        layer;
-            float            pixelOffset;
-
-            double pos;
-
-            double getTime() const
-            {
-                return xToTime (getBoundsInParent().getX() + 1);
-            }
-
-            double timeToX (const double time) const
-            {
-#if 0
-                //FIXME;
-                if (! wave.audioPeak() || ! trimmer.layer().isValid())
-                    return 0.0f;
-
-                double startTime = 0.0f;
-                double endTime   = wave.audioPeak()->getTotalLength();
-                return (wave.getWidth() * ((time - startTime) / (endTime - startTime)));
-#endif
-                return 0.0;
-            }
-
-            double xToTime (const float x) const
-            {
-#if 0
-                if (! wave.audioPeak())
-                    return 0.0f;
-
-                double startTime = 0.0f;
-                double endTime   = wave.audioPeak()->getTotalLength();
-                return (x / (float)wave.getWidth()) * (endTime - startTime) + startTime;
-#endif
-                return 0.0;
-            }
-
-        };
-
-        ScopedPointer<Indicator> inpoint, outpoint;
-        friend class Indicator;
-
-    };
 
 EditScreen::EditScreen (SamplerDisplay& owner)
     : Screen (owner, "Test Screen", Screen::editScreen)
