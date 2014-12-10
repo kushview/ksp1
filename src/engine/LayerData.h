@@ -51,8 +51,21 @@ namespace KSP1 {
         /** Returns the audio file this data was loaded from if any */
         const File& getAudioFile() const { return currentFile; }
 
+        /** Get the frame offset */
+        const int64& getOffset() const { return offset; }
+
+        /** Get the length frames */
+        const int64& getLength() const { return length; }
+
+        /** Get the start frame in the parent */
+        const int64& getStart() const { return start; }
+
         /** Get the parent SamplerSound's ID for this LayerData */
         const uint32& getParent() const { return parent; }
+
+        /** Get the SamplerSound this layer belongs to.  Returns
+            nullptr if it isn't a part of a sound */
+        SamplerSound* getSound() const { return sound; }
 
         /** Load an audio file into memory and set the render buffer */
         bool loadAudioFile (const File& audioFile);
@@ -90,6 +103,7 @@ namespace KSP1 {
         AtomicDouble resonance;
         AtomicFrame  in, out;
         Range<double> velocityRange;
+        int64 start, offset, length;
 
         /** Set the type (URID) of this Layer (unused) */
         void setType (const LV2_URID t) { type = t; }
@@ -106,11 +120,12 @@ namespace KSP1 {
         uint32          numChannels;
         double          sampleRate;
 
-        const int32  id;
-        uint32       parent;
-        int          index;
-        int          note;
-        File         currentFile;
+        const int32   id;
+        uint32        parent;
+        SamplerSound* sound;
+        int           index;
+        int           note;
+        File          currentFile;
 
         Shared<AudioSampleBuffer> scratch;
         Element::AtomicValue<AudioSampleBuffer*> renderBuffer;

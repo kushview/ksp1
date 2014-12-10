@@ -28,8 +28,11 @@ namespace KSP1 {
     static int32 lastLayerSalt = 0;
 
     LayerData::LayerData (SampleCache& cache, int layerId)
-        : cache (cache), id ((layerId != 0) ? layerId : KSP1::generateObjectID (++lastLayerSalt))
+        : cache (cache),
+          id ((layerId != 0) ? layerId : KSP1::generateObjectID (++lastLayerSalt))
     {
+        sound = nullptr;
+        start = length = offset = 0;
         index = -1;
         note = -1;
         type = 0;
@@ -40,7 +43,7 @@ namespace KSP1 {
         out.set (0);
         gain.set (1.0f);
         filter = new LowPassFilter ();
-        sampleRate = 0.0f;
+        sampleRate = 0.0;
         numChannels = 0;
         lengthInSamples = 0;
     }
@@ -83,12 +86,14 @@ namespace KSP1 {
         }
         else if (prop == uris.slugs_start)
         {
-            in.set (sampleRate * value.as_double());
-            out.set (in.get() + out.get());
+            start = (sampleRate * value.as_double());
         }
         else if (prop == uris.slugs_length)
         {
-            out.set (in.get() + (sampleRate * value.as_double()));
+            length = (sampleRate * value.as_double());
+        }
+        else if (prop == uris.slugs_offset) {
+            offset = (sampleRate * value.as_double());
         }
         else if (prop == uris.slugs_pitch)
         {
@@ -108,9 +113,7 @@ namespace KSP1 {
         else if (prop == uris.slugs_resonance) {
 
         }
-        else if (prop == uris.slugs_offset) {
 
-        }
         else if (prop == uris.slugs_name) {
 
         }
@@ -121,7 +124,7 @@ namespace KSP1 {
             parent = static_cast<uint32> (value.as_int());
         }
         else {
-            DBG ("unhandled property urid: " << (int)prop);
+            //DBG ("unhandled property urid: " << (int)prop);
         }
     }
 
@@ -159,6 +162,7 @@ namespace KSP1 {
 
     void LayerData::reset()
     {
+        sound = nullptr;
         note = index = -1;
         parent = 0;
         if (renderBuffer.set (nullptr))
@@ -179,8 +183,9 @@ namespace KSP1 {
             loadAudioFile (file);
         }
 
-        in.set (sampleRate * (double) json.getProperty (Slugs::start, 0));
-        out.set (in.get() + (sampleRate * (double) json.getProperty (Slugs::length, 0)));
+        start  = (sampleRate * (double) json.getProperty (Slugs::start, 0));
+        offset = (sampleRate * (double) json.getProperty (Slugs::offset, 0));
+        length = (sampleRate * (double) json.getProperty (Slugs::length, 0));
     }
 
     void LayerData::restoreFromXml (const XmlElement& e)
@@ -211,18 +216,19 @@ namespace KSP1 {
     {
         const URIs& uris (forge.uris);
         ForgeFrame frame;
-        ForgeRef ref (forge.write_object (frame, (uint32) id, forge.uris.ksp1_LayerData));
-        forge.write_key (uris.slugs_parent); forge.write_int (static_cast<int> (parent));
-        forge.write_key (uris.slugs_index); forge.write_int (index);
-        forge.write_key (uris.slugs_note); forge.write_int (note);
-        forge.write_key (uris.slugs_volume); forge.write_double (Decibels::gainToDecibels ((double) gain.get()));
-        forge.write_key (uris.slugs_pitch); forge.write_double (pitch.get());
-        forge.write_key (uris.slugs_panning); forge.write_double (panning.get());
-        forge.write_key (uris.slugs_start); forge.write_double ((double) in.get() / sampleRate);
-        forge.write_key (uris.slugs_length); forge.write_double ((double)(out.get() - in.get()) / sampleRate);
-        forge.write_key (uris.slugs_offset); forge.write_double (in.get());
+        ForgeRef ref (forge.write_object (frame, static_cast<uint32> (id), forge.uris.ksp1_LayerData));
+        forge.write_key (uris.slugs_parent);   forge.write_int (static_cast<int> (parent));
+        forge.write_key (uris.slugs_index);    forge.write_int (index);
+        forge.write_key (uris.slugs_note);     forge.write_int (note);
+        forge.write_key (uris.slugs_volume);   forge.write_double (Decibels::gainToDecibels ((double) gain.get()));
+        forge.write_key (uris.slugs_pitch);    forge.write_double (pitch.get());
+        forge.write_key (uris.slugs_panning);  forge.write_double (panning.get());
+        forge.write_key (uris.slugs_start);    forge.write_double (static_cast<double> (start) / sampleRate);
+        forge.write_key (uris.slugs_length);   forge.write_double (static_cast<double> (length) / sampleRate);
+        forge.write_key (uris.slugs_offset);   forge.write_double (static_cast<double> (offset) / sampleRate);
 
-        if (currentFile != File::nonexistent) {
+        if (currentFile != File::nonexistent)
+        {
             // not sure if doing this is realtime-safe
             forge.write_key (uris.slugs_file);
             lv2_atom_forge_path (&forge, currentFile.getFullPathName().toRawUTF8(),
@@ -272,6 +278,10 @@ namespace KSP1 {
                     lengthInSamples = reader->lengthInSamples;
                 if (numChannels != reader->numChannels)
                     numChannels = reader->numChannels;
+
+                if (length <= 0) {
+                    length = lengthInSamples;
+                }
             }
         }
 

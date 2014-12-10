@@ -51,11 +51,12 @@ namespace KSP1 {
         bool appliesToNote (const int note);
         bool appliesToChannel (const int chan);
 
-        const KeyInfo& getKey() const { return key; }
+        const KeyInfo& getKeyInfo() const { return key; }
         int getRootNote() const;
         void setRootNote (int n);
 
-        int32 numLayers() const { return activeLayers.size(); }
+        int32 getNumLayers() const { return activeLayers.size(); }
+        const int64& getStart() const { return start.get(); }
 
         LayerData* getLayer (int32 index) const { return activeLayers.getUnchecked (index); }
         LayerData** begin() const { return activeLayers.begin(); }
@@ -85,7 +86,7 @@ namespace KSP1 {
             if (nframes > longest || nframes <= 0)
                 nframes = longest;
 
-            while (! duration.set (nframes));
+            duration.set (nframes);
         }
 
         void setProperty (const URIs& uris, const PatchSet& set);
@@ -93,9 +94,7 @@ namespace KSP1 {
         void restoreFromJSON (const var& json);
 
         /** Set the sounds default length. This is the longest of all layers */
-        inline void setDefaultLength() {
-            setLength (0);
-        }
+        void setDefaultLength();
 
         /** Get the total length of this sound.  This is thread/realtime safe */
         int64 length() const { return duration.get(); }

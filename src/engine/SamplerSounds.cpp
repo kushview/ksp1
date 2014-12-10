@@ -103,6 +103,7 @@ namespace KSP1 {
         dataLock.lock();
         activeLayers.add (data);
         data->parent = static_cast<uint32> (id);
+        data->sound = this;
         data->note = key.note;
         data->index = activeLayers.size() - 1;
         dataLock.unlock();
@@ -110,6 +111,33 @@ namespace KSP1 {
         setDefaultLength();
         return true;
     }
+
+    void SamplerSound::setDefaultLength()
+    {
+       start.set (0);
+       int64 end = 0;
+
+       for (int i = 0; i < activeLayers.size(); ++i)
+       {
+           if (i == 0)
+           {
+               start.set (activeLayers.getUnchecked(i)->getStart());
+               end = activeLayers.getUnchecked(i)->getStart() + activeLayers.getUnchecked(i)->getLength();
+           }
+           else
+           {
+               if (activeLayers.getUnchecked(i)->getStart() < start.get())
+                   start.set (activeLayers.getUnchecked(i)->getStart());
+
+               if ((activeLayers.getUnchecked(i)->getStart() + activeLayers.getUnchecked(i)->getLength()) > end)
+                   end = activeLayers.getUnchecked(i)->getStart() + activeLayers.getUnchecked(i)->getLength();
+           }
+       }
+
+       jassert (end > start.get());
+
+       duration.set (end - start.get());
+   }
 
     bool SamplerSound::appliesToNote (const int note)
     {
@@ -136,8 +164,7 @@ namespace KSP1 {
 
     int SamplerSound::getRootNote() const { return key.note; }
 
-    int64
-    SamplerSound::longestLayerFrames() const
+    int64 SamplerSound::longestLayerFrames() const
     {
         int64 longest = 0;
 
@@ -149,8 +176,7 @@ namespace KSP1 {
         return longest;
     }
 
-    void
-    SamplerSound::removeLayer (LayerData* data)
+    void SamplerSound::removeLayer (LayerData* data)
     {
         dataLock.lock();
         activeLayers.removeFirstMatchingValue (data);
@@ -158,8 +184,7 @@ namespace KSP1 {
         dataLock.unlock();
     }
 
-    void
-    SamplerSound::setMidiChannel (int chan)
+    void SamplerSound::setMidiChannel (int chan)
     {
         if (chan >= 1 && chan <= 16)
         {
@@ -177,8 +202,7 @@ namespace KSP1 {
     }
 
 
-    void
-    SamplerSound::setAttack (double ratio)
+    void SamplerSound::setAttack (double ratio)
     {
         const float len = ratio * ((double) length() / 4.0f);
 

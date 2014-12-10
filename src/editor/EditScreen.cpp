@@ -209,6 +209,19 @@ public:
         return (key && key->isValid()) ? key->countLayers() : 0;
     }
 
+    void mouseWheelMove (const MouseEvent& ev, const MouseWheelDetails& md) override
+    {
+        TimeScale& ts = const_cast<TimeScale&> (timeScale());
+
+        if (md.deltaY > 0.0)
+            ts.setHorizontalZoom (ts.horizontalZoom() + 10);
+        else if (md.deltaY < 0.0 && ts.horizontalZoom() >= 10)
+            ts.setHorizontalZoom (ts.horizontalZoom() - 10);
+
+        ts.updateScale();
+        triggerAsyncUpdate();
+    }
+
     void setKey (const KeyItem& item)
     {
         key = new KeyItem (item);
@@ -271,10 +284,11 @@ private:
             }
         }
 
-        virtual void setClipRange (const ClipRange<double>& loc) {
-            layer.setStartTime (loc.getStart());
-            layer.setEndTime (loc.getEnd());            
-            layer.node().setProperty (Slugs::offset, (double) loc.getOffset(), 0);
+        virtual void setClipRange (const ClipRange<double>& loc)
+        {
+            layer.setProperty (Slugs::offset, loc.getOffset());
+            layer.setProperty (Slugs::start,  loc.getStart());
+            layer.setProperty (Slugs::length, loc.getLength());
         }
 
         virtual TimeUnit getTimeUnit() const { return TimeUnit::Seconds; }
@@ -303,14 +317,14 @@ private:
                 }
 
                 g.setColour (Colours::red);
-                peak->drawChannels (g, r, start, end, 0.95f);
+                peak->drawChannels (g, r, start, end, 0.90f);
             }
 
             g.setColour (Colours::black);
             String txt ("Pos: ");
             txt << roundDoubleToInt (layer.offset() * timeline().timeScale().getSampleRate())
-                << " -" << roundDoubleToInt (layer.start() * timeline().timeScale().getSampleRate())
-                << " - " << roundDoubleToInt (layer.end() * timeline().timeScale().getSampleRate());
+                << " : " << roundDoubleToInt (layer.start() * timeline().timeScale().getSampleRate())
+                << " : " << roundDoubleToInt (layer.end() * timeline().timeScale().getSampleRate());
             g.drawText (txt, 1, 1, getWidth(), getHeight(), Justification::topLeft);
         }
 

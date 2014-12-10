@@ -329,8 +329,8 @@ namespace KSP1 {
         KeyItem (const int note, const bool setMissing = true);
         KeyItem (const ValueTree& k);
 
-        bool isValid() const { return objectData.isValid(); }
-        bool isNotValid() const { return ! isValid(); }
+        bool isValid()      const { return objectData.isValid(); }
+        bool isNotValid()   const { return ! objectData.isValid(); }
 
         LayerItem addLayer (const File& file);
         LayerItem addLayer (const LayerItem& layer);

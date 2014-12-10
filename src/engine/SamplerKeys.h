@@ -21,6 +21,7 @@
 #define KSP1_SAMPLERKEYS_H
 
 #include "engine/ADSR.h"
+#include "engine/LayeringMode.h"
 #include "Types.h"
 
 namespace KSP1 {
@@ -87,22 +88,22 @@ namespace KSP1 {
         ID type;
     };
 
-
     struct KeyInfo
     {
-        int          note;         ///< Note number
-        int          length;       ///< Length as in 'Key Span'
-        TriggerMode  triggerMode;  ///< Trigger Mode
-        int          voiceGroup;   ///< Voice Group
-        bool         muted;        ///< Muted
-        double       volume;       ///< Volume (as in decibels)
-        double       gain;         ///< Gain as in SPL
-        double       fxGain [4];   ///< FX Gains
-        double       pitch;        ///< The overall pitch
-        double       randomPitch;  ///< Random Pitch Factor (unused)
-        bool         reverse;      ///< Play in reverse
-        bool         locked;       ///< Locked
-        ADSR         adsr;         ///< ADSR for the note
+        int          note;          ///< Note number
+        int          length;        ///< Length as in 'Key Span'
+        LayeringMode layeringMode;  ///< The layering mode
+        TriggerMode  triggerMode;   ///< Trigger Mode
+        int          voiceGroup;    ///< Voice Group
+        bool         muted;         ///< Muted
+        double       volume;        ///< Volume (as in decibels)
+        double       gain;          ///< Gain as in SPL
+        double       fxGain [4];    ///< FX Gains
+        double       pitch;         ///< The overall pitch
+        double       randomPitch;   ///< Random Pitch Factor (unused)
+        bool         reverse;       ///< Play in reverse
+        bool         locked;        ///< Locked
+        ADSR         adsr;          ///< ADSR for the note
     };
 }
 

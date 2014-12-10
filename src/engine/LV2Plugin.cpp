@@ -161,6 +161,10 @@ void LV2Plugin::run (uint32_t nframes)
 
     sampler->renderNextBlock (audio, buf, 0, static_cast<int> (nframes));
     audio.applyGainRamp (0, nframes, lastGain, sampler->getMasterGain());
+
+    //forge->frame_time (0);
+    //forge->write_float (audio.getMagnitude (0, static_cast<int> (nframes)));
+
     lastGain = sampler->getMasterGain();
 }
 
@@ -196,7 +200,7 @@ void LV2Plugin::handle_patch_get (const PatchGet &obj)
     }
 }
 
-void LV2Plugin::do_patch_set_root_level (const PatchSet& set) {
+void LV2Plugin::handle_patch_set_root_level (const PatchSet& set) {
    /* DBG ("set_root_level");
     DBG ("  " << unmap (set.property.as_urid())); */
 }
@@ -204,13 +208,24 @@ void LV2Plugin::do_patch_set_root_level (const PatchSet& set) {
 void LV2Plugin::handle_patch_set (const PatchSet& set)
 {
     if (! set.subject)
-        return do_patch_set_root_level (set);
+        return handle_patch_set_root_level (set);
 
-    if (set.subject.has_object_type (uris->ksp1_Layer)) {
-        if (LayerData* data = sampler->getLayerData (*uris, set.subject.as_object())) {
+    if (set.subject.has_object_type (uris->ksp1_Layer))
+    {
+        if (LayerData* data = sampler->getLayerData (*uris, set.subject.as_object()))
+        {
             data->setProperty (*uris, set);
-        } else {
-            DBG ("can't set layer property: " << unmap (set.property.as_urid()));
+            if (set.property.as_urid() == uris->slugs_length ||
+                set.property.as_urid() == uris->slugs_offset ||
+                set.property.as_urid() == uris->slugs_start)
+            {
+                if (SamplerSound* snd = data->getSound())
+                    snd->setDefaultLength();
+            }
+        }
+        else
+        {
+            //DBG ("can't set layer property: " << unmap (set.property.as_urid()));
         }
     }
     else if (set.subject.has_object_type (uris->ksp1_Key))
@@ -322,7 +337,6 @@ WorkerStatus LV2Plugin::work_response (uint32_t size, const void* body)
                 if (SamplerSynth* old = sampler.release())
                     jobs->dispose (old);
 
-                DBG ("LV2Plugin: installing new synth");
                 sampler = next;
                 sampler->setCurrentPlaybackSampleRate (sampleRate);
                 forge->frame_time (0);
@@ -389,14 +403,18 @@ StateStatus LV2Plugin::save (StateStore &store, uint32_t /*flags*/, const Featur
     {
         if (map_path && make_path)
         {
-            if (char* absolute = make_path->path (make_path->handle, "data.json")) {
-                if (char* abstract = map_path->abstract_path (map_path->handle, absolute)) {
+            if (char* absolute = make_path->path (make_path->handle, "data.json"))
+            {
+                if (char* abstract = map_path->abstract_path (map_path->handle, absolute))
+                {
                     const File file (String::fromUTF8 (absolute));
                     FileOutputStream fos (file);
                     JSON::writeToStream (fos, json);
                     store (uris->slugs_file, abstract, strlen (abstract) + 1, forge->Path, STATE_IS_POD);
+
                     std::free (abstract);
                 }
+
                 std::free (absolute);
             }
         }
@@ -445,8 +463,6 @@ StateStatus LV2Plugin::restore (StateRetrieve &retrieve, uint32_t flags, const F
     {
         const String jsonStr (String::fromUTF8 ((const char*) data));
         const var json = JSON::parse (jsonStr);
-
-        DBG (JSON::toString(json));
     }
 
     while (! wasRestored.set (1)) { }

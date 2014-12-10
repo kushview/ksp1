@@ -131,7 +131,7 @@ private:
     void handle_patch_set (const PatchSet& obj);
     void handle_patch (const Patch& patch);
 
-    void do_patch_set_root_level (const PatchSet& set);
+    void handle_patch_set_root_level (const PatchSet& set);
 
 };
 

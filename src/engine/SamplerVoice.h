@@ -76,6 +76,10 @@ namespace KSP1 {
        friend class SamplerSynth;
 
        ADSR adsr;
+
+
+
+       void _renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples);
     };
 
 
