@@ -79,7 +79,7 @@ public:
     void onKeySelected (int k);
     void buttonStateChanged (Button*);
     void stabilizeView();
-
+    void setMainRMS (const float rmsL, const float rmsR);
 
     //[/UserMethods]
 
@@ -110,6 +110,7 @@ private:
     void layerChosen();
     /** @internal Update all of the controls in this view */
     void updateControls (NotificationType n = dontSendNotification);
+
     //[/UserVariables]
 
     ScopedPointer<TextButton> layerKeyButton;

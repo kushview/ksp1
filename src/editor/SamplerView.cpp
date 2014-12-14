@@ -27,6 +27,7 @@
 
 #include "editor/AssetsListBox.h"
 #include "editor/Banks.h"
+#include "editor/LevelMeter.h"
 #include "editor/SamplerDisplay.h"
 #include "editor/EditScreen.h"
 #include "editor/ProgramsListBox.h"
@@ -773,6 +774,13 @@ void SamplerView::stabilizeView()
 {
     updateControls (dontSendNotification);
 }
+
+ void SamplerView::setMainRMS (const float rmsL, const float rmsR)
+ {
+     meter->setValue (0, rmsL);
+     meter->setValue (1, rmsR);
+     meter->refresh();
+ }
 
 //[/MiscUserCode]
 

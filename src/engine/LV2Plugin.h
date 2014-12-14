@@ -125,6 +125,7 @@ private:
     ScopedPointer<JobManager> jobs;
     float* audioIns[2];
     float* audioOuts[2];
+    MidiBuffer midiIn;
     AtomicInt wasRestored;
 
     void handle_patch_get (const PatchGet& obj);

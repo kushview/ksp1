@@ -72,6 +72,7 @@ void LV2Plugin::activate()
 {
     lastGain = 1.0f;
     sampler->setCurrentPlaybackSampleRate (sampleRate);
+    midiIn.ensureSize (2048);
 }
 
 void LV2Plugin::connect_port (uint32_t port, void *ptr)
@@ -100,6 +101,7 @@ void LV2Plugin::deactivate()
 void LV2Plugin::run (uint32_t nframes)
 {
 
+    const int32 numSamples = static_cast<int> (nframes);
     const lvtk::AtomSequence seq (p<LV2_Atom_Sequence*> (Port::AtomInput));
     forge->set_buffer ((uint8_t*)notifyPort, notifyPort->atom.size);
     forge->sequence_head (notifyFrame, 0);
@@ -108,7 +110,7 @@ void LV2Plugin::run (uint32_t nframes)
     {
         if (wasRestored.set (0))
         {
-            forge->frame_time(0);
+            forge->frame_time (0);
             ForgeFrame frame;
             forge->write_object (frame, 1, uris->ksp1_SamplerSynth);
             forge->write_key (uris->slugs_index); forge->write_int (1);
@@ -116,15 +118,14 @@ void LV2Plugin::run (uint32_t nframes)
         }
     }
 
-    MidiBuffer buf;
-    AudioSampleBuffer audio (audioOuts, 2, nframes);
+    AudioSampleBuffer audio (audioOuts, 2, numSamples);
     audio.clear();
 
     for (const lvtk::AtomEvent& ev : seq)
     {
         if (ev.body.type == uris->midi_MidiEvent)
         {
-            buf.addEvent (LV2_ATOM_BODY (&ev.body), ev.body.size,
+            midiIn.addEvent (LV2_ATOM_BODY (&ev.body), ev.body.size,
                     (ev.time.frames < nframes) ? ev.time.frames : nframes - 1);
         }
         else if (ev.body.type == uris->atom_Object)
@@ -159,13 +160,20 @@ void LV2Plugin::run (uint32_t nframes)
             DBG (unmap (ev.body.type));
     }
 
-    sampler->renderNextBlock (audio, buf, 0, static_cast<int> (nframes));
+    sampler->renderNextBlock (audio, midiIn, 0, static_cast<int> (nframes));
     audio.applyGainRamp (0, nframes, lastGain, sampler->getMasterGain());
 
-    //forge->frame_time (0);
-    //forge->write_float (audio.getMagnitude (0, static_cast<int> (nframes)));
+    forge->frame_time (0);
+    {
+        ForgeFrame rmsFrame;
+        forge->write_object (rmsFrame, 0, 333333);
+        forge->write_key (1); forge->write_float (audio.getRMSLevel (0, 0, numSamples)) ;
+        forge->write_key (2); forge->write_float (audio.getRMSLevel (1, 0, numSamples));
+        forge->pop_frame (rmsFrame);
+    }
 
     lastGain = sampler->getMasterGain();
+    midiIn.clear();
 }
 
 

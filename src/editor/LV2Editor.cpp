@@ -180,15 +180,24 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
 {
     if (port == Port::AtomOutput && format == uris->atom_eventTransfer)
     {
-        interface->setFrozen (true);
+
         const lvtk::Atom atom (buffer);
 
         if (atom.total_size() != size) {
-            DBG ("Size Mismatch in port event");
             return;
         }
 
-        if (atom.type() == uris->atom_Object && atom.as_object().otype() == uris->patch_Response)
+        interface->setFrozen (true);
+
+        if (atom.type() == uris->atom_Object && atom.has_object_type (333333))
+        {
+            const lvtk::Atom left, right;
+            lv2_atom_object_get (atom.as_object().cobj(), 1, &left, 2, &right, 0);
+            if (left && right) {
+                view->setMainRMS (left.as_float(), right.as_float());
+            }
+        }
+        else if (atom.type() == uris->atom_Object && atom.as_object().otype() == uris->patch_Response)
         {
             const AtomObject object (atom.as_object());
             const Atom body, request, sequenceNumber;
@@ -214,7 +223,7 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
         else if (atom.has_object_type (uris->ksp1_SamplerSynth)) {
             interface->getInstrument()->clear();
             view->stabilizeView();
-            this->keyboard->getKeyboard();
+            keyboard->getKeyboard();
         }
 
         else if (atom.type() == 100100)
