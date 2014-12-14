@@ -123,6 +123,7 @@ private:
     ScopedPointer<SamplerSynth> sampler;
     ScopedPointer<KSP1::URIs> uris;
     ScopedPointer<JobManager> jobs;
+    int32_t procFrame;
     float* audioIns[2];
     float* audioOuts[2];
     MidiBuffer midiIn;

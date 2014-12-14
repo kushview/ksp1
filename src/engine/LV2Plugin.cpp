@@ -121,58 +121,70 @@ void LV2Plugin::run (uint32_t nframes)
     AudioSampleBuffer audio (audioOuts, 2, numSamples);
     audio.clear();
 
+    procFrame = 0;
     for (const lvtk::AtomEvent& ev : seq)
     {
+        if (procFrame < ev.time.frames)
+            sampler->renderNextBlock (audio, midiIn, procFrame, ev.time.frames - procFrame);
+
         if (ev.body.type == uris->midi_MidiEvent)
         {
             midiIn.addEvent (LV2_ATOM_BODY (&ev.body), ev.body.size,
-                    (ev.time.frames < nframes) ? ev.time.frames : nframes - 1);
+                (ev.time.frames < numSamples) ? ev.time.frames : numSamples - 1);
         }
         else if (ev.body.type == uris->atom_Object)
         {
             const lvtk::AtomObject obj (&ev.body);
 
-            if (obj.otype() == uris->patch_Set) {
-                PatchSet set (*uris, obj);
+            if (obj.otype() == uris->patch_Set)
+            {
+                const PatchSet set (*uris, obj);
                 handle_patch_set (set);
             }
-            else if (obj.otype() == uris->patch_Get) {
-                PatchGet get (*uris, obj);
+            else if (obj.otype() == uris->patch_Get)
+            {
+                const PatchGet get (*uris, obj);
                 handle_patch_get (get);
             }
             else if (obj.otype() == uris->patch_Patch)
             {
-                Patch patch (*uris, obj);
+                const Patch patch (*uris, obj);
                 handle_patch (patch);
             }
             else if (obj.otype() == uris->patch_Delete)
             {
                 const PatchDelete del (*uris, obj);
-                if (del.subject.has_object_type (uris->ksp1_Layer)) {
+                if (del.subject.has_object_type (uris->ksp1_Layer))
+                {
                     lvtk::AtomObject layer (del.subject.as_object());
                     if (LayerData* data = sampler->getLayerData (*uris, layer))
                         sampler->recycleLayerData (data);
                 }
             }
         }
-
         else
+        {
             DBG (unmap (ev.body.type));
+        }
+
+        procFrame = ev.time.frames;
     }
 
-    sampler->renderNextBlock (audio, midiIn, 0, static_cast<int> (nframes));
-    audio.applyGainRamp (0, nframes, lastGain, sampler->getMasterGain());
+    if (procFrame < numSamples)
+        sampler->renderNextBlock (audio, midiIn, procFrame, numSamples - procFrame);
 
-    forge->frame_time (0);
+    audio.applyGainRamp (0, numSamples, lastGain, sampler->getMasterGain());
+    lastGain = sampler->getMasterGain();
+
+    forge->frame_time (procFrame);
     {
         ForgeFrame rmsFrame;
         forge->write_object (rmsFrame, 0, 333333);
-        forge->write_key (1); forge->write_float (audio.getRMSLevel (0, 0, numSamples)) ;
+        forge->write_key (1); forge->write_float (audio.getRMSLevel (0, 0, numSamples));
         forge->write_key (2); forge->write_float (audio.getRMSLevel (1, 0, numSamples));
         forge->pop_frame (rmsFrame);
     }
 
-    lastGain = sampler->getMasterGain();
     midiIn.clear();
 }
 
