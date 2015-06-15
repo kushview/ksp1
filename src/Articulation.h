@@ -117,13 +117,13 @@ namespace KSP1 {
 
         inline String getTypeString() const
         {
-            return getProperty (Slugs::type);
+            return getProperty (Tags::type);
         }
 
         inline int32 getNoteNumber() const
         {
             ValueTree parent (node().getParent());
-            return parent.getProperty (Slugs::note, -1);
+            return parent.getProperty (Tags::note, -1);
         }
 
     private:

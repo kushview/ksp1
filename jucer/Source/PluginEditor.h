@@ -7,12 +7,9 @@
 namespace KSP1 {
 namespace Gui {
 
-class SamplerEditor;
-
 class PluginEditor  : public AudioProcessorEditor
 {
 public:
-    
     PluginEditor (PluginProcessor* plugin);
     ~PluginEditor();
 
@@ -22,9 +19,7 @@ public:
     void resized() override;
     
 private:
-    ScopedPointer<SamplerEditor> editor;
     Element::Style style;
-    
 };
 
 }}

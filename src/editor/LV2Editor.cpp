@@ -28,8 +28,6 @@
 
 #define KSP1_USE_LV2_MESSAGE_THREAD 0
 
-
-
 namespace KSP1 {
 
 struct PatchResponse {

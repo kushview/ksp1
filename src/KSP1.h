@@ -26,11 +26,11 @@
  #include "../jucer/JuceLibraryCode/JuceHeader.h"
 #endif
 
-namespace Element { }
-using namespace Element;
+namespace KSP1
+{
+    using namespace Element;
 
-namespace KSP1 {
-    static int generateObjectID (int salt = 0)
+    inline static int generateObjectID (int salt = 0)
     {
         Random r (salt == 0 ? Time::currentTimeMillis() : salt);
 

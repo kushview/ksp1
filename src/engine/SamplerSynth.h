@@ -1,6 +1,6 @@
 /*
-    This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+    SamplerSynth.h - This file is part of KSP1
+    Copyright (C) 2015  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,17 +20,17 @@
 #ifndef KSP1_SAMPLER_SYNTH_H
 #define KSP1_SAMPLER_SYNTH_H
 
-#include "modules/juce_audio_basics/juce_audio_basics.h"
 #include "Types.h"
 #include "engine/Disposable.h"
 
-namespace lvtk {
+namespace lvtk
+{
     class Atom;
     class AtomObject;
 }
 
-namespace KSP1 {
-
+namespace KSP1
+{
     class LayerData;
     class PatchSet;
     class SampleCache;
@@ -41,11 +41,9 @@ namespace KSP1 {
                          public Disposable
     {
     public:
-
         class DataLoader
         {
         public:
-
             struct Type {
                 virtual bool canLoad (const File&) =0;
             };
@@ -61,7 +59,6 @@ namespace KSP1 {
             Array<LayerData*> layers;
             friend class SamplerSynth;
             SampleCache& cache;
-
         };
 
         /** Create a new Sampler with an external sample cache */
@@ -77,7 +74,7 @@ namespace KSP1 {
 
         void setVolume (const double val);
         inline void setGain (const double val) { masterGain.set (val); }
-        inline const double& getGain() const { return masterGain.get(); }
+        inline const double getGain() const { return masterGain.get(); }
 
         /** Get the current MIDI channel this sampler operates on */
         const int& getMidiChannel() const { return midiChannel.get(); }

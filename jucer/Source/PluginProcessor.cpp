@@ -5,26 +5,32 @@
       * Michael Fisher <mfisher@kushview.net>
 */
 
-#include "../src/Globals.h"
-#include "../src/Sampler.h"
+#include "../../lvtk/lvtk/plugin.hpp"
 #include "engine/SamplerSynth.h"
-#include "../src/Locations.h"
-
-#include "PluginConfig.h"
+#include "Locations.h"
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
 
+
 using namespace Element;
 
-namespace KSP1 {
-    
-    class PluginWorld :  public KSP1::Globals
+namespace KSP1
+{    
+    class PluginWorld
     {
     public:
 
         PluginWorld() { }
         
-        void init () { }
+        void init ()
+        {
+            workThread = new WorkThread ("KSP1_Worker", 4096, 5);
+            workThread->startThread();
+
+            features.add (symbols.createMapFeature());
+            features.add (symbols.createUnmapFeature());
+            features.add (new LV2Worker());
+        }
         
         void registerPlugin (PluginProcessor* plug)
         {
@@ -40,7 +46,6 @@ namespace KSP1 {
             return instances.size() == 0;
         }
         
-    
         AudioProcessor* load (const String& uri)
         {
 #if 0
@@ -58,22 +63,23 @@ namespace KSP1 {
         }
     
         Array<PluginProcessor*> instances;
+        SymbolMap symbols;
+        LV2FeatureArray features;
+        ScopedPointer<WorkThread> workThread;
     };
-    
-
-    static ScopedPointer<PluginWorld>  globals;
+   
+    static ScopedPointer<PluginWorld> globals;
 }
 
-
-//==============================================================================
-// This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     using namespace KSP1;
 
-    if (! globals)
+    if (!globals)
+    {
         globals = new KSP1::PluginWorld();
-    
+        globals->init();
+    }
     PluginProcessor* plugin = new PluginProcessor();
     return plugin;
 }
@@ -82,6 +88,12 @@ namespace KSP1 {
 
 PluginProcessor::PluginProcessor()
 {
+    jassert (lvtk::get_lv2_descriptors().size() == 1);
+    LV2_Descriptor* descriptor = &lvtk::get_lv2_descriptors()[0];
+    const LV2_Feature* feats[] = { nullptr };
+    descriptor->instantiate (descriptor, 44100.0, "c:\\SDKs", globals->features);
+    
+#if 0
     useExternalData = false;
     if (! globals)
         globals = new KSP1::PluginWorld();
@@ -90,7 +102,7 @@ PluginProcessor::PluginProcessor()
     instrument = new Instrument ("New Instrument");
     sampler = new SamplerProcessor (*globals);
     
-#if 0
+
     //FIXME:
     if (SamplerSynth* s = static_cast<SamplerSynth*> (sampler->currentSynth())) {
         s->setGain (1.0);
@@ -102,26 +114,9 @@ PluginProcessor::PluginProcessor()
 #endif
 }
 
-PluginProcessor::PluginProcessor (KSP1::Globals& g)
-{
-    useExternalData = true;
-    instrument = new Instrument ("New Instrument");
-    sampler = new SamplerProcessor (g);
-
-#if 0
-    //FIXME:
-    if (SamplerSynth* s = sampler->currentSynth()) {
-        s->setGain (1.0);
-        s->setInstrument (instrument);
-    } else {
-        // gotta have a synth to make sounds ..
-        jassertfalse;
-    }
-#endif
-}
-
 PluginProcessor::~PluginProcessor()
 {
+#if 0
     if (sampler)
         sampler->releaseResources();
 
@@ -132,10 +127,10 @@ PluginProcessor::~PluginProcessor()
                                             : false;
     if (shutdown)
         globals = nullptr;
+#endif
 }
 
-void
-PluginProcessor::fillInPluginDescription (PluginDescription &desc) const
+void PluginProcessor::fillInPluginDescription (PluginDescription &desc) const
 {
     desc.name               = getName();
     desc.category           = "Instruments";
@@ -154,31 +149,31 @@ const String PluginProcessor::getName() const {
 }
 
 int PluginProcessor::getNumParameters() {
-    return sampler->getNumParameters();
+    return 0; // sampler->getNumParameters();
 }
 
 float PluginProcessor::getParameter (int index) {
-    return sampler->getParameter (index);
+    return 0.0f; // sampler->getParameter(index);
 }
 
 void PluginProcessor::setParameter (int index, float newValue) {
-    sampler->setParameter (index, newValue);
+   // sampler->setParameter (index, newValue);
 }
 
 const String PluginProcessor::getParameterName (int index) {
-    return sampler->getParameterName (index);
+    return "param name"; // sampler->getParameterName(index);
 }
 
 const String PluginProcessor::getParameterText (int index) {
-    return sampler->getParameterText (index);
+    return "param text"; // sampler->getParameterText(index);
 }
 
 const String PluginProcessor::getInputChannelName (int channelIndex) const {
-    return sampler->getInputChannelName (channelIndex);
+    return "input name"; // sampler->getInputChannelName(channelIndex);
 }
 
 const String PluginProcessor::getOutputChannelName (int channelIndex) const {
-    return sampler->getOutputChannelName (channelIndex);
+    return "out name"; // sampler->getOutputChannelName(channelIndex);
 }
 
 bool PluginProcessor::isInputChannelStereoPair  (int index) const { return true; }
@@ -203,35 +198,36 @@ bool PluginProcessor::producesMidi() const
 }
 
 bool PluginProcessor::silenceInProducesSilenceOut() const {
-    return sampler->silenceInProducesSilenceOut();
+    return false; // sampler->silenceInProducesSilenceOut();
 }
 
 double PluginProcessor::getTailLengthSeconds() const {
-    return sampler->getTailLengthSeconds();
+    return 0.0; // sampler->getTailLengthSeconds();
 }
 
 int PluginProcessor::getNumPrograms() {
-    return sampler->getNumPrograms();
+    return 0;// sampler->getNumPrograms();
 }
 
 int PluginProcessor::getCurrentProgram() {
-    return sampler->getCurrentProgram();
+    return 0;// sampler->getCurrentProgram();
 }
 
 void PluginProcessor::setCurrentProgram (int index) {
-    return sampler->setCurrentProgram (index);
+    // return sampler->setCurrentProgram (index);
 }
 
 const String PluginProcessor::getProgramName (int index) {
-    return sampler->getProgramName (index);
+    return ""; // sampler->getProgramName(index);
 }
 
 void PluginProcessor::changeProgramName (int index, const String& newName) {
-    sampler->changeProgramName (index, newName);
+    //sampler->changeProgramName (index, newName);
 }
 
 void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
 {
+#if 0
     int32 outputs = getNumOutputChannels();
     if (outputs < 2)
     {
@@ -240,36 +236,35 @@ void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
     }
 
     sampler->prepareToPlay (sampleRate, blockSize);
+#endif
 }
 
 void PluginProcessor::releaseResources()
 {
-    sampler->releaseResources();
+    //sampler->releaseResources();
 }
 
 void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
 {
-    sampler->processBlock (audio, midi);
+    //sampler->processBlock (audio, midi);
 }
 
 bool PluginProcessor::hasEditor() const { return true; }
 
-AudioProcessorEditor*
-PluginProcessor::createEditor()
+AudioProcessorEditor* PluginProcessor::createEditor()
 {
     Gui::PluginEditor* ed = new Gui::PluginEditor (this);
     return ed;
 }
 
-void
-PluginProcessor::getStateInformation (MemoryBlock& destData)
+void PluginProcessor::getStateInformation (MemoryBlock& destData)
 {
     InstrumentPtr sinst;
 #if 0
     //FIXME:
     if (SamplerSynth* synth = sampler->currentSynth())
         sinst = synth->getInstrument();
-#endif
+
 
     jassert (sinst != nullptr);
     if (ScopedXml xml = sinst->createXml())
@@ -277,11 +272,13 @@ PluginProcessor::getStateInformation (MemoryBlock& destData)
         copyXmlToBinary (*xml, destData);
         //Logger::writeToLog (instrument->node().toXmlString());
     }
+#endif
 }
 
 void
 PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
+#if 0
     if (ScopedXml xml = getXmlFromBinary (data, sizeInBytes))
     {
         ValueTree data (ValueTree::fromXml (*xml));
@@ -291,7 +288,7 @@ PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
             // FIXME: sampler->currentSynth()->setInstrument (instrument);
         }
     }
+#endif
 }
 
 }
-

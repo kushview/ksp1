@@ -409,7 +409,7 @@ namespace KSP1 {
     bool
     Articulator::mutate (const Articulation& art, const Identifier& prop)
     {
-        if (prop == Slugs::type) {
+        if (prop == Tags::type) {
 
         }
         return true;

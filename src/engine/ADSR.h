@@ -117,13 +117,12 @@ namespace KSP1 {
 
         /** Compares ADSR values only. Tick positions are ignored. This is
             so the ADSR can be processed my multiple sources. @see ADSR::sync */
-        inline bool
-        operator== (const ADSR& other)
+        inline bool operator== (const ADSR& other)
         {
             return attackTime == other.attackTime &&
-                    decayTime == other.decayTime &&
-                    sustainLevel == other.sustainLevel &&
-                    releaseTime == other.releaseTime;
+                   decayTime == other.decayTime &&
+                   sustainLevel == other.sustainLevel &&
+                   releaseTime == other.releaseTime;
         }
 
         inline bool operator!= (const ADSR& other) {
@@ -152,15 +151,13 @@ namespace KSP1 {
 
     };
 
-    inline void
-    ADSR::processBuffer (int count, float buffer[])
+    inline void ADSR::processBuffer (int count, float buffer[])
     {
-        short ticks;
         short duration;
-        short future = count + 1;
+        short future = static_cast<short> (count) + 1;
         short iMax;
 
-        ticks = static_cast<short> (modeTicks);
+        short ticks = static_cast<short> (modeTicks);
         if (futureRelease != 0.0f)
             if (count + totalTicks >= futureRelease)
                 future = static_cast<short> (futureRelease - (count + totalTicks));
@@ -265,8 +262,7 @@ namespace KSP1 {
         modeTicks = static_cast<float> (ticks);
     }
 
-    inline float
-    ADSR::setFutureRelease (float when)
+    inline float ADSR::setFutureRelease (float when)
     {
         if (adsrState == Idle ) {
             return 0.0f;
@@ -294,8 +290,7 @@ namespace KSP1 {
         }
     }
 
-    inline void
-    ADSR::forceRelease (float maxRelease)
+    inline void ADSR::forceRelease (float maxRelease)
     {
         if( adsrState == Idle)
             return;
@@ -315,8 +310,7 @@ namespace KSP1 {
         }
     }
 
-    inline void
-    ADSR::reset()
+    inline void ADSR::reset()
     {
         adsrState = Attack;
         adsrValue = 0.0f;

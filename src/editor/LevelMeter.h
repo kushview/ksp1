@@ -25,12 +25,12 @@
 namespace KSP1 {
 namespace Gui {
 
-    class LevelMeter : public HighQualityMeter
+    class LevelMeter : public DigitalMeter
     {
     public:
 
         LevelMeter()
-            : HighQualityMeter (2)
+            : DigitalMeter (2)
         {
 
         }

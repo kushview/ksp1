@@ -121,8 +121,7 @@ namespace KSP1 {
     }
 
 
-    const File&
-    DataPath::simBeatThangPath()
+    const File& DataPath::simBeatThangPath()
     {
         static File simBeatThangPath;
         if (simBeatThangPath == File::nonexistent)
@@ -133,8 +132,15 @@ namespace KSP1 {
             File docs = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory().getSiblingFile("Documents");
             File d = docs.getChildFile ("SimBeatThang");
             d.createDirectory();
-           #elif JUCE_WINDOWS
-            assert (false); // Implement windows data paths
+           #elif defined (_WIN32)
+            File d;
+            if (SystemStats::isOperatingSystem64Bit()) {
+                d = "C:\\Program Files (x86)\\Beat Kangz\\Virtual Beat Thang";
+            } else {
+                d = "C:\\Program Files\\Beat Kangz\\Virtual Beat Thang";
+            }
+           #elif defined (_WIN64)
+            File d = "C:\\Program Files\\Beat Kangz\\Virtual Beat Thang";
            #elif JUCE_LINUX
             File d = File::getSpecialLocation (File::userHomeDirectory);
             d = d.getChildFile (".btvpro/Legacy/SimBeatThang");

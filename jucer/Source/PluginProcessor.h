@@ -9,20 +9,15 @@
 #ifndef KSP1_H
 #define KSP1_H
 
-#include "PluginConfig.h"
+#include "JuceHeader.h"
 #include "Instrument.h"
-#include "Sampler.h"
 
-namespace KSP1 {
-
-class AudioEngine;
-class Globals;
+namespace KSP1
+{
 
 class PluginProcessor  : public AudioProcessor
 {
 public:
-
-    PluginProcessor (KSP1::Globals& world);
     PluginProcessor();
     ~PluginProcessor();
 
@@ -66,13 +61,11 @@ public:
     void fillInPluginDescription (PluginDescription &description) const;
 
     KSP1::InstrumentPtr getInstrument() const { return this->instrument; }
-    KSP1::SamplerProcessor* getSampler() const { return sampler.get(); }
     
 private:
     bool useExternalData;
     KSP1::InstrumentPtr instrument;
-    ScopedPointer<KSP1::SamplerProcessor> sampler;
-    
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };

@@ -10,17 +10,19 @@
 
 #include "KSP1.h"
 
-namespace KSP1 {
-    typedef AtomicValue<int>      AtomicInt;
+namespace KSP1
+{
+    typedef AtomicValue<int>    AtomicInt;
     typedef AtomicLock          DataLock;
     typedef AtomicValue<double> AtomicDouble;
     typedef AtomicValue<bool>   AtomicFlag;
     typedef AtomicValue<float>  AtomicFloat;
     typedef AtomicValue<int64>  AtomicFrame;
-    typedef FrameSpan           FrameSpan;
 }
 
-namespace Tags {
+namespace Tags
+{
+    using namespace Element::Slugs;
     static const Identifier articulation    = "articulation";
     static const Identifier interval        = "interval";
     static const Identifier key             = "key";

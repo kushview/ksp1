@@ -1,5 +1,5 @@
 /*
-    Interface.h - This file is part of KSP1
+    SamplerInterface.h - This file is part of KSP1
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -23,8 +23,8 @@
 #include "KSP1.h"
 #include "Instrument.h"
 
-namespace KSP1 {
-
+namespace KSP1
+{
     class KeyItem;
     class LayerItem;
 
@@ -68,11 +68,10 @@ namespace KSP1 {
         ValueTree state;
         void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property);
         void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded);
-        void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved);
-        void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved);
+        void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved);
+        void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex);
         void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged);
         void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged);
-
     };
 }
 

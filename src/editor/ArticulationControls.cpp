@@ -113,7 +113,7 @@ ArticulationControls::setModel (const KSP1::Articulation& model)
     ValueTree state (model.node());
 
     Value& artVal = articulationType->getSelectedIdAsValue();
-    artVal.referTo (state.getPropertyAsValue (Slugs::type, nullptr));
+    artVal.referTo (state.getPropertyAsValue (Tags::type, nullptr));
 }
 
 //[/MiscUserCode]

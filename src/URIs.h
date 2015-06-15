@@ -208,6 +208,9 @@ namespace KSP1 {
         inline static LV2_URID slugToURID (MAP& map, const char* slug) {
             return map.map (slugToURI (slug).c_str());
         }
+
+        URIs(const URIs&);
+        URIs& operator= (const URIs&);
     };
 }
 

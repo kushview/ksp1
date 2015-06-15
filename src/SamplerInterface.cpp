@@ -64,7 +64,7 @@ void SamplerInterface::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
     }
 }
 
-void SamplerInterface::valueTreeChildRemoved (ValueTree& parent, ValueTree& child)
+void SamplerInterface::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int /*indexFromWhichChildWasRemoved*/)
 {
     if (child.hasType (Tags::key))
     {
@@ -78,7 +78,7 @@ void SamplerInterface::valueTreeChildRemoved (ValueTree& parent, ValueTree& chil
     }
 }
 
-void SamplerInterface::valueTreeChildOrderChanged (ValueTree& /*tree*/)
+void SamplerInterface::valueTreeChildOrderChanged (ValueTree& /*tree*/, int /*oldIndex*/, int /*newIndex*/)
 {
 
 }

@@ -20,6 +20,10 @@
 #ifndef KSP1_PLUGIN_CONFIG_H
 #define KSP1_PLUGIN_CONFIG_H
 
+#include "JuceHeader.h"
+
+#if 0
+#include "AppConfig.h"
 //==============================================================================
 // Audio plugin settings..
 
@@ -149,5 +153,7 @@
 #ifndef  JucePlugin_AAXDisableMultiMono
  #define JucePlugin_AAXDisableMultiMono    0
 #endif
+#endif
+
 
 #endif /* KSP1_PLUGIN_CONFIG_H */

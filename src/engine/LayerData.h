@@ -28,20 +28,19 @@ namespace lvtk {
     class AtomObject;
 }
 
-namespace KSP1 {
-
+namespace KSP1
+{
     class LowPassFilter;
     class PatchSet;
     class SampleCache;
     class SamplerSound;
     class SamplerSynth;
     class SamplerVoice;
-    class URIs;
+    struct URIs;
 
     class LayerData
     {
     public:
-
         LayerData (SampleCache&, int layerId);
         ~LayerData();
 

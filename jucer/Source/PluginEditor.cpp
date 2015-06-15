@@ -5,7 +5,6 @@
       * Michael Fisher <mfisher@kushview.net>
 */
 
-#include "editor/SamplerEditor.h"
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -18,29 +17,33 @@ namespace Gui {
         setLookAndFeel (&style);
         setOpaque (true);
         
+#if 0
         addAndMakeVisible (editor = new KSP1::Gui::SamplerEditor (plug->getSampler()));
         editor->setOpaque (true);
 
         setSize (editor->getWidth(), editor->getHeight());
+#else
+        setSize (400, 350);
+#endif
     }
     
     PluginEditor::~PluginEditor()
     {
         AudioProcessor* base = getAudioProcessor();
+#if 0
         if (PluginProcessor* proc = dynamic_cast<PluginProcessor*> (base))
             if (KSP1::SamplerProcessor* samp = proc->getSampler())
                 samp->editorBeingDeleted (editor);
-
+#endif
         if (base)
             base->editorBeingDeleted (this);
         
-        editor = nullptr;
         setLookAndFeel (nullptr);
     }
     
     void PluginEditor::setInstrument (InstrumentPtr i)
     {
-        editor->setInstrument (i);
+        // FIXME: editor->setInstrument (i);
     }
 
     void PluginEditor::paint (Graphics& g)
@@ -50,8 +53,6 @@ namespace Gui {
     
     void PluginEditor::resized()
     {
-        if (editor)
-            editor->setSize (getWidth(), getHeight());
-    }
-    
+
+    }    
 }}

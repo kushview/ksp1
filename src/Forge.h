@@ -23,8 +23,8 @@
 #include "URIs.h"
 #include "../../libs/lvtk/lvtk/ext/atom.hpp"
 
-namespace KSP1 {
-
+namespace KSP1
+{
     typedef lvtk::Atom Atom;
     typedef lvtk::AtomObject AtomObject;
     typedef lvtk::ForgeRef ForgeRef;
@@ -33,7 +33,6 @@ namespace KSP1 {
     class Forge : public lvtk::AtomForge
     {
     public:
-
         Forge (const URIs& u, LV2_URID_Map* map, LV2_URID_Unmap* unmap)
             : AtomForge (map),  uris (u), p_map (map), p_unmap (unmap)
         { }
@@ -197,7 +196,6 @@ namespace KSP1 {
     private:
         LV2_URID_Map* p_map;
         LV2_URID_Unmap* p_unmap;
-
     };
 
 }  /* namespace KSP1 */

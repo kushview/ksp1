@@ -25,17 +25,19 @@
 #include "../../libs/lvtk/lvtk/plugin.hpp"
 #include "../../libs/lvtk/lvtk/ext/atom.hpp"
 
+namespace KSP1
+{
 
-namespace KSP1 {
-
-struct PatchMessage {
+struct PatchMessage
+{
     PatchMessage (const URIs& u, const lvtk::AtomObject &o) : uris(u), object (o) { }
     const URIs& uris;
     const lvtk::AtomObject object;
     const lvtk::Atom subject;
 };
 
-struct PatchDelete : public PatchMessage {
+struct PatchDelete : public PatchMessage
+{
     PatchDelete (const URIs& u, const lvtk::AtomObject& o)
         : PatchMessage (u, o)
     {
@@ -69,7 +71,8 @@ struct PatchSet : public PatchMessage
     const lvtk::Atom property, value;
 };
 
-struct Patch : public PatchMessage {
+struct Patch : public PatchMessage
+{
     Patch (const URIs& uris, const lvtk::AtomObject& obj)
         : PatchMessage (uris, obj)
     {
@@ -82,7 +85,6 @@ struct Patch : public PatchMessage {
 
     const lvtk::Atom add, remove;
 };
-
 
 class LV2Plugin;
 class SampleCache;
@@ -134,7 +136,6 @@ private:
     void handle_patch (const Patch& patch);
 
     void handle_patch_set_root_level (const PatchSet& set);
-
 };
 
 } /* namespace KSP1 */

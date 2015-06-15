@@ -18,7 +18,6 @@ namespace Gui {
 class SoundsTimeline : public TimelineComponent
 {
 public:
-
     SoundsTimeline()
         : TimelineComponent()
     {

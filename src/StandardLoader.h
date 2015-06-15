@@ -1,5 +1,5 @@
 /*
-    This file is part of KSP1
+    StandardLoader.h - This file is part of KSP1
     Copyright (C) 2014  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -23,12 +23,11 @@
 #include "Instrument.h"
 #include "InstrumentLoader.h"
 
-namespace KSP1 {
-
+namespace KSP1
+{
     class XmlLoader  : public InstrumentLoader
     {
     public:
-
         XmlLoader (Instrument& i, ProgressSink& sink)
             : InstrumentLoader (i)
         {
@@ -64,8 +63,8 @@ namespace KSP1 {
             instrument.setData (data);
             finishedLoading();
             return;
-
-
+#if 0
+            // FIXME or MOVEME
             totalSteps = 0;
 
             for (int i = 0; i < data.getNumChildren(); ++i)
@@ -110,19 +109,17 @@ namespace KSP1 {
             String name = data.getProperty (Slugs::name, String ("Empty Circuit"));
             instrument.setName (name);
             finishedLoading();
+#endif
         }
 
     private:
-
         String error;
         int totalSteps;
-
     };
 
     class StandardLoader  : public XmlLoader
     {
     public:
-
         StandardLoader (Instrument& i, ProgressSink& sink)
             : XmlLoader (i, sink)
         { }

@@ -32,6 +32,8 @@
 
 namespace KSP1 {
 
+class MidiKeyboardUpDownButton;
+
 //==============================================================================
 /**
     This is a modified copy of JUCE's juce::MidiKeyboardComponent
@@ -298,7 +300,7 @@ public:
     void colourChanged() override;
 
 protected:
-    //==============================================================================
+    
     /** Draws a white note in the given rectangle.
 
         isOver indicates whether the mouse is over the key, isDown indicates whether the key is

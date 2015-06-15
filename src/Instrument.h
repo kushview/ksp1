@@ -51,7 +51,7 @@ namespace KSP1 {
               forge (f), objectType (otype),
               objectID (oid), parentID (parent)
         {
-            slugUsedAsId = Slugs::id;
+            slugUsedAsId = Tags::id;
         }
 
         ForgeRef writeAtomObject()
@@ -103,7 +103,7 @@ namespace KSP1 {
                 } else if (value.isDouble()) {
                     forge.write_key (key);
                     forge.write_double ((double) value);
-                } else if (value.isString() && slug == Slugs::file) {
+                } else if (value.isString() && slug == Tags::file) {
                     forge.write_key (key);
                     forge.write_path (value.toString().toRawUTF8());
                 } else if (value.isString()) {
@@ -178,18 +178,18 @@ namespace KSP1 {
         LayerItem (const ValueTree& data);
         ~LayerItem();
 
-        inline bool isEmpty() const { return ! objectData.hasProperty (Slugs::file); }
+        inline bool isEmpty() const { return ! objectData.hasProperty (Tags::file); }
         inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::layer)
-                                        && (int32) objectData.getProperty(Slugs::index, -1) >= 0
-                                        && (int32) objectData.getProperty (Slugs::note, -1) >= 0; }
+                                        && (int32) objectData.getProperty(Tags::index, -1) >= 0
+                                        && (int32) objectData.getProperty (Tags::note, -1) >= 0; }
         int32 index() const;
         int32 getNote() const;
 
-        inline String fileString() const { return get (Slugs::file); }
+        inline String fileString() const { return get (Tags::file); }
 
         inline void setAtomObject (const URIs& uris, const lvtk::AtomObject& object)
         {
-            setProperty (Slugs::id, static_cast<int> (object.id()));
+            setProperty (Tags::id, static_cast<int> (object.id()));
             for (const auto& p : object)
             {
                 const lvtk::Atom value (&p.value);
@@ -200,19 +200,19 @@ namespace KSP1 {
         inline void setProperty (const URIs& uris, uint32 prop, const lvtk::Atom& value)
         {
             if (prop == uris.slugs_index) {
-                setProperty (Slugs::index, value.as_int());
+                setProperty (Tags::index, value.as_int());
             } else if (prop == uris.slugs_note) {
-                setProperty (Slugs::note, value.as_int());
+                setProperty (Tags::note, value.as_int());
             } else if (prop == uris.slugs_volume) {
-                setProperty (Slugs::volume, value.as_double());
+                setProperty (Tags::volume, value.as_double());
             } else if (prop == uris.slugs_pitch) {
-                setProperty (Slugs::pitch, value.as_double());
+                setProperty (Tags::pitch, value.as_double());
             } else if (prop == uris.slugs_start) {
-                setProperty (Slugs::start, value.as_double());
+                setProperty (Tags::start, value.as_double());
             } else if (prop == uris.slugs_length) {
-                setProperty (Slugs::length, value.as_double());
+                setProperty (Tags::length, value.as_double());
             } else if (prop == uris.slugs_offset) {
-                setProperty (Slugs::offset, value.as_double());
+                setProperty (Tags::offset, value.as_double());
             } else if (prop == uris.slugs_file) {
                 const File file (String::fromUTF8 (value.as_string()));
                 setFile (file);
@@ -222,23 +222,23 @@ namespace KSP1 {
         inline void
         setFile (const File& file)
         {
-            set (Slugs::file, file.getFullPathName());
-            set (Slugs::name, file.getFileNameWithoutExtension());
+            set (Tags::file, file.getFullPathName());
+            set (Tags::name, file.getFileNameWithoutExtension());
         }
 
-        inline void setStartTime (double time)  { set (Slugs::start,  time); }
-        inline void setEndTime (double time)    { set (Slugs::length, time - startTime()); }
-        inline double startTime() const { return (double) get (Slugs::start); }
-        inline double endTime()   const { return startTime() + (double)get(Slugs::length); }
+        inline void setStartTime (double time)  { set (Tags::start,  time); }
+        inline void setEndTime (double time)    { set (Tags::length, time - startTime()); }
+        inline double startTime() const { return (double) get (Tags::start); }
+        inline double endTime()   const { return startTime() + (double)get(Tags::length); }
 
         inline double gain() const
         {
-            double vol = get (Slugs::volume);
+            double vol = get (Tags::volume);
             return Decibels::decibelsToGain (vol);
         }
 
         inline double panning()   const { return get (Tags::panning); }
-        inline double pitch()     const { return get (Slugs::pitch); }
+        inline double pitch()     const { return get (Tags::pitch); }
         inline double cutoff()    const { return get (Tags::cutoff);  }
         inline double resonance() const { return get (Tags::resonance); }
 
@@ -295,8 +295,8 @@ namespace KSP1 {
         inline ForgeRef writeAtomObject (Forge& forge) const
         {
             const ValueTree parent = getParentValueTree();
-            const uint32 oid = (uint32)(int) getProperty (Slugs::id);
-            const uint32 pid = (uint32)(int) parent.getProperty (Slugs::id, 0);
+            const uint32 oid = (uint32)(int) getProperty (Tags::id);
+            const uint32 pid = (uint32)(int) parent.getProperty (Tags::id, 0);
             PropertyWriter writer (forge, objectData, forge.uris.ksp1_Layer, oid, pid);
             return writer.writeAtomObject();
         }
@@ -304,10 +304,10 @@ namespace KSP1 {
         inline ForgeRef writeAtomSubject (Forge& forge) const
         {
             const ValueTree parent = getParentValueTree();
-            const uint32 oid = (uint32)(int) getProperty (Slugs::id);
-            const uint32 pid = (uint32)(int) parent.getProperty (Slugs::id, 0);
+            const uint32 oid = (uint32)(int) getProperty (Tags::id);
+            const uint32 pid = (uint32)(int) parent.getProperty (Tags::id, 0);
             PropertyWriter writer (forge, objectData, forge.uris.ksp1_Layer, oid, pid);
-            return writer.writeAtomObjectIncluding ({ Slugs::parent, Slugs::index });
+            return writer.writeAtomObjectIncluding ({ Tags::parent, Tags::index });
         }
 
     private:
@@ -340,8 +340,8 @@ namespace KSP1 {
         void clearLayers();
         int countLayers() const;
 
-        double getVolume()     const { return (double) objectData.getProperty (Slugs::volume); }
-        Value getVolumeValue()       { return objectData.getPropertyAsValue (Slugs::volume, nullptr); }
+        double getVolume()     const { return (double) objectData.getProperty (Tags::volume); }
+        Value getVolumeValue()       { return objectData.getPropertyAsValue (Tags::volume, nullptr); }
 
         int32 getTriggerMode() const { return (int32) objectData.getProperty (Tags::triggerMode); }
         Value getTriggerModeValue()  { return objectData.getPropertyAsValue (Tags::triggerMode, nullptr); }
@@ -350,23 +350,23 @@ namespace KSP1 {
         int32 getVoiceGroup()  const { return (int32) objectData.getProperty (Tags::voiceGroup); }
         Value getVoiceGroupValue()   { return objectData.getPropertyAsValue (Tags::voiceGroup, nullptr); }
 
-        int32 getNote()        const { return (int32) objectData.getProperty (Slugs::note, -1); }
-        Value getNoteValue()         { return objectData.getPropertyAsValue (Slugs::note, nullptr); }
+        int32 getNote()        const { return (int32) objectData.getProperty (Tags::note, -1); }
+        Value getNoteValue()         { return objectData.getPropertyAsValue (Tags::note, nullptr); }
 
         KeyItem& operator= (const KeyItem& other);
 
         ForgeRef writeAtomObject (Forge& forge) const
         {
-            const uint32 id = (uint32)(int) getProperty (Slugs::id, (int) 0);
+            const uint32 id = (uint32)(int) getProperty (Tags::id, (int) 0);
             PropertyWriter writer (forge, objectData, forge.uris.ksp1_Key, id);
             return writer.writeAtomObject();
         }
 
         ForgeRef writeAtomSubject (Forge& forge) const
         {
-            const uint32 id = (uint32)(int) getProperty (Slugs::id, (int) 0);
+            const uint32 id = (uint32)(int) getProperty (Tags::id, (int) 0);
             PropertyWriter writer (forge, objectData, forge.uris.ksp1_Key, id);
-            return writer.writeAtomObjectIncluding ({ Slugs::note });
+            return writer.writeAtomObjectIncluding ({ Tags::note });
         }
 
         void setAtomObject (const URIs& uris, const lvtk::AtomObject& object);
@@ -407,8 +407,8 @@ namespace KSP1 {
         void load (const File& file, ProgressSink& sink);
         void load (const Programming::Item& file, ProgressSink& sink);
 
-        inline float getVolume() const { return (float) node().getProperty (Slugs::volume, 0.0f); }
-        inline void setVolume (float vol) { node().setProperty (Slugs::volume, vol, nullptr); }
+        inline float getVolume() const { return (float) node().getProperty (Tags::volume, 0.0f); }
+        inline void setVolume (float vol) { node().setProperty (Tags::volume, vol, nullptr); }
         void setMissingProperties (bool recursive = true);
 
         Instrument& operator= (const Instrument& other);

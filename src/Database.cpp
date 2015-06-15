@@ -18,11 +18,9 @@
 */
 
 
-#include <sqlite3.h>
+#include "../libs/sqlite3/sqlite3.h"
 #include "KSP1.h"
 #include "Database.h"
-
-
 
 static int db_init = -100;
 
