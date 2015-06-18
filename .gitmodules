@@ -12,4 +12,5 @@
 	branch = master
 [submodule "libs/lv2"]
 	path = libs/lv2
-	url = http://lv2plug.in/git/lv2.git
+	url = https://github.com/drobilla/lv2.git
+	branch = master
