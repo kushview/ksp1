@@ -21,6 +21,7 @@
 #define KSP1_URIS_H
 
 #include <functional>
+#include <string>
 #include <lv2/lv2plug.in/ns/ext/atom/atom.h>
 #include <lv2/lv2plug.in/ns/ext/urid/urid.h>
 #include <lv2/lv2plug.in/ns/ext/midi/midi.h>

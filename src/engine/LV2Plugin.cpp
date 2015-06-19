@@ -100,7 +100,6 @@ void LV2Plugin::deactivate()
 
 void LV2Plugin::run (uint32_t nframes)
 {
-
     const int32 numSamples = static_cast<int> (nframes);
     const lvtk::AtomSequence seq (p<LV2_Atom_Sequence*> (Port::AtomInput));
     forge->set_buffer ((uint8_t*)notifyPort, notifyPort->atom.size);

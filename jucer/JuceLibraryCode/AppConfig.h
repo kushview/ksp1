@@ -22,20 +22,20 @@
 #define JUCE_USE_EGL 0
 #define LVTK_JUCE_NAMESPACE juce
 
-#if KSP1_STANDALONE
+#ifdef KSP1_STANDALONE
  #define JUCE_ALSA 1
 #endif
 
-#if _MSC_VER
-#pragma warning( disable : 4100 )
-#pragma warning( disable : 4373 )
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4127 )
-#pragma warning( disable : 4389 )
-#pragma warning( disable : 4018 )
-#pragma warning( disable : 4245 )
-#pragma warning( disable : 4189 )
-#pragma warning( disable : 4996 )
+#ifdef _MSC_VER
+ #pragma warning( disable : 4100 )
+ #pragma warning( disable : 4373 )
+ #pragma warning( disable : 4244 )
+ #pragma warning( disable : 4127 )
+ #pragma warning( disable : 4389 )
+ #pragma warning( disable : 4018 )
+ #pragma warning( disable : 4245 )
+ #pragma warning( disable : 4189 )
+ #pragma warning( disable : 4996 )
 #endif
 
 // [END_USER_CODE_SECTION]

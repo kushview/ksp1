@@ -21,7 +21,7 @@
 #define KSP1_FORGE_H
 
 #include "URIs.h"
-#include "../../libs/lvtk/lvtk/ext/atom.hpp"
+#include "../libs/lvtk/lvtk/ext/atom.hpp"
 
 namespace KSP1
 {

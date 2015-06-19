@@ -15,6 +15,7 @@
 namespace KSP1
 {
 
+class PluginModule;
 class PluginProcessor  : public AudioProcessor
 {
 public:
@@ -65,6 +66,7 @@ public:
 private:
     bool useExternalData;
     KSP1::InstrumentPtr instrument;
+    ScopedPointer<PluginModule> module;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)

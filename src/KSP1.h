@@ -29,6 +29,7 @@
 namespace KSP1
 {
     using namespace Element;
+    using Element::TimeScale;
 
     inline static int generateObjectID (int salt = 0)
     {

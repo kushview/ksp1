@@ -3,6 +3,7 @@
     This is an automatically generated GUI class created by the Introjucer!
 */
 
+#include "KSP1.h"
 #include "editor/EditScreen.h"
 #include "editor/ProgramsListBox.h"
 #include "editor/SamplerDisplay.h"

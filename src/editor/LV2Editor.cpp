@@ -95,8 +95,10 @@ class LV2EditorInit : public DeletedAtShutdown {
 public:
     LV2EditorInit()
     {
+#ifdef __linux__
         initialiseJuce_GUI();
         MessageManager::getInstance();
+#endif
     }
 
     ~LV2EditorInit() { }
@@ -119,6 +121,7 @@ LV2Editor::LV2Editor (const char* plugin)
     forge = new Forge (*uris, get_urid_map(), get_urid_unmap());
     view = create_view();
 
+#ifdef __linux__
     if (LV2UI_Widget* parent = this->get_parent())
         xwin_parent = (intptr_t) parent;
 
@@ -129,7 +132,8 @@ LV2Editor::LV2Editor (const char* plugin)
         ui_resize (view->getWidth(), view->getHeight());
         xwin = (intptr_t) view->getPeer()->getNativeHandle();
     }
-
+#endif
+    
     if (editors.size() == 0)
         runLoop = true;
 
@@ -154,7 +158,9 @@ LV2Editor::~LV2Editor()
 
     if (editors.size() == 0)
     {
+#ifdef __linux__
         shutdownJuce_GUI();
+#endif
         editor_init = nullptr;
     }
     else if (runLoop)
@@ -170,7 +176,9 @@ int LV2Editor::idle()
     if (! runLoop)
         return 0;
 
+#ifdef __linux__
     MessageManager::getInstance()->runDispatchLoopUntil (24);
+#endif
     return 0;
 }
 

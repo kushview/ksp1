@@ -6,13 +6,13 @@
 */
 
 #include "../../lvtk/lvtk/plugin.hpp"
+#include "../../lvtk/lvtk/ui.hpp"
+#include "KSP1.h"
 #include "engine/SamplerSynth.h"
 #include "Locations.h"
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
-
-
-using namespace Element;
+#include "Ports.h"
 
 namespace KSP1
 {    
@@ -29,7 +29,7 @@ namespace KSP1
 
             features.add (symbols.createMapFeature());
             features.add (symbols.createUnmapFeature());
-            features.add (new LV2Worker());
+            features.add (new LV2Worker (*workThread, 2048, (LV2_Handle)nullptr, (LV2_Worker_Interface*)nullptr));
         }
         
         void registerPlugin (PluginProcessor* plug)
@@ -48,17 +48,6 @@ namespace KSP1
         
         AudioProcessor* load (const String& uri)
         {
-#if 0
-            String e;
-            Element::Processor* proc = nullptr;
-            
-            if (PluginDescription* desc = plugins().availablePlugins().getTypeForFile (uri))
-                proc = plugins().createPlugin (*desc, e);
-            else
-                e = "plugin not available";
-                        
-            return proc;
-#endif
             return nullptr;
         }
     
@@ -69,6 +58,105 @@ namespace KSP1
     };
    
     static ScopedPointer<PluginWorld> globals;
+    
+    class PluginModule
+    {
+    public:
+        PluginModule()
+            : descriptor (&lvtk::get_lv2_descriptors()[0]),
+              uiDescriptor (&lvtk::get_lv2g2g_descriptors()[0]),
+              handle (nullptr)
+        {
+            currentSampleRate = 0.0;
+        }
+        
+        void instantiate (double rate)
+        {
+            bool rateChanged = false;
+            if (currentSampleRate != rate)
+            {
+                currentSampleRate = rate;
+                rateChanged = true;
+            }
+            
+            if (handle != nullptr || rateChanged)
+            {
+                deactivate();
+                cleanup();
+                features = nullptr;
+                jassert (nullptr == handle && nullptr == workerInterface);
+            }
+            
+            if (nullptr == handle)
+            {
+                features = new LV2FeatureArray();
+                features->add (globals->symbols.createMapFeature());
+                features->add (globals->symbols.createUnmapFeature());
+                LV2Worker* worker = new LV2Worker (*globals->workThread, 2048);
+                features->add (worker);
+                handle = descriptor->instantiate (descriptor, currentSampleRate, "", *features);
+                workerInterface = const_cast<LV2_Worker_Interface*> (
+                    (const LV2_Worker_Interface*) extensionData (LV2_WORKER__interface)
+                );
+                
+                if (handle && workerInterface)
+                    worker->setInterface (handle, workerInterface);
+            }
+        }
+        
+        void activate()
+        {
+            if (handle)
+            {
+                descriptor->activate (handle);
+            }
+        }
+        
+        void deactivate()
+        {
+            if (handle)
+            {
+                descriptor->deactivate (handle);
+            }
+        }
+        
+        void cleanup()
+        {
+            if (handle)
+            {
+                descriptor->cleanup (handle);
+                handle = nullptr;
+            }
+            workerInterface = nullptr;
+        }
+        
+        const void* extensionData (const String& uri)
+        {
+            return descriptor->extension_data (uri.toRawUTF8());
+        }
+        
+        void process (AudioSampleBuffer& audio, MidiBuffer& midi)
+        {
+            if (! handle)
+            {
+                audio.clear(); midi.clear();
+                return;
+            }
+            
+            descriptor->connect_port (handle, Port::MainLeft, audio.getWritePointer (0, 0));
+            descriptor->connect_port (handle, Port::MainRight, audio.getWritePointer (1, 0));
+            
+            midi.clear();
+        }
+        
+    private:
+        const LV2_Descriptor* descriptor;
+        const LV2UI_Descriptor* uiDescriptor;
+        LV2_Handle handle;
+        LV2_Worker_Interface* workerInterface;
+        ScopedPointer<LV2FeatureArray> features;
+        double currentSampleRate;
+    };
 }
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
@@ -77,9 +165,10 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
     if (!globals)
     {
-        globals = new KSP1::PluginWorld();
+        globals = new PluginWorld();
         globals->init();
     }
+    
     PluginProcessor* plugin = new PluginProcessor();
     return plugin;
 }
@@ -89,9 +178,8 @@ namespace KSP1 {
 PluginProcessor::PluginProcessor()
 {
     jassert (lvtk::get_lv2_descriptors().size() == 1);
-    LV2_Descriptor* descriptor = &lvtk::get_lv2_descriptors()[0];
-    const LV2_Feature* feats[] = { nullptr };
-    descriptor->instantiate (descriptor, 44100.0, "c:\\SDKs", globals->features);
+    jassert (lvtk::get_lv2g2g_descriptors().size() == 1);
+    module = new PluginModule();
     
 #if 0
     useExternalData = false;
@@ -176,8 +264,8 @@ const String PluginProcessor::getOutputChannelName (int channelIndex) const {
     return "out name"; // sampler->getOutputChannelName(channelIndex);
 }
 
-bool PluginProcessor::isInputChannelStereoPair  (int index) const { return true; }
-bool PluginProcessor::isOutputChannelStereoPair (int index) const { return true; }
+bool PluginProcessor::isInputChannelStereoPair  (int) const { return true; }
+bool PluginProcessor::isOutputChannelStereoPair (int) const { return true; }
 
 bool PluginProcessor::acceptsMidi() const
 {
@@ -227,26 +315,20 @@ void PluginProcessor::changeProgramName (int index, const String& newName) {
 
 void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
 {
-#if 0
-    int32 outputs = getNumOutputChannels();
-    if (outputs < 2)
-    {
-        setPlayConfigDetails (0, 2, sampleRate, blockSize);
-        outputs = getNumOutputChannels();
-    }
-
-    sampler->prepareToPlay (sampleRate, blockSize);
-#endif
+    setPlayConfigDetails (0, 2, sampleRate, blockSize);
+    module->instantiate (sampleRate);
+    module->activate();
 }
 
 void PluginProcessor::releaseResources()
 {
-    //sampler->releaseResources();
+    module->deactivate();
+    module->cleanup();
 }
 
 void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
 {
-    //sampler->processBlock (audio, midi);
+    module->process (audio, midi);
 }
 
 bool PluginProcessor::hasEditor() const { return true; }

@@ -90,7 +90,7 @@ class LV2Plugin;
 class SampleCache;
 class SamplerSynth;
 typedef lvtk::Plugin<LV2Plugin, lvtk::URID<true>, lvtk::Worker<true>,
-                     lvtk::State<true> > LV2PluginType;
+                     lvtk::State<false> > LV2PluginType;
 
 class LV2Plugin : public LV2PluginType
 {
