@@ -61,7 +61,6 @@ private:
     const std::string plugin_uri;
     intptr_t xwin, xwin_parent;
     bool runLoop;
-
     ScopedPointer<AudioPeakFactory> peaks;
     ScopedPointer<Forge> forge;
     ScopedPointer<KSP1::URIs>  uris;

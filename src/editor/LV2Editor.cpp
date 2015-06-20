@@ -119,7 +119,7 @@ LV2Editor::LV2Editor (const char* plugin)
     URIs::MapFunc map = std::bind (&LV2Editor::map, this, _1);
     uris  = new URIs (map);
     forge = new Forge (*uris, get_urid_map(), get_urid_unmap());
-    view = create_view();
+    create_view();
 
 #ifdef __linux__
     if (LV2UI_Widget* parent = this->get_parent())
@@ -138,7 +138,6 @@ LV2Editor::LV2Editor (const char* plugin)
         runLoop = true;
 
     editors.add (this);
-
     keyboard = new KeyboardGetter (*interface);
 }
 
@@ -312,7 +311,11 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
 
 LV2UI_Widget LV2Editor::widget()
 {
+   #if __linux__
     return reinterpret_cast<LV2UI_Widget> (xwin);
+   #else
+    return reinterpret_cast<LV2UI_Widget> (view.get());
+   #endif
 }
 
 SamplerView* LV2Editor::create_view()

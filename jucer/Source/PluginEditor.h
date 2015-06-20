@@ -1,8 +1,9 @@
 
-#ifndef BTSP1_EDITOR_H
-#define BTSP1_EDITOR_H
+#ifndef KSP1_PLUGIN_EDITOR_H
+#define KSP1_PLUGIN_EDITOR_H
 
 #include "PluginProcessor.h"
+#include "Instrument.h"
 
 namespace KSP1 {
 namespace Gui {
@@ -10,7 +11,7 @@ namespace Gui {
 class PluginEditor  : public AudioProcessorEditor
 {
 public:
-    PluginEditor (PluginProcessor* plugin);
+    PluginEditor (PluginProcessor* plug, PluginWorld& pw);
     ~PluginEditor();
 
     void setInstrument (InstrumentPtr i);
@@ -19,9 +20,11 @@ public:
     void resized() override;
     
 private:
+    PluginWorld& world;
     Element::Style style;
+    class Module; ScopedPointer<Module> module;
 };
 
 }}
 
-#endif  // BTSP1_EDITOR_H
+#endif  // KSP1_PLUGIN_EDITOR_H

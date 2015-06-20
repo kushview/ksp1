@@ -16,46 +16,46 @@
 
 namespace KSP1
 {    
-    class PluginWorld
+    PluginWorld::PluginWorld() { }
+    PluginWorld::~PluginWorld()
     {
-    public:
+        symbols.clear();
+        workThread = nullptr;
+    }
 
-        PluginWorld() { }
-        
-        void init ()
-        {
-            workThread = new WorkThread ("KSP1_Worker", 4096, 5);
-            workThread->startThread();
+    LV2Feature* PluginWorld::createMapFeature()   { return symbols.createMapFeature(); }
+    LV2Feature* PluginWorld::createUnmapFeature() { return symbols.createUnmapFeature(); }
 
-            features.add (symbols.createMapFeature());
-            features.add (symbols.createUnmapFeature());
-            features.add (new LV2Worker (*workThread, 2048, (LV2_Handle)nullptr, (LV2_Worker_Interface*)nullptr));
-        }
-        
-        void registerPlugin (PluginProcessor* plug)
-        {
-            if (instances.size() == 0)
-                init();
+    void PluginWorld::registerPlugin (PluginProcessor* plug)
+    {
+        if (instances.size() == 0)
+            init();
             
-            instances.addIfNotAlreadyThere (plug);
-        }
+        instances.addIfNotAlreadyThere (plug);
+    }
         
-        bool unregisterPlugin (PluginProcessor* plug)
+    bool PluginWorld::unregisterPlugin(PluginProcessor* plug)
         {
             instances.removeFirstMatchingValue (plug);
             return instances.size() == 0;
         }
         
-        AudioProcessor* load (const String& uri)
+    AudioProcessor* PluginWorld::load(const String& uri)
         {
             return nullptr;
         }
     
-        Array<PluginProcessor*> instances;
-        SymbolMap symbols;
-        LV2FeatureArray features;
-        ScopedPointer<WorkThread> workThread;
-    };
+    WorkThread& PluginWorld::getWorkThread()
+    {
+        jassert(workThread);
+        return *workThread;
+    }
+
+    void PluginWorld::init()
+    {
+        workThread = new WorkThread ("KSP1_Worker", 4096, 5);
+        workThread->startThread();
+    }
    
     static ScopedPointer<PluginWorld> globals;
     
@@ -90,9 +90,9 @@ namespace KSP1
             if (nullptr == handle)
             {
                 features = new LV2FeatureArray();
-                features->add (globals->symbols.createMapFeature());
-                features->add (globals->symbols.createUnmapFeature());
-                LV2Worker* worker = new LV2Worker (*globals->workThread, 2048);
+                features->add (globals->createMapFeature(), false);
+                features->add (globals->createUnmapFeature());
+                LV2Worker* worker = new LV2Worker (globals->getWorkThread(), 2048);
                 features->add (worker);
                 handle = descriptor->instantiate (descriptor, currentSampleRate, "", *features);
                 workerInterface = const_cast<LV2_Worker_Interface*> (
@@ -148,11 +148,13 @@ namespace KSP1
             
             midi.clear();
         }
-        
+       
+
     private:
         const LV2_Descriptor* descriptor;
         const LV2UI_Descriptor* uiDescriptor;
         LV2_Handle handle;
+        LV2UI_Handle uiHandle;
         LV2_Worker_Interface* workerInterface;
         ScopedPointer<LV2FeatureArray> features;
         double currentSampleRate;
@@ -163,10 +165,8 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     using namespace KSP1;
 
-    if (!globals)
-    {
+    if (! globals) {
         globals = new PluginWorld();
-        globals->init();
     }
     
     PluginProcessor* plugin = new PluginProcessor();
@@ -180,42 +180,20 @@ PluginProcessor::PluginProcessor()
     jassert (lvtk::get_lv2_descriptors().size() == 1);
     jassert (lvtk::get_lv2g2g_descriptors().size() == 1);
     module = new PluginModule();
-    
-#if 0
-    useExternalData = false;
-    if (! globals)
-        globals = new KSP1::PluginWorld();
-
     globals->registerPlugin (this);
-    instrument = new Instrument ("New Instrument");
-    sampler = new SamplerProcessor (*globals);
-    
-
-    //FIXME:
-    if (SamplerSynth* s = static_cast<SamplerSynth*> (sampler->currentSynth())) {
-        s->setGain (1.0);
-        s->setInstrument (instrument);
-    } else {
-        // need to have a synth to make sounds ..
-        jassertfalse;
-    }
-#endif
 }
 
 PluginProcessor::~PluginProcessor()
 {
-#if 0
-    if (sampler)
-        sampler->releaseResources();
+    module->deactivate();
+    module->cleanup();
+    module = nullptr;
 
-    sampler    = nullptr;
-    instrument = nullptr;
-
-    const bool shutdown = ! useExternalData ? globals->unregisterPlugin (this)
-                                            : false;
-    if (shutdown)
+    const bool shutdownGlobals = globals->unregisterPlugin (this);
+    if (shutdownGlobals)
+    {
         globals = nullptr;
-#endif
+    }
 }
 
 void PluginProcessor::fillInPluginDescription (PluginDescription &desc) const
@@ -316,6 +294,7 @@ void PluginProcessor::changeProgramName (int index, const String& newName) {
 void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
 {
     setPlayConfigDetails (0, 2, sampleRate, blockSize);
+    ring = new RingBuffer(4096 * 3);
     module->instantiate (sampleRate);
     module->activate();
 }
@@ -324,9 +303,10 @@ void PluginProcessor::releaseResources()
 {
     module->deactivate();
     module->cleanup();
+    ring = nullptr;
 }
 
-void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
+void PluginProcessor::processBlock(AudioSampleBuffer& audio, MidiBuffer& midi)
 {
     module->process (audio, midi);
 }
@@ -335,7 +315,7 @@ bool PluginProcessor::hasEditor() const { return true; }
 
 AudioProcessorEditor* PluginProcessor::createEditor()
 {
-    Gui::PluginEditor* ed = new Gui::PluginEditor (this);
+    Gui::PluginEditor* ed = new Gui::PluginEditor (this, *globals);
     return ed;
 }
 
@@ -371,6 +351,25 @@ PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
         }
     }
 #endif
+}
+
+void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 portProtocol, const void* buffer)
+{
+    if (nullptr == ring)
+        ring = new RingBuffer (4096 * 3);
+
+    const uint32 totalSize = bufferSize + sizeof(PortEvent);
+
+    if (ring->canWrite (totalSize))
+    {
+        PortEvent ev;
+        ev.index = portIndex;
+        ev.protocol = portProtocol;
+        ev.size = bufferSize;
+        ev.time.frames = 0;
+        ring->write (&ev, sizeof (PortEvent));
+        // ring->write (buffer, bufferSize);
+    }
 }
 
 }

@@ -5,17 +5,36 @@
       * Michael Fisher <mfisher@kushview.net>
 */
 
+#ifndef KSP1_PLUGIN_PROCESSOR_H
+#define KSP1_PLUGIN_PROCESSOR_H
 
-#ifndef KSP1_H
-#define KSP1_H
-
-#include "JuceHeader.h"
 #include "Instrument.h"
 
-namespace KSP1
-{
+namespace KSP1 {
 
 class PluginModule;
+class PluginProcessor;
+
+class PluginWorld
+{
+public:
+    PluginWorld();
+    ~PluginWorld();
+
+    LV2Feature* createMapFeature();
+    LV2Feature* createUnmapFeature();
+    void registerPlugin (PluginProcessor* plug);
+    bool unregisterPlugin (PluginProcessor* plug);
+    AudioProcessor* load (const String& uri);
+    WorkThread& getWorkThread();
+
+private:
+    Array<PluginProcessor*> instances;
+    SymbolMap symbols;
+    ScopedPointer<WorkThread> workThread;
+    void init();
+};
+
 class PluginProcessor  : public AudioProcessor
 {
 public:
@@ -26,7 +45,7 @@ public:
     void releaseResources();
 
     void processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages);
-
+    void writeToPort (uint32 portIndex, uint32 bufferSize, uint32 portProtocol, const void* buffer);
     AudioProcessorEditor* createEditor();
     bool hasEditor() const;
 
@@ -60,13 +79,11 @@ public:
     void setStateInformation (const void* data, int sizeInBytes);
 
     void fillInPluginDescription (PluginDescription &description) const;
-
-    KSP1::InstrumentPtr getInstrument() const { return this->instrument; }
     
 private:
     bool useExternalData;
-    KSP1::InstrumentPtr instrument;
     ScopedPointer<PluginModule> module;
+    ScopedPointer<RingBuffer> ring;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
@@ -74,4 +91,4 @@ private:
 
 }
 
-#endif  // KSP1_H
+#endif  // KSP1_PLUGIN_PROCESSOR_H
