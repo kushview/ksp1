@@ -84,9 +84,11 @@ private:
     bool useExternalData;
     ScopedPointer<PluginModule> module;
     ScopedPointer<RingBuffer> ring;
-
-    //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
+    HeapBlock<uint8> block;
+    HeapBlock<uint8> seqBlock;
+    ScopedPointer<PortBuffer> atomIn, atomOut;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor);
 };
 
 }

@@ -132,7 +132,7 @@
 			</array>
 			<key>volume</key>
 			<array>
-				<real>1.0388258695602417</real>
+				<real>0.6142999529838562</real>
 			</array>
 		</dict>
 		<key>synth list</key>
@@ -281,11 +281,36 @@
 			<integer>1</integer>
 		</dict>
 		<key>Window Frame</key>
-		<string>{{182, 155}, {355, 577}}</string>
+		<string>{{873, 234}, {355, 577}}</string>
 		<key>Window Max</key>
 		<string>{2560, 1622}</string>
 		<key>Window Min</key>
 		<string>{360, 540}</string>
+		<key>kAUInspectorListKey</key>
+		<array>
+			<dict>
+				<key>kAUInspectorStateKey_BusIndex</key>
+				<integer>0</integer>
+				<key>kAUInspectorStateKey_BusType</key>
+				<string>kBusType_Input</string>
+				<key>kAUInspectorStateKey_Bypassed</key>
+				<false/>
+				<key>kAUInspectorStateKey_CurrentViewName</key>
+				<string>KSP1</string>
+				<key>kAUInspectorStateKey_EffectIndex</key>
+				<integer>-1</integer>
+				<key>kAUInspectorStateKey_PresetDrawerExpandedItems</key>
+				<array/>
+				<key>kAUInspectorStateKey_PresetDrawerShowing</key>
+				<false/>
+				<key>kAUInspectorStateKey_TrackIndex</key>
+				<integer>0</integer>
+				<key>kAUInspectorStateKey_WindowLevel</key>
+				<integer>2147483647</integer>
+				<key>kAUInspectorStateKey_WindowRect</key>
+				<string>{{157, 271}, {960, 582}}</string>
+			</dict>
+		</array>
 	</dict>
 </dict>
 </plist>

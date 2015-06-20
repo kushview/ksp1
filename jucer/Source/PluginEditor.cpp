@@ -41,13 +41,10 @@ namespace Gui {
             handle = nullptr;
         }
 
-        SamplerView* getView() {
-            return (haveInstance()) ? static_cast<SamplerView*> (widget) : nullptr;
-        }
+        SamplerView* getView() { return (haveInstance()) ? static_cast<SamplerView*> (widget) : nullptr; }
 
-        bool haveInstance() const {
-            return (handle && editor && widget);
-        }
+        bool haveInstance() const { return (handle && editor && widget); }
+        
         static void writeCallback (LV2UI_Controller controller,
                                    uint32_t         portIndex,
                                    uint32_t         bufferSize,
@@ -55,7 +52,7 @@ namespace Gui {
                                    const void*      buffer)
         {
             PluginProcessor* proc = static_cast<PluginProcessor*> (controller);
-            proc->writeToPort(portIndex, bufferSize, portProtocol, buffer);
+            proc->writeToPort (portIndex, bufferSize, portProtocol, buffer);
         }
          
     private:
@@ -66,7 +63,7 @@ namespace Gui {
         LV2Editor* editor;
     };
 
-    PluginEditor::PluginEditor(PluginProcessor* plug, PluginWorld& pw)
+    PluginEditor::PluginEditor (PluginProcessor* plug, PluginWorld& pw)
         : AudioProcessorEditor(plug),
           world (pw)
     {

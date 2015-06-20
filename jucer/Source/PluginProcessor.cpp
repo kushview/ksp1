@@ -15,8 +15,14 @@
 #include "Ports.h"
 
 namespace KSP1
-{    
-    PluginWorld::PluginWorld() { }
+{
+    ScopedPointer<Element::URIs> uris;
+    
+    PluginWorld::PluginWorld()
+        : symbols()
+    {
+    }
+    
     PluginWorld::~PluginWorld()
     {
         symbols.clear();
@@ -68,6 +74,7 @@ namespace KSP1
               handle (nullptr)
         {
             currentSampleRate = 0.0;
+            worker = nullptr;
         }
         
         void instantiate (double rate)
@@ -83,16 +90,18 @@ namespace KSP1
             {
                 deactivate();
                 cleanup();
+                worker = nullptr;
                 features = nullptr;
                 jassert (nullptr == handle && nullptr == workerInterface);
             }
             
             if (nullptr == handle)
             {
+                jassert (worker == nullptr);
                 features = new LV2FeatureArray();
                 features->add (globals->createMapFeature(), false);
                 features->add (globals->createUnmapFeature());
-                LV2Worker* worker = new LV2Worker (globals->getWorkThread(), 2048);
+                worker = new LV2Worker (globals->getWorkThread(), 2048);
                 features->add (worker);
                 handle = descriptor->instantiate (descriptor, currentSampleRate, "", *features);
                 workerInterface = const_cast<LV2_Worker_Interface*> (
@@ -135,20 +144,16 @@ namespace KSP1
             return descriptor->extension_data (uri.toRawUTF8());
         }
         
-        void process (AudioSampleBuffer& audio, MidiBuffer& midi)
+        void run (int frames)
         {
-            if (! handle)
-            {
-                audio.clear(); midi.clear();
-                return;
-            }
-            
-            descriptor->connect_port (handle, Port::MainLeft, audio.getWritePointer (0, 0));
-            descriptor->connect_port (handle, Port::MainRight, audio.getWritePointer (1, 0));
-            
-            midi.clear();
+            descriptor->run (handle, static_cast<uint32> (frames));
+            worker->processWorkResponses();
+            worker->endRun();
         }
-       
+        
+        void connectPort (uint32 index, void* data) {
+            descriptor->connect_port (handle, index, data);
+        }
 
     private:
         const LV2_Descriptor* descriptor;
@@ -158,6 +163,7 @@ namespace KSP1
         LV2_Worker_Interface* workerInterface;
         ScopedPointer<LV2FeatureArray> features;
         double currentSampleRate;
+        LV2Worker* worker;
     };
 }
 
@@ -165,8 +171,11 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     using namespace KSP1;
 
-    if (! globals) {
+    if (! globals)
+    {
         globals = new PluginWorld();
+        ScopedPointer<LV2Feature> feat (globals->createMapFeature());
+        uris = new Element::URIs ((LV2_URID_Map*) feat->getFeature()->data);
     }
     
     PluginProcessor* plugin = new PluginProcessor();
@@ -294,7 +303,10 @@ void PluginProcessor::changeProgramName (int index, const String& newName) {
 void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
 {
     setPlayConfigDetails (0, 2, sampleRate, blockSize);
-    ring = new RingBuffer(4096 * 3);
+    ring = new RingBuffer (4096 * 3);
+    block.allocate (1024, true);
+    atomIn  = new PortBuffer (uris, uris->atom_Sequence, 4096);
+    atomOut = new PortBuffer (uris, uris->atom_Sequence, 4096);
     module->instantiate (sampleRate);
     module->activate();
 }
@@ -303,12 +315,67 @@ void PluginProcessor::releaseResources()
 {
     module->deactivate();
     module->cleanup();
+    block.free();
+    atomIn = nullptr;
     ring = nullptr;
 }
 
-void PluginProcessor::processBlock(AudioSampleBuffer& audio, MidiBuffer& midi)
+void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
 {
-    module->process (audio, midi);
+    atomIn->clear();
+    if (ring->canRead (sizeof (uint32)))
+    {
+        uint32 totalSize = 0;
+        ring->peak (&totalSize, sizeof (uint32));
+        bool readEvents = ring->canRead (totalSize);
+        PortEvent ev;
+        
+        while (readEvents)
+        {
+            zerostruct (ev);
+            ring->read (&totalSize, sizeof (uint32));
+            ring->read (&ev, sizeof (PortEvent));
+            jassert(totalSize == sizeof(uint32) + ev.size + sizeof(PortEvent));
+            ring->read (block, ev.size);
+            
+            if (ev.index == Port::AtomInput)
+            {
+                const lvtk::Atom atom (block.getData());
+                atomIn->addEvent (ev.time.frames,
+                                  atom.size(), atom.type(),
+                                  (uint8*) atom.body());
+            }
+            
+            if (ring->canRead (sizeof (uint32)))
+            {
+                ring->peak (&totalSize, sizeof (uint32));
+                readEvents = ring->canRead (totalSize);
+            }
+            else
+            {
+                readEvents = false;
+            }
+        }
+    }
+    
+    if (midi.getNumEvents() > 0)
+    {
+        MidiBuffer::Iterator iter (midi);
+        const uint8* data = nullptr; int bytes = 0, frame = 0;
+        while (iter.getNextEvent (data, bytes, frame))
+            atomIn->addEvent (frame, static_cast<uint32> (bytes),
+                              uris->midi_MidiEvent, data);
+        midi.clear();
+    }
+    
+    atomOut->reset (true);
+    module->connectPort (Port::AtomInput,  atomIn->getPortData());
+    module->connectPort (Port::AtomOutput, atomOut->getPortData());
+    module->connectPort (Port::MainLeft,   audio.getWritePointer (0, 0));
+    module->connectPort (Port::MainRight,  audio.getWritePointer (1, 0));
+    
+    module->run (audio.getNumSamples());
+    
 }
 
 bool PluginProcessor::hasEditor() const { return true; }
@@ -321,36 +388,10 @@ AudioProcessorEditor* PluginProcessor::createEditor()
 
 void PluginProcessor::getStateInformation (MemoryBlock& destData)
 {
-    InstrumentPtr sinst;
-#if 0
-    //FIXME:
-    if (SamplerSynth* synth = sampler->currentSynth())
-        sinst = synth->getInstrument();
-
-
-    jassert (sinst != nullptr);
-    if (ScopedXml xml = sinst->createXml())
-    {
-        copyXmlToBinary (*xml, destData);
-        //Logger::writeToLog (instrument->node().toXmlString());
-    }
-#endif
 }
 
-void
-PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
+void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-#if 0
-    if (ScopedXml xml = getXmlFromBinary (data, sizeInBytes))
-    {
-        ValueTree data (ValueTree::fromXml (*xml));
-        if (data.isValid())
-        {
-            instrument->setData (data);
-            // FIXME: sampler->currentSynth()->setInstrument (instrument);
-        }
-    }
-#endif
 }
 
 void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 portProtocol, const void* buffer)
@@ -358,7 +399,7 @@ void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 p
     if (nullptr == ring)
         ring = new RingBuffer (4096 * 3);
 
-    const uint32 totalSize = bufferSize + sizeof(PortEvent);
+    const uint32 totalSize = sizeof(uint32) + bufferSize + sizeof(PortEvent);
 
     if (ring->canWrite (totalSize))
     {
@@ -367,8 +408,13 @@ void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 p
         ev.protocol = portProtocol;
         ev.size = bufferSize;
         ev.time.frames = 0;
+        ring->write (&totalSize, sizeof (uint32));
         ring->write (&ev, sizeof (PortEvent));
-        // ring->write (buffer, bufferSize);
+        ring->write (buffer, bufferSize);
+    }
+    else
+    {
+        
     }
 }
 
