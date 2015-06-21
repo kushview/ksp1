@@ -187,7 +187,10 @@ void LV2Plugin::run (uint32_t nframes)
     midiIn.clear();
 }
 
-
+void LV2Plugin::trigger_restored()
+{
+    while (! wasRestored.set (1)) { }
+}
 
 WorkerStatus LV2Plugin::end_run()
 {
@@ -195,6 +198,7 @@ WorkerStatus LV2Plugin::end_run()
     return WORKER_SUCCESS;
 }
 
+SamplerSynth* LV2Plugin::get_sampler_synth() const { return sampler.get(); }
 void LV2Plugin::handle_patch_get (const PatchGet &obj)
 {
     if (! obj.subject) {
@@ -481,10 +485,10 @@ StateStatus LV2Plugin::restore (StateRetrieve &retrieve, uint32_t flags, const F
     else if (const void* data = retrieve (uris->ksp1_SamplerSynth, &size, &type, &rflags))
     {
         const String jsonStr (String::fromUTF8 ((const char*) data));
-        const var json = JSON::parse (jsonStr);
+        sampler->loadJSON (jsonStr);
     }
 
-    while (! wasRestored.set (1)) { }
+    trigger_restored();
     return STATE_SUCCESS;
 }
 

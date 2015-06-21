@@ -91,6 +91,9 @@ namespace KSP1
         /** Load a sampler from a file */
         bool loadFile (const File& file);
 
+        /** Load a sampler from JSON data */
+        bool loadJSON (const String& jsonString);
+        
         /** Load the sampler from XML create with ValueTree::toXmlString() */
         bool loadValueTreeXml (const XmlElement& xml);
 

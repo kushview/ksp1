@@ -185,7 +185,6 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
 {
     if (port == Port::AtomOutput && format == uris->atom_eventTransfer)
     {
-
         const lvtk::Atom atom (buffer);
 
         if (atom.total_size() != size) {

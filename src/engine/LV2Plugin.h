@@ -105,6 +105,8 @@ public:
 
     const URIs& get_uris() const { return *uris; }
     SampleCache& get_sample_cache();
+    SamplerSynth* get_sampler_synth() const;
+    void trigger_restored();
 
     // LV2 Worker Callbacks
     lvtk::WorkerStatus work (lvtk::WorkerRespond &respond, uint32_t size, const void* data);

@@ -180,7 +180,6 @@ namespace KSP1 {
     {
         dataLock.lock();
         activeLayers.removeFirstMatchingValue (data);
-        data->reset();
         dataLock.unlock();
     }
 

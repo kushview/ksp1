@@ -21,6 +21,7 @@
 #include "engine/LowPassFilter.h"
 #include "engine/LV2Plugin.h"
 #include "engine/SampleCache.h"
+#include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
 
 namespace KSP1 {
@@ -162,7 +163,12 @@ namespace KSP1 {
 
     void LayerData::reset()
     {
-        sound = nullptr;
+        if (sound)
+        {
+            sound->removeLayer (this);
+            sound = nullptr;
+        }
+        
         note = index = -1;
         parent = 0;
         if (renderBuffer.set (nullptr))

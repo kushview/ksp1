@@ -17,7 +17,8 @@ namespace Gui {
     {
     public:
         Module (PluginProcessor* proc, PluginWorld& pw)
-            : desc (&lvtk::get_lv2g2g_descriptors()[0])
+            : atom_eventTransfer (pw.map (LV2_ATOM__eventTransfer)),
+              desc (&lvtk::get_lv2g2g_descriptors()[0])
         {
             jassert (desc);
             editor = nullptr;
@@ -40,7 +41,10 @@ namespace Gui {
             editor = nullptr;
             handle = nullptr;
         }
-
+        LV2UI_Handle getHandle() const {
+            return handle;
+        }
+        
         SamplerView* getView() { return (haveInstance()) ? static_cast<SamplerView*> (widget) : nullptr; }
 
         bool haveInstance() const { return (handle && editor && widget); }
@@ -54,7 +58,15 @@ namespace Gui {
             PluginProcessor* proc = static_cast<PluginProcessor*> (controller);
             proc->writeToPort (portIndex, bufferSize, portProtocol, buffer);
         }
-         
+        
+        void portEvent (uint32 index, uint32 size, uint32 format, const void* buffer)
+        {
+            if (haveInstance())
+                desc->port_event (handle, index, size, format, buffer);
+        }
+        
+        const LV2_URID atom_eventTransfer;
+        
     private:
         const LV2UI_Descriptor* desc;
         LV2UI_Widget widget;
@@ -79,14 +91,22 @@ namespace Gui {
     
     PluginEditor::~PluginEditor()
     {
-        if (AudioProcessor* base = getAudioProcessor())
+        if (PluginProcessor* base = dynamic_cast<PluginProcessor*> (getAudioProcessor()))
+        {
+            base->unregisterEditor (this);
             base->editorBeingDeleted (this);
-
+        }
+        
         if (SamplerView* view = module->getView())
             removeChildComponent (view);
-
+        
         module = nullptr;
         setLookAndFeel (nullptr);
+    }
+    
+    LV2UI_Handle PluginEditor::getHandle() const
+    {
+        return module->getHandle();
     }
     
     void PluginEditor::setInstrument (InstrumentPtr i)
@@ -102,5 +122,13 @@ namespace Gui {
     void PluginEditor::resized()
     {
         module->getView()->setBounds (getLocalBounds());
-    }    
+    }
+    
+    void PluginEditor::receiveNotification (const LV2_Atom* atom)
+    {
+        module->portEvent (Port::AtomOutput,
+                           lv2_atom_total_size (atom),
+                           module->atom_eventTransfer,
+                           atom);
+    }
 }}

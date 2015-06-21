@@ -8,6 +8,7 @@
 #include "../../lvtk/lvtk/plugin.hpp"
 #include "../../lvtk/lvtk/ui.hpp"
 #include "KSP1.h"
+#include "engine/LV2Plugin.h"
 #include "engine/SamplerSynth.h"
 #include "Locations.h"
 #include "PluginEditor.h"
@@ -29,6 +30,11 @@ namespace KSP1
         workThread = nullptr;
     }
 
+    LV2_URID PluginWorld::map (const char* uri)
+    {
+        return symbols.map (uri);
+    }
+    
     LV2Feature* PluginWorld::createMapFeature()   { return symbols.createMapFeature(); }
     LV2Feature* PluginWorld::createUnmapFeature() { return symbols.createUnmapFeature(); }
 
@@ -41,15 +47,15 @@ namespace KSP1
     }
         
     bool PluginWorld::unregisterPlugin(PluginProcessor* plug)
-        {
-            instances.removeFirstMatchingValue (plug);
-            return instances.size() == 0;
-        }
+    {
+        instances.removeFirstMatchingValue (plug);
+        return instances.size() == 0;
+    }
         
     AudioProcessor* PluginWorld::load(const String& uri)
-        {
-            return nullptr;
-        }
+    {
+        return nullptr;
+    }
     
     WorkThread& PluginWorld::getWorkThread()
     {
@@ -155,6 +161,17 @@ namespace KSP1
             descriptor->connect_port (handle, index, data);
         }
 
+        LV2Plugin* getPlugin() const
+        {
+            return static_cast<KSP1::LV2Plugin*> (handle);
+        }
+        
+        SamplerSynth* getSynth()
+        {
+            if (KSP1::LV2Plugin* plugin = getPlugin())
+                return plugin->get_sampler_synth();
+            return nullptr;
+        }
     private:
         const LV2_Descriptor* descriptor;
         const LV2UI_Descriptor* uiDescriptor;
@@ -194,15 +211,21 @@ PluginProcessor::PluginProcessor()
 
 PluginProcessor::~PluginProcessor()
 {
+    if (editors.size() > 0)
+    {
+        jassertfalse;
+        stopTimer();
+        for (auto* e : editors)
+            delete e;
+        editors.clear();
+    }
+    
     module->deactivate();
     module->cleanup();
     module = nullptr;
 
-    const bool shutdownGlobals = globals->unregisterPlugin (this);
-    if (shutdownGlobals)
-    {
+    if (globals->unregisterPlugin (this))
         globals = nullptr;
-    }
 }
 
 void PluginProcessor::fillInPluginDescription (PluginDescription &desc) const
@@ -304,6 +327,7 @@ void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
 {
     setPlayConfigDetails (0, 2, sampleRate, blockSize);
     ring = new RingBuffer (4096 * 3);
+    uiRing = new RingBuffer (4096 * 3);
     block.allocate (1024, true);
     atomIn  = new PortBuffer (uris, uris->atom_Sequence, 4096);
     atomOut = new PortBuffer (uris, uris->atom_Sequence, 4096);
@@ -318,6 +342,7 @@ void PluginProcessor::releaseResources()
     block.free();
     atomIn = nullptr;
     ring = nullptr;
+    uiRing = nullptr;
 }
 
 void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
@@ -373,9 +398,14 @@ void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
     module->connectPort (Port::AtomOutput, atomOut->getPortData());
     module->connectPort (Port::MainLeft,   audio.getWritePointer (0, 0));
     module->connectPort (Port::MainRight,  audio.getWritePointer (1, 0));
-    
     module->run (audio.getNumSamples());
     
+    LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) atomOut->getPortData(), ev)
+    {
+        uint32 totalSize = lv2_atom_total_size (&ev->body);
+        if (uiRing->canWrite (totalSize))
+            uiRing->write (&ev->body, totalSize);
+    }
 }
 
 bool PluginProcessor::hasEditor() const { return true; }
@@ -383,15 +413,53 @@ bool PluginProcessor::hasEditor() const { return true; }
 AudioProcessorEditor* PluginProcessor::createEditor()
 {
     Gui::PluginEditor* ed = new Gui::PluginEditor (this, *globals);
+    editors.add (ed);
+    
+    if (! isTimerRunning())
+        startTimer (36);
+    
     return ed;
+}
+
+
+
+void PluginProcessor::unregisterEditor (Gui::PluginEditor* ed)
+{
+    jassert (editors.contains (ed));
+    editors.removeFirstMatchingValue (ed);
+    
+    if (editors.size() <= 0 && isTimerRunning())
+        stopTimer();
 }
 
 void PluginProcessor::getStateInformation (MemoryBlock& destData)
 {
+    SamplerSynth* sampler = module->getSynth();
+    if (! sampler)
+        return;
+    
+    var data;
+    sampler->getNestedVariant (data);
+    const String json (JSON::toString (data, true));
+    destData.append (json.toRawUTF8(), strlen(json.toRawUTF8()));
 }
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
+    LV2Plugin* plugin = module->getPlugin();
+    SamplerSynth* sampler = module->getSynth();
+    if (! sampler || ! plugin)
+        return;
+    
+    const String json (CharPointer_UTF8 ((const char*) data),
+                       (size_t) sizeInBytes);
+    
+    if (! sampler->loadJSON (json))
+    {
+        DBG("Failed loading JSON data");
+    }
+    
+    plugin->trigger_restored();
 }
 
 void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 portProtocol, const void* buffer)
@@ -399,7 +467,7 @@ void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 p
     if (nullptr == ring)
         ring = new RingBuffer (4096 * 3);
 
-    const uint32 totalSize = sizeof(uint32) + bufferSize + sizeof(PortEvent);
+    const uint32 totalSize = sizeof(uint32) + bufferSize + sizeof (PortEvent);
 
     if (ring->canWrite (totalSize))
     {
@@ -415,6 +483,36 @@ void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 p
     else
     {
         
+    }
+}
+
+void PluginProcessor::timerCallback()
+{
+    if (! uiRing)
+        return;
+    
+    HeapBlock<uint8> block; block.allocate (1024, true);
+    LV2_Atom* atom = (LV2_Atom*) block.getData();
+    while (uiRing->getReadSpace() > sizeof (LV2_Atom))
+    {
+        if (sizeof (LV2_Atom) != uiRing->peak (atom, sizeof(LV2_Atom)))
+            break;
+        
+        const uint32 totalSize (lv2_atom_total_size (atom));
+        
+        if (! uiRing->canRead (totalSize))
+            break;
+        
+        if (totalSize == uiRing->read (atom, lv2_atom_total_size (atom)))
+        {
+            for (Gui::PluginEditor* editor : editors)
+                editor->receiveNotification (atom);
+                    
+        }
+        else
+        {
+            DBG ("Error reading plugin notification");
+        }
     }
 }
 

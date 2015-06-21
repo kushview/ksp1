@@ -287,6 +287,15 @@ namespace KSP1 {
         return false;
     }
 
+    bool SamplerSynth::loadJSON (const String& jsonString)
+    {
+        const var json (JSON::fromString (jsonString));
+        JSONSynthLoader loader (json, getSampleCache());
+        if (loader.createSounds())
+            return installLoadedData (loader);
+        return false;
+    }
+    
     bool SamplerSynth::loadValueTreeXml (const XmlElement& e)
     {
         bool res = false;

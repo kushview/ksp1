@@ -18,6 +18,8 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    LV2UI_Handle getHandle() const;
+    void receiveNotification (const LV2_Atom* atom);
     
 private:
     PluginWorld& world;
