@@ -67,9 +67,14 @@ namespace KSP1
     {
         workThread = new WorkThread ("KSP1_Worker", 4096, 5);
         workThread->startThread();
+        factoryInstruments.clearQuick();
+        DataPath::factoryContentPath().getChildFile("Instruments")
+            .findChildFiles (factoryInstruments, File::findFiles, true, "*.xml");
     }
    
+    
     static ScopedPointer<PluginWorld> globals;
+    
     
     class PluginModule
     {
@@ -203,6 +208,7 @@ namespace KSP1 {
 
 PluginProcessor::PluginProcessor()
 {
+    currentProgram = 0;
     jassert (lvtk::get_lv2_descriptors().size() == 1);
     jassert (lvtk::get_lv2g2g_descriptors().size() == 1);
     module = new PluginModule();
@@ -295,33 +301,33 @@ bool PluginProcessor::producesMidi() const
    #endif
 }
 
-bool PluginProcessor::silenceInProducesSilenceOut() const {
-    return false; // sampler->silenceInProducesSilenceOut();
-}
+bool PluginProcessor::silenceInProducesSilenceOut() const { return false; }
+double PluginProcessor::getTailLengthSeconds() const { return 0.0; }
+int PluginProcessor::getNumPrograms() { return globals->factoryInstruments.size(); }
+int PluginProcessor::getCurrentProgram() { return currentProgram; }
 
-double PluginProcessor::getTailLengthSeconds() const {
-    return 0.0; // sampler->getTailLengthSeconds();
-}
-
-int PluginProcessor::getNumPrograms() {
-    return 0;// sampler->getNumPrograms();
-}
-
-int PluginProcessor::getCurrentProgram() {
-    return 0;// sampler->getCurrentProgram();
-}
-
-void PluginProcessor::setCurrentProgram (int index) {
-    // return sampler->setCurrentProgram (index);
+void PluginProcessor::setCurrentProgram (int index)
+{
+    if (isPositiveAndBelow (index, globals->factoryInstruments.size())) {
+        if (LV2Plugin* plugin = module->getPlugin()) {
+            if (SamplerSynth* synth = module->getSynth()) {
+                currentProgram = index;
+                const File file (globals->factoryInstruments.getUnchecked (index));
+                if (file.existsAsFile()) {
+                    synth->loadFile (globals->factoryInstruments.getUnchecked (index));
+                    plugin->trigger_restored();
+                }
+            }
+        }
+    }
 }
 
 const String PluginProcessor::getProgramName (int index) {
-    return ""; // sampler->getProgramName(index);
+    return isPositiveAndBelow(index, globals->factoryInstruments.size())
+        ? globals->factoryInstruments[index].getFileNameWithoutExtension() : "Program not available";
 }
 
-void PluginProcessor::changeProgramName (int index, const String& newName) {
-    //sampler->changeProgramName (index, newName);
-}
+void PluginProcessor::changeProgramName (int /*index*/, const String& /*newName*/) { }
 
 void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
 {
@@ -416,7 +422,7 @@ AudioProcessorEditor* PluginProcessor::createEditor()
     editors.add (ed);
     
     if (! isTimerRunning())
-        startTimer (36);
+        startTimer (52);
     
     return ed;
 }

@@ -29,7 +29,6 @@ namespace KSP1 {
 class Database
 {
 public:
-
     typedef std::initializer_list<var> QueryArgs;
 
     Database();
@@ -50,7 +49,6 @@ public:
 
 private:
     sqlite3* db;
-
 };
 
 }

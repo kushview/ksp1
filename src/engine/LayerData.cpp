@@ -23,6 +23,7 @@
 #include "engine/SampleCache.h"
 #include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
+#include "DataPath.h"
 
 namespace KSP1 {
 
@@ -206,7 +207,8 @@ namespace KSP1 {
         if (e.hasAttribute ("file"))
         {
             const String filePath (e.getStringAttribute ("file", currentFile.getFullPathName()));
-            if (! loadAudioFile (File (filePath)))
+            const File newSampleFile (DataPath::resolvePath (filePath));
+            if (! loadAudioFile (newSampleFile))
             {
                 //
             }
@@ -271,6 +273,9 @@ namespace KSP1 {
 
     bool LayerData::loadAudioFile (const File& audioFile)
     {
+        if (! audioFile.existsAsFile())
+            return false;
+        
         BufferPtr old = scratch;
         scratch = cache.loadAudioFile (audioFile);
 

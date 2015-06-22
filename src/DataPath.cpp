@@ -85,25 +85,21 @@ namespace KSP1 {
         return exPath;
     }
 
-    const File&
-    DataPath::factoryContentPath()
+    const File& DataPath::factoryContentPath()
     {
         static File factoryPath;
         if (factoryPath == File::nonexistent)
         {
-#if JUCE_IOS
+           #if JUCE_IOS
             File d = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory().getSiblingFile("Documents");
             __userpath = d.getChildFile ("User Data");
             d = __userpath;
-#elif JUCE_ANDROID
+           #elif JUCE_ANDROID
 
-#else
-            File d = File::getSpecialLocation (File::userMusicDirectory);
-            factoryPath = d.getChildFile ("KSP1");
-
-            d = factoryPath;
-#endif
-
+           #elif JUCE_MAC
+            File d = File::getSpecialLocation (File::currentApplicationFile);
+            factoryPath = d.getChildFile ("Contents/Resources");
+           #endif
         }
 
         return factoryPath;
@@ -113,13 +109,13 @@ namespace KSP1 {
     File DataPath::resolvePath (const String& path)
     {
         jassert (path.isNotEmpty());
+        jassert (! File::isAbsolutePath (path));
         if (path.substring (0, 1) != "/")
             return factoryContentPath().getChildFile (path);
 
         File file (path);
         return file;
     }
-
 
     const File& DataPath::simBeatThangPath()
     {

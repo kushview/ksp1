@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "engine/LayerData.h"
 #include "engine/LV2Plugin.h"
 #include "engine/SampleCache.h"
 #include "engine/SamplerKeys.h"
@@ -25,7 +26,7 @@
 #include "SamplerVoice.h"
 #include "Instrument.h"
 #include "URIs.h"
-#include "engine/LayerData.h"
+
 
 namespace KSP1 {
 

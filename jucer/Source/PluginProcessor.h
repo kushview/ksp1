@@ -34,9 +34,12 @@ public:
     LV2_URID map (const char* uri);
     
 private:
+    friend class PluginProcessor;
     Array<PluginProcessor*> instances;
     SymbolMap symbols;
     ScopedPointer<WorkThread> workThread;
+    Array<File> factoryInstruments;
+    
     void init();
 };
 
@@ -85,6 +88,7 @@ private:
 
     ScopedPointer<PortBuffer> atomIn, atomOut;
     Array<Gui::PluginEditor*> editors;
+    int currentProgram;
     
     friend class Timer;
     void timerCallback() override;
