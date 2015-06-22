@@ -8,6 +8,7 @@ src/sampler/ReferenceCode.h
 .waf*
 .DS_Store
 *.pyc
+*.wav
 jucer/builds
 jucer/Builds
 jucer/JuceLibraryCode/modules
