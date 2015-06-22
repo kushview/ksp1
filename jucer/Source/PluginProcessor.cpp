@@ -162,7 +162,8 @@ namespace KSP1
             worker->endRun();
         }
         
-        void connectPort (uint32 index, void* data) {
+        void connectPort (uint32 index, void* data)
+        {
             descriptor->connect_port (handle, index, data);
         }
 
@@ -177,6 +178,7 @@ namespace KSP1
                 return plugin->get_sampler_synth();
             return nullptr;
         }
+        
     private:
         const LV2_Descriptor* descriptor;
         const LV2UI_Descriptor* uiDescriptor;
@@ -248,39 +250,20 @@ void PluginProcessor::fillInPluginDescription (PluginDescription &desc) const
     desc.pluginFormatName   = "Internal";
 }
 
-const String PluginProcessor::getName() const {
-    return JucePlugin_Name;
+const String PluginProcessor::getName() const { return JucePlugin_Name; }
+int PluginProcessor::getNumParameters() { return 0; }
+float PluginProcessor::getParameter (int index) { return 0.0f; }
+void PluginProcessor::setParameter (int index, float newValue) { }
+const String PluginProcessor::getParameterName (int index) { return String::empty; }
+const String PluginProcessor::getParameterText (int index) { return String::empty; }
+const String PluginProcessor::getInputChannelName (int channelIndex) const { return String::empty; }
+
+const String PluginProcessor::getOutputChannelName (int channelIndex) const
+{
+    return String("Main ") + String (channelIndex == 0 ? "Left" : "Right");
 }
 
-int PluginProcessor::getNumParameters() {
-    return 0; // sampler->getNumParameters();
-}
-
-float PluginProcessor::getParameter (int index) {
-    return 0.0f; // sampler->getParameter(index);
-}
-
-void PluginProcessor::setParameter (int index, float newValue) {
-   // sampler->setParameter (index, newValue);
-}
-
-const String PluginProcessor::getParameterName (int index) {
-    return "param name"; // sampler->getParameterName(index);
-}
-
-const String PluginProcessor::getParameterText (int index) {
-    return "param text"; // sampler->getParameterText(index);
-}
-
-const String PluginProcessor::getInputChannelName (int channelIndex) const {
-    return "input name"; // sampler->getInputChannelName(channelIndex);
-}
-
-const String PluginProcessor::getOutputChannelName (int channelIndex) const {
-    return "out name"; // sampler->getOutputChannelName(channelIndex);
-}
-
-bool PluginProcessor::isInputChannelStereoPair  (int) const { return true; }
+bool PluginProcessor::isInputChannelStereoPair  (int) const { return false; }
 bool PluginProcessor::isOutputChannelStereoPair (int) const { return true; }
 
 bool PluginProcessor::acceptsMidi() const
@@ -322,7 +305,8 @@ void PluginProcessor::setCurrentProgram (int index)
     }
 }
 
-const String PluginProcessor::getProgramName (int index) {
+const String PluginProcessor::getProgramName (int index)
+{
     return isPositiveAndBelow(index, globals->factoryInstruments.size())
         ? globals->factoryInstruments[index].getFileNameWithoutExtension() : "Program not available";
 }
@@ -501,7 +485,7 @@ void PluginProcessor::timerCallback()
     LV2_Atom* atom = (LV2_Atom*) block.getData();
     while (uiRing->getReadSpace() > sizeof (LV2_Atom))
     {
-        if (sizeof (LV2_Atom) != uiRing->peak (atom, sizeof(LV2_Atom)))
+        if (sizeof (LV2_Atom) != uiRing->peak (atom, sizeof (LV2_Atom)))
             break;
         
         const uint32 totalSize (lv2_atom_total_size (atom));
@@ -513,7 +497,6 @@ void PluginProcessor::timerCallback()
         {
             for (Gui::PluginEditor* editor : editors)
                 editor->receiveNotification (atom);
-                    
         }
         else
         {
