@@ -1,7 +1,7 @@
 /*
     PluginProcessor.cpp - This file is part of KSP1
 
-    Copyright (C) 2013 Kushview, LLC  All rights reserved.
+    Copyright (C) 2015 Kushview, LLC  All rights reserved.
       * Michael Fisher <mfisher@kushview.net>
 */
 
