@@ -27,3 +27,5 @@ libs/vstsdk2.4
 *.includes
 
 content/
+testpack/
+data/factory/
