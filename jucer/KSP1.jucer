@@ -215,7 +215,6 @@
       <FILE id="KaFLiW" name="MediaLibrary.h" compile="0" resource="0" file="../src/MediaLibrary.h"/>
       <FILE id="PM1GBM" name="MediaObject.h" compile="0" resource="0" file="../src/MediaObject.h"/>
       <FILE id="VwnBy2" name="Monitor.h" compile="0" resource="0" file="../src/Monitor.h"/>
-      <FILE id="TKbXtl" name="MutableAtom.h" compile="0" resource="0" file="../src/MutableAtom.h"/>
       <FILE id="KZ7efH" name="PatternClip.h" compile="0" resource="0" file="../src/PatternClip.h"/>
       <FILE id="Hga0UQ" name="PatternLoader.h" compile="0" resource="0" file="../src/PatternLoader.h"/>
       <FILE id="vXt4Dw" name="PluginConfig.h" compile="0" resource="0" file="Source/PluginConfig.h"/>

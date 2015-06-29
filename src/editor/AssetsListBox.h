@@ -64,7 +64,7 @@ namespace Gui {
         Scoped<AssetItem> root;
         Scoped<AssetsListBoxHeader> header;
         void setResults (const ValueTree& newData);
-        ValueTree results;
+        var results;
 
         Element::Icon getIcon() const;
         bool isRootItemValid() const { return root != nullptr && root->isValid(); }

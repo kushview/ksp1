@@ -1,6 +1,6 @@
 /*
     This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+    Copyright (C) 2015  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 
 #include "KSP1.h"
 
-namespace KSP1 {
-
+namespace KSP1
+{
     /** A data structure which contains information about BeatThang data paths.
         This class should ONLY be used when working Beat Thang mkI content */
     struct Filesystem
@@ -42,23 +42,31 @@ namespace KSP1 {
     class KnownFilesystems
     {
     public:
-        typedef OwnedArray <Filesystem> ArrayType;
+        typedef OwnedArray<Filesystem> ArrayType;
 
         KnownFilesystems();
         ~KnownFilesystems();
 
-        void add (const String& uuid,
-                  const File& path,
-                  const String& name);
-
+        /** Add a new filesystem
+            @param uuid the Filesystem UUID
+            @param path the Filesystem root path
+            @param name the Filesystem name
+        */
+        void add (const String& uuid, const File& path, const String& name);
         void buildAssetTreeIndexes();
-
+        
+        /** Get all filesystem names
+            @param names The array to fill with names
+         */
         void getNames (StringArray& names);
+        
+        /** Get a Filesystem path by urid */
         const File& getPathForID (uint32 urid) const;
+        
+        /** Get a Filesystem path by UUID string */
         const File& getPathForUUID (const String& uuid) const;
 
         /** Get a file from a uuid and path
-
             @param uuid The FSID to look for
             @param path The file path within the filysystem
          */
@@ -90,22 +98,17 @@ namespace KSP1 {
         inline const Filesystem* const* end() const { return llist.end(); }
 
     private:
-
         FileSearchPath locations;
         ArrayType llist;
-
     };
 
     /** A scanner for sampler (beatthang) file systems */
     class FilesystemScanner
     {
     public:
-
         FilesystemScanner (KnownFilesystems& fses, const FileSearchPath& searchPaths);
         ~FilesystemScanner() { }
-
     };
-
 }
 
 #endif /* KSP1_FILESYSTEM_H */

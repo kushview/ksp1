@@ -22,6 +22,9 @@
 #include "engine/SampleCache.h"
 #include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
+#include "ContentScanner.h"
+#include "Database.h"
+#include "DataPath.h"
 #include "Ports.h"
 #include "URIs.h"
 #include "LV2Plugin.h"
@@ -70,6 +73,14 @@ LV2Plugin::~LV2Plugin()
 
 void LV2Plugin::activate()
 {
+    if (DataPath::defaultDatabaseFile().existsAsFile())
+        DataPath::defaultDatabaseFile().deleteFile();
+    
+    Database db (DataPath::defaultDatabaseFile());
+    { DatabaseSchema schema (db); }
+    { ContentScanner scanner (db);
+      scanner.scanLocation (DataPath::factoryContentPath()); }
+    
     lastGain = 1.0f;
     sampler->setCurrentPlaybackSampleRate (sampleRate);
     midiIn.ensureSize (2048);

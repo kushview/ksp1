@@ -26,8 +26,7 @@ namespace KSP1 {
     DataPath::DataPath (const File &srcDir) { file = srcDir.isDirectory() ? srcDir : srcDir.getParentDirectory(); }
     DataPath::~DataPath() { }
 
-    const File&
-    DataPath::defaultUserPath()
+    const File& DataPath::defaultUserPath()
     {
         static File __userpath;
         if (__userpath == File::nonexistent)
@@ -39,9 +38,8 @@ namespace KSP1 {
 #elif JUCE_ANDROID
             
 #else
-            File d = DataPath::factoryContentPath();
+            File d = File::getSpecialLocation(File::userMusicDirectory).getChildFile("KSP1");
             __userpath = d.getChildFile (String ("UserData"));
-
             d = __userpath;
 #endif
             
@@ -59,14 +57,19 @@ namespace KSP1 {
         return __userpath;
     }
 
-    const File&
-    DataPath::defaultDatabaseFile()
+    const File& DataPath::defaultDatabaseFile()
     {
-        static File __dbPath;
-        if (File::nonexistent == __dbPath)
+        static File __dbPath = File::nonexistent;
+        if (__dbPath == File::nonexistent)
         {
+           #if JUCE_MAC
+            __dbPath = File::getSpecialLocation(File::userMusicDirectory).getChildFile("KSP1");
+            __dbPath.createDirectory();
+            __dbPath = __dbPath.getChildFile ("library.db");
+           #else
             __dbPath = factoryContentPath().getChildFile ("library.db");
             __dbPath.getParentDirectory().createDirectory();
+           #endif
         }
         return __dbPath;
     }

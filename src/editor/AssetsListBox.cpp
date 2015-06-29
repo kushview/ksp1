@@ -1,6 +1,6 @@
 /*
     This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+    Copyright (C) 2015  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ namespace Gui {
                                 public TextEditor::Listener
     {
     public:
-
         AssetsListBoxHeader (AssetsListBox* box)
             : owner (box)
         {
@@ -40,6 +39,7 @@ namespace Gui {
             searchText.setTooltip ("Search for samples and instruments");
             setSize (100, 24);
         }
+        
         ~AssetsListBoxHeader()
         {
             searchText.removeListener (this);
@@ -50,21 +50,27 @@ namespace Gui {
             searchText.setSize (getWidth(), getHeight());
         }
 
-        /** Called when the user changes the text in some way. */
         virtual void textEditorTextChanged (TextEditor& text) override
         {
 
         }
 
-        /** Called when the user presses the return key. */
         virtual void textEditorReturnKeyPressed (TextEditor& text) override
         {
             Database db (DataPath::defaultDatabaseFile().getFullPathName().toRawUTF8());
             String sql ("SELECT id, name, path FROM assets WHERE name LIKE '%");
             sql << text.getText() << "%' ORDER BY name ASC;";
-            const ValueTree res (db.executeQuery (sql));
-            owner->results = res;
-            owner->updateContent();
+            
+            var results;
+            if (db.executeQuery (results, sql))
+            {
+                owner->results = results;
+                
+                File f ("~/Desktop/results.json");
+                f.create();
+                f.replaceWithText(JSON::toString (results));
+                owner->updateContent();
+            }
         }
 
         /** Called when the user presses the escape key. */
@@ -82,7 +88,6 @@ namespace Gui {
     private:
         AssetsListBox* owner;
         TextEditor searchText;
-
     };
 
     AssetsListBox::AssetsListBox()
@@ -99,45 +104,39 @@ namespace Gui {
         setHeaderComponent (nullptr);
     }
 
-    Element::Icon
-    AssetsListBox::getIcon() const
+    Element::Icon AssetsListBox::getIcon() const
     {
         return  Element::Icon (Element::getIcons().document, Colours::yellow);
     }
 
-    void
-    AssetsListBox::setRootItem (const AssetItem &asset)
+    void AssetsListBox::setRootItem (const AssetItem &asset)
     {
         root = new AssetItem (asset);
         updateContent();
     }
 
-    int
-    AssetsListBox::getNumRows()
+    int AssetsListBox::getNumRows()
     {
-        return results.getNumChildren();
+        return results.size();
     }
 
-    AssetItem
-    AssetsListBox::getAsset (int32 row) const
+    AssetItem AssetsListBox::getAsset (int32 row) const
     {
         assert (root != nullptr);
         return root->getChild (row);
     }
 
-    AssetItem
-    AssetsListBox::getSelectedAsset() const
+    AssetItem AssetsListBox::getSelectedAsset() const
     {
         return getAsset (this->getSelectedRow());
     }
 
-    void
-    AssetsListBox::paintListBoxItem (int row, Graphics& g, int w, int h, bool selected)
+    void AssetsListBox::paintListBoxItem (int row, Graphics& g, int w, int h, bool selected)
     {
         if (! isRootItemValid())
             return;
 
-        ValueTree r (results.getChild (row));
+        const var& r (results[row]);
 
         const int pady = 4;
         const int padx = 22;
@@ -153,8 +152,9 @@ namespace Gui {
                                              false);
         g.setColour (Colours::whitesmoke);
         g.setFont (Font (getRowHeight() - 2));
-        g.drawFittedText (r.getProperty (Slugs::name, "Error"),
-                          padx, pady, w - padx, h - (2 * pady),
+
+        const String name = r.getDynamicObject()->getProperties().getWithDefault("name", "Error");
+        g.drawFittedText (name, padx, pady, w - padx, h - (2 * pady),
                           Justification::centredLeft, 1);
     }
 
@@ -172,21 +172,21 @@ namespace Gui {
     void AssetsListBox::listBoxItemDoubleClicked (int row, const MouseEvent& e)
     {
         SparseSet<int> s;
-        s.addRange(Range<int> (row, row));
-       setSelectedRows (s, dontSendNotification);
-       const ValueTree r (results.getChild(row));
-       DBG (r.getProperty(Slugs::path, String::empty).toString());
-       return ListBoxModel::listBoxItemDoubleClicked (row, e);
+        s.addRange (Range<int> (row, row));
+        setSelectedRows (s, dontSendNotification);
+#if 0
+        const ValueTree r (results.getChild(row));
+        DBG (r.getProperty(Slugs::path, String::empty).toString());
+        return ListBoxModel::listBoxItemDoubleClicked (row, e);
+#endif
     }
 
-    void
-    AssetsListBox::backgroundClicked (const MouseEvent& e)
+    void AssetsListBox::backgroundClicked (const MouseEvent& e)
     {
         return ListBoxModel::backgroundClicked (e);
     }
 
-    void
-    AssetsListBox::selectedRowsChanged (int row)
+    void AssetsListBox::selectedRowsChanged (int row)
     {
         return ListBoxModel::selectedRowsChanged (row);
     }
@@ -198,6 +198,7 @@ namespace Gui {
 
     void AssetsListBox::returnKeyPressed (int row)
     {
+#if 0
         const ValueTree r (results.getChild (row));
         if (! r.isValid()) return;
 
@@ -211,7 +212,7 @@ namespace Gui {
 
         const int note (view->getDisplay()->selectedNote());
         KeyItem key (view->getDisplay()->getInstrument()->getOrCreateKey (note));
-        File file (filePath);
+        File file (DataPath::resolve();
         if (! file.existsAsFile())
             DBG ("File doesn't exist");
 
@@ -219,6 +220,7 @@ namespace Gui {
             key.addLayer (file);
         else
             DBG ("Key is invalid, can't add layer");
+#endif
     }
 
     void AssetsListBox::listWasScrolled() { }
@@ -229,11 +231,14 @@ namespace Gui {
         desc.append ("files");
         for (int i = 0; i < selected.size(); ++i)
         {
+#if 0
             const ValueTree r (results.getChild (selected [i]));
             String filePath (r.getProperty (Slugs::path, String::empty).toString());
             const File f (DataPath::resolvePath (filePath));
             desc.append (f.getFullPathName());
+#endif
         }
+
         return desc;
     }
 

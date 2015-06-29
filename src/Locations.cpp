@@ -1,6 +1,6 @@
 /*
     This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+    Copyright (C) 2015  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,22 +37,19 @@ namespace KSP1 {
         return fses;
     }
 
-    void
-    Locations::printAll()
+    void Locations::printAll()
     {
-        Logger::writeToLog ("[BTV] Locations: " + String (fses.size()) + String (" total"));
+        Logger::writeToLog ("Beat Thang Locations: " + String (fses.size()) + String (" total"));
         for (const Filesystem* fs : fses)
             Logger::writeToLog (fs->name + String ("\t") + String (fs->uuid));
     }
 
-    void
-    Locations::rebuildIndexes()
+    void Locations::rebuildIndexes()
     {
         // fses.buildAssetTreeIndexes();
     }
 
-    File
-    Locations::resolvePath (const String& path) const
+    File Locations::resolvePath (const String& path) const
     {
         File ret (File::nonexistent);
 

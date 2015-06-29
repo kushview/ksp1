@@ -33,16 +33,23 @@ public:
 
     Database();
     Database (const char* resource);
+    Database (const File& file);
     Database (const Database& other) {
         this->db = other.db;
     }
 
     ~Database();
 
+#if 0
     ValueTree executeQuery (const String& sql, const QueryArgs& args = {});
+#endif
+    bool executeQuery (var& results, const String& sql, const QueryArgs& args = {});
     void executeUpdate (const String& sql, const QueryArgs& args = {});
 
-    Database& operator= (const Database& other) {
+    bool tableExists (const String& name) const;
+    
+    Database& operator= (const Database& other)
+    {
         this->db = other.db;
         return *this;
     }
@@ -51,5 +58,21 @@ private:
     sqlite3* db;
 };
 
+class DatabaseSchema
+{
+public:
+    inline DatabaseSchema (Database& db)
+    {
+        String sql =
+        "CREATE TABLE IF NOT EXISTS assets ("
+        "    id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "    name VARCHAR(128), "
+        "    path VARCHAR(255), "
+        "    type VARCHAR(64));";
+        
+        db.executeUpdate (sql);
+    }
+};
+    
 }
 #endif // KSP1_DATABASE_H

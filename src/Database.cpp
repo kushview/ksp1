@@ -37,6 +37,16 @@ int ksp1_db_query (void* arg, int count, char** values,  char** fields)
     return SQLITE_OK;
 }
 
+// sqlite callback format : int (*callback)(void*,int,char**,char**)
+int ksp1_query_var (void* arg, int count, char** values,  char** fields)
+{
+    DynamicObject::Ptr obj = new DynamicObject();
+    for (int i = 0; i < count; ++i)
+        obj->setProperty (fields[i], values[i]);
+    ((var*) arg)->append (var (obj));
+    return SQLITE_OK;
+}
+
 namespace KSP1 {
 
     Database::Database()
@@ -55,22 +65,30 @@ namespace KSP1 {
         jassert (db_init == SQLITE_OK);
 
         int res = sqlite3_open (resource, &db);
-        if (SQLITE_OK != res) {
+        if (SQLITE_OK != res)
+        {
             DBG ("SQL Error: " << sqlite3_errmsg (db));
-            if (db != nullptr) {
+            if (db != nullptr)
+            {
                 sqlite3_close (db);
                 db = nullptr;
             }
         }
     }
 
+    Database::Database (const File& file)
+        : Database (file.getFullPathName().toRawUTF8())
+    { }
 
     Database::~Database()
     {
-        if (db)
-            sqlite3_close ((sqlite3*) db);
+        if (db) {
+            sqlite3_close (db);
+            db = nullptr;
+        }
     }
 
+#if 0
     ValueTree Database::executeQuery (const String& sql, const QueryArgs& args)
     {
         if (nullptr == db)
@@ -119,7 +137,61 @@ namespace KSP1 {
 
         return tree;
     }
-
+#endif
+    
+    bool Database::executeQuery (var& results, const String& sql, const QueryArgs& args)
+    {
+        if (nullptr == db)
+            return false;
+        
+        char* err = nullptr;
+        int res = SQLITE_ERROR;
+        
+        if (! sql.containsChar ('?'))
+        {
+            res = sqlite3_exec (db, sql.toRawUTF8(), ksp1_query_var, &results, &err);
+        }
+        else
+        {
+            String query;
+            int start = 0;
+            int end = 0;
+            
+            for (const var& val : args)
+            {
+                end = sql.indexOf (start, "?");
+                query << sql.substring (start, end);
+                
+                if (val.isString())
+                    query << "'" << val.toString() << "'";
+                else
+                    query << val.toString();
+                
+                start = end + 1;
+            }
+            
+            query << sql.substring (start);
+            res = sqlite3_exec (db, query.toRawUTF8(), ksp1_db_query, &results, &err);
+        }
+        
+        const bool result = (res == SQLITE_OK);
+        
+        if (res == SQLITE_OK) {
+            
+        } else {
+            
+        }
+        
+        if (err)
+        {
+            DBG ("SQL Error: " << err);
+            sqlite3_free (err);
+            err = nullptr;
+        }
+        
+        return result;
+    }
+    
     void Database::executeUpdate (const String& sql, const QueryArgs& args)
     {
         if (nullptr == db)
@@ -157,10 +229,12 @@ namespace KSP1 {
             res = sqlite3_exec (db, query.toRawUTF8(), ksp1_db_query, this, &err);
         }
 
-        if (err) {
+        if (err)
+        {
             DBG ("SQL Error: " << err);
             sqlite3_free (err);
             err = nullptr;
         }
     }
+    
 }
