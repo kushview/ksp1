@@ -8,9 +8,9 @@
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginSilenceInIsSilenceOut="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="KSP1AU" pluginRTASCategory=""
               aaxIdentifier="net.kushview.KSP1" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="3.1.1" companyName="Kushview, LLC" userNotes=""
-              includeBinaryInAppConfig="1" buildVST3="1" buildRTAS="0" buildAAX="0"
-              companyWebsite="http://kushview.net" companyEmail="info@kushview.net">
+              jucerVersion="3.1.1" companyName="Kushview" userNotes="" includeBinaryInAppConfig="1"
+              buildVST3="1" buildRTAS="0" buildAAX="0" companyWebsite="http://kushview.net"
+              companyEmail="info@kushview.net">
   <MAINGROUP id="mEwrer" name="KSP1">
     <GROUP id="{2CAC4549-6992-3946-0EF4-5A3D78FC6D22}" name="libs">
       <GROUP id="{2DE091A2-9AF3-7846-82A7-24034FB1C70B}" name="lvtk">
