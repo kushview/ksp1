@@ -89,11 +89,13 @@ def configure (conf):
             conf.env[d] = conf.is_defined (d)
 
     conf.check_cfg (package='lilv-0', uselib_store='LILV', args='--cflags --libs', mandatory=True)
-    conf.check_cfg (package='suil-0', uselib_store='SUIL', args='--cflags --libs', mandatory=True)
+    conf.check_cfg (package='suil-0', uselib_store='SUIL', args='--cflags --libs', mandatory=False)
     conf.check_cfg (package='jack', uselib_store='JACK', args='--cflags --libs', mandatory=False)
     add_pkg_defs (['HAVE_LILV', 'HAVE_SUIL', 'HAVE_JACK'])
 
     if juce.is_linux():
+        conf.check(features='c cxx cxxprogram', lib=['dl'], cflags=['-Wall'], uselib_store='DL')
+        conf.check(features='c cxx cxxprogram', lib=['pthread'], cflags=['-Wall'], uselib_store='PTHREAD')
         conf.check_cfg (package="alsa", uselib_store="ALSA", args='--cflags --libs', mandatory=True)
         conf.check_cfg (package="freetype2", uselib_store="FREETYPE2", args='--cflags --libs', mandatory=True)
         if conf.env.USE_EGL:
@@ -142,6 +144,7 @@ def configure (conf):
     juce.display_msg (conf, "Compile flags (c++)", conf.env.CXXFLAGS)
     juce.display_msg (conf, "Linker flags", conf.env.LINKFLAGS)
 
+    print conf.env
 
 def build_prepare_mac (bld):
     return
@@ -162,8 +165,7 @@ def build_sqlite3 (bld):
         name = 'bin/sqlite3',
         target = 'bin/sqlite3',
         source = bld.path.ant_glob ('libs/sqlite3/*.c'),
-        linkflags = ['-lpthread', '-ldl'],
-        use = ['libsqlite3'],
+        use = ['libsqlite3', 'DL', 'PTHREAD'],
         install_path = None
     )
 
@@ -198,9 +200,8 @@ def build (bld):
         source = plugin_source,
         includes = ['jucer/JuceLibraryCode', 'jucer/Source', 'src', 'libs/lvtk'],
         target = 'plugins/ksp1.lv2/plugin',
-        use = ['libsqlite3'],
+        use = ['libsqlite3', 'PTHREAD', 'DL'],
         cxxflags = ['-DKSP1_BUILD_LV2=1'],
-        linkflags = ['-lpthread'],
         install_path = plugin_dir,
         env = plugin_environ
     )

@@ -20,10 +20,9 @@
 #ifndef KSP1_LV2_PLUGIN_H
 #define KSP1_LV2_PLUGIN_H
 
-#include "Forge.h"
-#include "engine/Jobs.h"
 #include "../../libs/lvtk/lvtk/plugin.hpp"
-#include "../../libs/lvtk/lvtk/ext/atom.hpp"
+#include "Forge.h"
+#include "KSP1.h"
 
 namespace KSP1
 {
@@ -86,6 +85,7 @@ struct Patch : public PatchMessage
     const lvtk::Atom add, remove;
 };
 
+class JobManager;
 class LV2Plugin;
 class SampleCache;
 class SamplerSynth;
@@ -131,7 +131,7 @@ private:
     float* audioIns[2];
     float* audioOuts[2];
     MidiBuffer midiIn;
-    AtomicInt wasRestored;
+    AtomicValue<int> wasRestored;
 
     void handle_patch_get (const PatchGet& obj);
     void handle_patch_set (const PatchSet& obj);

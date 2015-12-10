@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="gPa4hq" name="KSP1 Standalone" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.yourcompany.KSP1Standalone" includeBinaryInAppConfig="1"
-              jucerVersion="3.1.0">
+              jucerVersion="3.1.1">
   <MAINGROUP id="DZcnxR" name="KSP1 Standalone">
     <GROUP id="{2EDD76D6-D8BA-22FA-92C9-906205CC75CA}" name="src">
       <FILE id="LF1m1M" name="ADSR.cpp" compile="1" resource="0" file="../src/ADSR.cpp"/>
@@ -170,20 +170,19 @@
         <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="element_base" path="../libs/element/modules"/>
-        <MODULEPATH id="lvtk_core" path="../libs/lvtk-juce/modules"/>
         <MODULEPATH id="element_gui" path="../libs/element/modules"/>
         <MODULEPATH id="element_models" path="../libs/element/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/modules"/>
-        <MODULEPATH id="lvtk_plugins" path="../libs/lvtk-juce/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <ANDROID targetFolder="Builds/Android" androidActivityClass="com.yourcompany.KSP1Standalone"
              androidSDKPath="${user.home}/SDKs/android-sdk" androidNDKPath="${user.home}/SDKs/android-ndk"
              androidMinimumSDK="8" androidInternetNeeded="1" androidKeyStore="${user.home}/.android/debug.keystore"
              androidKeyStorePass="android" androidKeyAlias="androiddebugkey"
-             androidKeyAliasPass="android" androidCpp11="1">
+             androidKeyAliasPass="android" androidCpp11="1" androidVersionCode="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" androidArchitectures="armeabi armeabi-v7a" isDebug="1"
                        optimisation="1" targetName="KSP1 Standalone"/>
@@ -191,7 +190,6 @@
                        optimisation="2" targetName="KSP1 Standalone"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="lvtk_core" path="../libs/lvtk-juce/modules"/>
         <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
@@ -209,7 +207,7 @@
         <MODULEPATH id="element_gui" path="../libs/element/modules"/>
         <MODULEPATH id="element_base" path="../libs/element/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/modules"/>
-        <MODULEPATH id="lvtk_plugins" path="../libs/lvtk-juce/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/modules"/>
       </MODULEPATHS>
     </ANDROID>
     <XCODE_IPHONE targetFolder="Builds/iOS">
@@ -220,7 +218,6 @@
                        targetName="KSP1 Standalone"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="lvtk_core" path="../libs/lvtk-juce/modules"/>
         <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
@@ -238,7 +235,7 @@
         <MODULEPATH id="element_gui" path="../libs/element/modules"/>
         <MODULEPATH id="element_base" path="../libs/element/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/modules"/>
-        <MODULEPATH id="lvtk_plugins" path="../libs/lvtk-juce/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
   </EXPORTFORMATS>
@@ -246,6 +243,7 @@
     <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="element_engines" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="element_gui" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="element_lv2" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="element_models" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
@@ -260,8 +258,7 @@
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="lvtk_core" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="lvtk_plugins" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
-  <JUCEOPTIONS/>
+  <JUCEOPTIONS ELEMENT_OSC="disabled" ELEMENT_LV2_PLUGIN_HOST="enabled" JUCE_WEB_BROWSER="disabled"
+               JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"/>
 </JUCERPROJECT>

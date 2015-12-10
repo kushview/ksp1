@@ -19,18 +19,13 @@
 
 #ifndef KSP1_JOBS_H
 #define KSP1_JOBS_H
+
 #include "Forge.h"
 #include "KSP1.h"
 #include "URIs.h"
 #include "engine/SamplerSynth.h"
 #include "../../libs/lvtk/lvtk/ext/atom.hpp"
 #include "../../libs/lvtk/lvtk/ext/worker.hpp"
-
-namespace lvtk {
-    struct Atom;
-    struct AtomObject;
-    struct WorkerRespond;
-}
 
 namespace KSP1 {
 
@@ -113,9 +108,7 @@ private:
     This class inherits lvtk::Atom, so you can pass it to lvtk and
     LV2 standard functions that take LV2_Atom* as parameters
  */
-struct ObjectRef : public lvtk::Atom
-{
-
+struct ObjectRef : public lvtk::Atom {
     /** Writes writes an object pointer by using a Forge.  The passed
         in Forge must have already called lvtk::AtomForge::set_buffer
         before using this ctor
