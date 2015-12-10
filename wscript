@@ -144,8 +144,6 @@ def configure (conf):
     juce.display_msg (conf, "Compile flags (c++)", conf.env.CXXFLAGS)
     juce.display_msg (conf, "Linker flags", conf.env.LINKFLAGS)
 
-    print conf.env
-
 def build_prepare_mac (bld):
     return
 
