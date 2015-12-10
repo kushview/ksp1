@@ -77,20 +77,18 @@
 #define KSP1_SLUGS__cutoff          NS_SLUGS "cutoff"
 #define KSP1_SLUGS__resonance       NS_SLUGS "resonance"
 
-namespace KSP1
-{
-    struct URIs
-    {
+namespace KSP1 {
+    struct URIs {
         typedef std::function<LV2_URID(const char*)> MapFunc;
 
         URIs (MapFunc &map)
             : assets_Search       (map (KSP1_ASSETS__Search)),
-        
+
               atom_eventTransfer  (map (LV2_ATOM__eventTransfer)),
               atom_Object         (map (LV2_ATOM__Object)),
               atom_Path           (map (LV2_ATOM__Path)),
               atom_URID           (map (LV2_ATOM__URID)),
-        
+
               ksp1_Instrument     (map (KSP1__Instrument)),
               ksp1_Key            (map (KSP1__Key)),
               ksp1_Layer          (map (KSP1__Layer)),
@@ -98,13 +96,13 @@ namespace KSP1
               ksp1_SamplerSound   (map (NS_KSP1 "SamplerSound")),
               ksp1_SamplerSynth   (map (KSP1__SamplerSynth)),
               ksp1_SqlQuery       (map (NS_KSP1 "SqlQuery")),
-        
+
               jobs_disposeObject  (map (KSP1_JOBS__disposeObject)),
               jobs_finalizeJob    (map (KSP1_JOBS__finalizeJob)),
               jobs_installObject  (map (KSP1_JOBS__installObject)),
               jobs_Disposable     (map (KSP1_JOBS__Disposable)),
               jobs_ObjectRef      (map (KSP1_JOBS__ObjectRef)),
-        
+
               slugs_cutoff          (map (KSP1_SLUGS__cutoff)),
               slugs_file            (map (KSP1_SLUGS__file)),
               slugs_index           (map (KSP1_SLUGS__index)),
@@ -127,9 +125,9 @@ namespace KSP1
               slugs_velocityLower   (map (KSP1_SLUGS__velocityLower)),
               slugs_voiceGroup      (map (KSP1_SLUGS__voiceGroup)),
               slugs_volume          (map (KSP1_SLUGS__volume)),
-        
+
               midi_MidiEvent        (map (LV2_MIDI__MidiEvent)),
-        
+
               patch_add             (map (LV2_PATCH__add)),
               patch_body            (map (LV2_PATCH__body)),
               patch_property        (map (LV2_PATCH__property)),
@@ -149,7 +147,7 @@ namespace KSP1
         { }
 
         const uint32_t assets_Search;
-        
+
         const uint32_t atom_eventTransfer;
         const uint32_t atom_Object;
         const uint32_t atom_Path;
@@ -191,7 +189,7 @@ namespace KSP1
         const uint32_t slugs_velocityLower;
         const uint32_t slugs_voiceGroup;
         const uint32_t slugs_volume;
-        
+
         const uint32_t midi_MidiEvent;
 
         const uint32_t patch_add;
@@ -221,7 +219,9 @@ namespace KSP1
             return map.map (slugToURI (slug).c_str());
         }
 
+        /** @internal Disable copy constructor */
         URIs(const URIs&);
+        /** @internal Disable copy constructor */
         URIs& operator= (const URIs&);
     };
 }

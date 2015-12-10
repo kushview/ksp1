@@ -166,7 +166,6 @@ def build_sqlite3 (bld):
         install_path = None
     )
 
-
 def build (bld):
     build_sqlite3 (bld)
 
