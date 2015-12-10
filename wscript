@@ -204,6 +204,7 @@ def build (bld):
     )
 
     bld.add_group()
+
     p = juce.IntrojucerProject (bld, 'standalone/KSP1 Standalone.jucer');
     ui = bld.shlib (
         source = bld.path.ant_glob ('src/*.cpp') +
@@ -244,26 +245,29 @@ def build (bld):
         linkflags = ['-lpthread']
     )
     '''
-    '''
-    bt = bld.program (
-        source = bld.path.ant_glob ('jucer/Source/**/*.cpp'),
-        includes = ['standalone/JuceLibraryCode', 'jucer/Source', 'src', 'libs/lvtk'],
-        target = 'bin/ksp1',
-        use = ['libksp1', 'libsqlite3'],
-        cxxflags = ['-DKSP1_STANDALONE=1'],
-        linkflags = ['-lpthread']
-    )
-    '''
 
-    if bld.env.KSP1_BUILD_TESTS:
-        tests = bld.program (
-            source = bld.path.ant_glob ('tests/**/*.cpp'),
-            includes = ['src', 'project/JuceLibraryCode'],
-            name = 'runTests',
-            target = 'runTests',
-            use = ['BTV', 'LILV', 'SUIL'],
-            linkflags = obj.linkflags,
-        )
+    bld.add_group()
+
+    bt = bld.program (
+        source = bld.path.ant_glob ('standalone/Source/**/*.cpp') +
+                 p.getLibraryCode(),
+        includes = ['standalone/JuceLibraryCode', 'standalone/Source', 'src'],
+        target = 'bin/ksp1',
+        use = ['libsqlite3', 'PTHREAD', 'LILV', 'SUIL', 'X11', 'XEXT',
+               'ALSA', 'FREETYPE2', 'GL', 'EGL', 'GLESV2', 'XCB'],
+        cxxflags = ['-DKSP1_STANDALONE=1'],
+        env = bld.env.derive()
+    )
+
+    # if bld.env.KSP1_BUILD_TESTS:
+    #     tests = bld.program (
+    #         source = bld.path.ant_glob ('tests/**/*.cpp'),
+    #         includes = ['src', 'project/JuceLibraryCode'],
+    #         name = 'runTests',
+    #         target = 'runTests',
+    #         use = ['BTV', 'LILV', 'SUIL'],
+    #         linkflags = obj.linkflags,
+    #     )
 
     #bld.add_post_fun (build_installer)
 
