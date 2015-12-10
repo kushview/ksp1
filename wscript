@@ -26,7 +26,6 @@ def options(opt):
     opt.add_option ('--installers', default=False, action='store_true', dest='installers', \
         help='Create installer(s) after the build is complete [ Default: False ]')
 
-
 def compiler_pre_config (conf):
     if not juce.is_win32():
         '''Use clang by default on non-windows'''
