@@ -19,15 +19,13 @@
 
 #include "Instrument.h"
 
-namespace KSP1
-{
+namespace KSP1 {
 
 LayerItem::LayerItem (const ValueTree& data)
     : ClipModel (data)
 {
     setMissingProperties();
 }
-
 
 LayerItem::LayerItem()
     : ClipModel (Tags::layer)
@@ -41,10 +39,9 @@ LayerItem::~LayerItem()
 
 }
 
-
 int32 LayerItem::index() const
 {
-    ValueTree keyNode (node().getParent());
+    const ValueTree keyNode (node().getParent());
     return keyNode.indexOf (this->node());
 }
 

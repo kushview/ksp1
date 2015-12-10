@@ -179,6 +179,7 @@ def build (bld):
         src/engine/SamplerSynth.cpp
         src/engine/SamplerVoice.cpp
         src/engine/LV2Plugin.cpp
+        src/URIs.cpp
     '''.split()
 
     juce_module_path = 'libs/libjuce/src/modules'
