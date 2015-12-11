@@ -73,6 +73,5 @@ public:
         db.executeUpdate (sql);
     }
 };
-    
 }
 #endif // KSP1_DATABASE_H

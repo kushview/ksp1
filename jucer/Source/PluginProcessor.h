@@ -47,8 +47,8 @@ class PluginProcessor  : public AudioProcessor,
                          private Timer
 {
 public:
-    PluginProcessor();
     ~PluginProcessor();
+    static PluginProcessor* create();
 
     void prepareToPlay (double sampleRate, int samplesPerBlock);
     void releaseResources();
@@ -79,7 +79,10 @@ public:
     void setStateInformation (const void* data, int sizeInBytes);
     void fillInPluginDescription (PluginDescription &description) const;
     void unregisterEditor (Gui::PluginEditor*);
-    
+
+protected:
+    PluginProcessor();
+
 private:
     bool useExternalData;
     ScopedPointer<PluginModule> module;

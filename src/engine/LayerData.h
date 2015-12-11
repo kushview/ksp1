@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_KEYLAYER_H
-#define KSP1_KEYLAYER_H
+#ifndef KSP1_LAYER_DATA_H
+#define KSP1_LAYER_DATA_H
 
 #include "engine/SamplerKeys.h"
 #include "Forge.h"

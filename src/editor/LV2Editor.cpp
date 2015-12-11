@@ -26,25 +26,17 @@
 #include "URIs.h"
 #include "../../libs/lvtk/src/ui.cpp"
 
-#define KSP1_USE_LV2_MESSAGE_THREAD 0
+#if __linux__
+ #if KSP1_STANDALONE
+  #define KSP1_USE_LV2_MESSAGE_THREAD 0
+ #else
+  #define KSP1_USE_LV2_MESSAGE_THREAD 1
+ #endif
+#else
+ #define KSP1_USE_LV2_MESSAGE_THREAD 0
+#endif
 
 namespace KSP1 {
-
-struct PatchResponse {
-    PatchResponse (const URIs& uris, const AtomObject& o)
-        : object (o) {
-        assert (object.otype() == uris.patch_Response);
-        lv2_atom_object_get (object,
-            uris.patch_body, &body,
-            uris.patch_request, &request,
-            uris.patch_sequenceNumber, &sequenceNumber,
-        0);
-    }
-
-    const AtomObject object;
-    const Atom body, request, sequenceNumber;
-};
-
 namespace Gui {
 
 // need to qualify these to avoid conflicts with other libraries (boost).
@@ -95,15 +87,16 @@ class LV2EditorInit : public DeletedAtShutdown {
 public:
     LV2EditorInit()
     {
-#ifdef __linux__
+       #if KSP1_USE_LV2_MESSAGE_THREAD
         initialiseJuce_GUI();
         MessageManager::getInstance();
-#endif
+       #endif
     }
 
     ~LV2EditorInit() { }
 };
 static LV2EditorInit* editor_init = nullptr;
+
 
 LV2Editor::LV2Editor (const char* plugin)
     : plugin_uri (plugin),
@@ -121,7 +114,7 @@ LV2Editor::LV2Editor (const char* plugin)
     forge = new Forge (*uris, get_urid_map(), get_urid_unmap());
     create_view();
 
-#ifdef __linux__
+   #if KSP1_USE_LV2_MESSAGE_THREAD
     if (LV2UI_Widget* parent = this->get_parent())
         xwin_parent = (intptr_t) parent;
 
@@ -132,7 +125,7 @@ LV2Editor::LV2Editor (const char* plugin)
         ui_resize (view->getWidth(), view->getHeight());
         xwin = (intptr_t) view->getPeer()->getNativeHandle();
     }
-#endif
+   #endif
     
     if (editors.size() == 0)
         runLoop = true;
@@ -157,9 +150,9 @@ LV2Editor::~LV2Editor()
 
     if (editors.size() == 0)
     {
-#ifdef __linux__
+       #if KSP1_USE_LV2_MESSAGE_THREAD
         shutdownJuce_GUI();
-#endif
+       #endif
         editor_init = nullptr;
     }
     else if (runLoop)
@@ -175,9 +168,10 @@ int LV2Editor::idle()
     if (! runLoop)
         return 0;
 
-#ifdef __linux__
+   #if KSP1_USE_LV2_MESSAGE_THREAD
     MessageManager::getInstance()->runDispatchLoopUntil (24);
-#endif
+   #endif
+
     return 0;
 }
 
@@ -310,7 +304,7 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
 
 LV2UI_Widget LV2Editor::widget()
 {
-   #if __linux__
+   #if KSP1_USE_LV2_MESSAGE_THREAD
     return reinterpret_cast<LV2UI_Widget> (xwin);
    #else
     return reinterpret_cast<LV2UI_Widget> (view.get());

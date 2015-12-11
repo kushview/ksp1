@@ -23,54 +23,55 @@
 
 namespace KSP1 {
 
-    class LayeringMode {
-    public:
-
-        enum ID {
-            Combine = 0,    ///< Layers are mixed (combined)
-            RoundRobin,     ///< Layers are alternated upon each note-on
-            VelocityRange   ///< Layer is selected according to a velocity range
-        };
-
-        LayeringMode() : mode (Combine) { }
-
-        LayeringMode (const int32& m)
-        {
-            assert (m < VelocityRange + 1);
-            mode = static_cast<ID> (m);
-        }
-
-        LayeringMode (const ID& id) : mode (id) { }
-
-        LayeringMode (const String& id)
-        {
-            if (id == "combine") {
-                mode = Combine;
-            } else if (id == "roundRobin") {
-                mode = RoundRobin;
-            } else if (id == "combine") {
-                mode = VelocityRange;
-            } else {
-                assert (false);
-            }
-        }
-
-        const ID getMode() const { return static_cast<ID> (mode); }
-
-        bool operator== (const LayeringMode& o) const { return o.mode == mode; }
-        bool operator== (const int32& o) const { return o == mode; }
-        bool operator!= (const LayeringMode& o) const { return o.mode != mode; }
-        bool operator!= (const int32& o) const { return o != mode; }
-
-        LayeringMode& operator= (const LayeringMode& o)
-        {
-            mode = o.mode;
-            return *this;
-        }
-
-    private:
-        int32 mode;
+class LayeringMode
+{
+public:
+    enum ID
+    {
+        Combine = 0,    ///< Layers are mixed (combined)
+        RoundRobin,     ///< Layers are alternated upon each note-on
+        VelocityRange   ///< Layer is selected according to a velocity range
     };
+
+    LayeringMode() : mode (Combine) { }
+
+    LayeringMode (const int32& m)
+    {
+        assert (m < VelocityRange + 1);
+        mode = static_cast<ID> (m);
+    }
+
+    LayeringMode (const ID& id) : mode (id) { }
+
+    LayeringMode (const String& id)
+    {
+        if (id == "combine") {
+            mode = Combine;
+        } else if (id == "roundRobin") {
+            mode = RoundRobin;
+        } else if (id == "combine") {
+            mode = VelocityRange;
+        } else {
+            assert (false);
+        }
+    }
+
+    const ID getMode() const { return static_cast<ID> (mode); }
+
+    bool operator== (const LayeringMode& o) const { return o.mode == mode; }
+    bool operator== (const int32& o) const { return o == mode; }
+    bool operator!= (const LayeringMode& o) const { return o.mode != mode; }
+    bool operator!= (const int32& o) const { return o != mode; }
+
+    LayeringMode& operator= (const LayeringMode& o)
+    {
+        mode = o.mode;
+        return *this;
+    }
+
+private:
+    int32 mode;
+};
 
 }
 

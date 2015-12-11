@@ -24,13 +24,11 @@
 #include "MidiFilter.h"
 
 namespace KSP1 {
-
     class StrokeType;
 
     class Articulator :  public MidiFilter
     {
     public:
-
         Articulator();
         ~Articulator();
 
@@ -44,7 +42,6 @@ namespace KSP1 {
     private:
         class Impl; Scoped<Impl> impl;
     };
-
 }
 
 #endif /* KSP1_ARTICULATOR_H */

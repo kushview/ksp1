@@ -179,6 +179,9 @@ def build (bld):
         src/engine/SamplerSynth.cpp
         src/engine/SamplerVoice.cpp
         src/engine/LV2Plugin.cpp
+        src/ContentScanner.cpp
+        src/Database.cpp
+        src/DataPath.cpp
         src/URIs.cpp
     '''.split()
 
@@ -193,71 +196,65 @@ def build (bld):
     plugin_environ.cshlib_PATTERN = plugin_environ.cxxshlib_PATTERN = \
         bld.env.plugin_PATTERN
 
-    plugin = bld.shlib (
-        source = plugin_source,
-        includes = ['jucer/JuceLibraryCode', 'jucer/Source', 'src', 'libs/lvtk'],
-        target = 'plugins/ksp1.lv2/plugin',
-        use = ['libsqlite3', 'PTHREAD', 'DL'],
-        cxxflags = ['-DKSP1_BUILD_LV2=1'],
-        install_path = plugin_dir,
-        env = plugin_environ
-    )
-
-    bld.add_group()
-
     p = juce.IntrojucerProject (bld, 'standalone/KSP1 Standalone.jucer');
-    ui = bld.shlib (
-        source = bld.path.ant_glob ('src/*.cpp') +
-                 bld.path.ant_glob ('src/editor/*.cpp') +
-                 p.getLibraryCode(),
-        includes = ['standalone/JuceLibraryCode', 'src', 'libs/lvtk'],
-        target = 'plugins/ksp1.lv2/ui',
-        use = ['libsqlite3', 'LILV', 'SUIL', 'X11', 'XEXT',
-               'ALSA', 'FREETYPE2', 'GL', 'EGL', 'GLESV2', 'XCB'],
-        cxxflags = ['-DKSP1_STANDALONE=1'],
-        linkflags = ['-lpthread'],
-        install_path = plugin_dir,
-        env = plugin_environ
-    )
 
-    ttl = bld (
-        features = 'subst',
-        source = 'jucer/LV2/manifest.ttl',
-        target = 'plugins/ksp1.lv2/manifest.ttl',
-        install_path = plugin_dir
-    )
+    if bld.env.KSP1_BUILD_PLUGINS:
+        plugin = bld.shlib (
+            source = plugin_source,
+            includes = ['jucer/JuceLibraryCode', 'jucer/Source', 'src', 'libs/lvtk'],
+            target = 'plugins/ksp1.lv2/plugin',
+            use = ['libsqlite3', 'PTHREAD', 'DL'],
+            cxxflags = ['-DKSP1_BUILD_LV2=1'],
+            install_path = plugin_dir,
+            env = plugin_environ
+        )
 
-    ttl = bld (
-        features = 'subst',
-        source = 'jucer/LV2/KSP1.ttl',
-        target = 'plugins/ksp1.lv2/KSP1.ttl',
-        install_path = plugin_dir
-    )
-    '''
-    libksp1 = bld.objects (
-        source = p.getLibraryCode() + bld.path.ant_glob ('src/**/*.cpp'),
-        includes = ['jucer/JuceLibraryCode', 'jucer/Source', 'src'],
-        name = 'libksp1',
-        target = 'libs/ksp1',
-        use = ['LILV', 'SUIL', 'X11', 'XEXT', 'ALSA', 'FREETYPE2', 'GL', \
-               'EGL', 'GLESV2', 'XCB'],
-        cxxflags = ['-fPIC'],
-        linkflags = ['-lpthread']
-    )
-    '''
+        bld.add_group()
 
-    bld.add_group()
+        ui = bld.shlib (
+            source = bld.path.ant_glob ('src/*.cpp') +
+                     bld.path.ant_glob ('src/editor/*.cpp') +
+                     p.getLibraryCode(),
+            includes = ['standalone/JuceLibraryCode', 'src', 'libs/lvtk'],
+            target = 'plugins/ksp1.lv2/ui',
+            use = ['libsqlite3', 'LILV', 'SUIL', 'X11', 'XEXT',
+                   'ALSA', 'FREETYPE2', 'GL', 'EGL', 'GLESV2', 'XCB'],
+            cxxflags = ['-DKSP1_STANDALONE=1'],
+            linkflags = ['-lpthread'],
+            install_path = plugin_dir,
+            env = plugin_environ
+        )
 
-    bt = bld.program (
-        source = bld.path.ant_glob ('standalone/Source/**/*.cpp') +
-                 p.getLibraryCode(),
-        includes = ['standalone/JuceLibraryCode', 'standalone/Source', 'src'],
-        target = 'bin/ksp1',
-        use = ['libsqlite3', 'PTHREAD', 'LILV', 'SUIL', 'X11', 'XEXT',
-               'ALSA', 'FREETYPE2', 'GL', 'EGL', 'GLESV2', 'XCB'],
-        cxxflags = ['-DKSP1_STANDALONE=1'],
-        env = bld.env.derive()
-    )
+        ttl = bld (
+            features = 'subst',
+            source = 'jucer/LV2/manifest.ttl',
+            target = 'plugins/ksp1.lv2/manifest.ttl',
+            install_path = plugin_dir
+        )
+
+        ttl = bld (
+            features = 'subst',
+            source = 'jucer/LV2/KSP1.ttl',
+            target = 'plugins/ksp1.lv2/KSP1.ttl',
+            install_path = plugin_dir
+        )
+
+        bld.add_group()
+
+    if bld.env.KSP1_BUILD_APPS:
+        bt = bld.program (
+            source = bld.path.ant_glob ('src/**/*.cpp') +
+                     bld.path.ant_glob ('jucer/Source/**/*.cpp') +
+                     bld.path.ant_glob ('standalone/Source/**/*.cpp') +
+                     p.getLibraryCode(),
+            includes = ['standalone/JuceLibraryCode', 'standalone/Source', \
+                        'libs/lvtk', 'jucer/Source', 'src'],
+            target = 'bin/ksp1',
+            use = ['libsqlite3', 'PTHREAD', 'LILV', 'SUIL', 'X11', 'XEXT',
+                   'ALSA', 'FREETYPE2', 'GL', 'EGL', 'GLESV2', 'XCB'],
+            cxxflags = ['-DKSP1_STANDALONE=1'],
+            env = bld.env.derive()
+        )
 
     # if bld.env.KSP1_BUILD_TESTS:
     #     tests = bld.program (

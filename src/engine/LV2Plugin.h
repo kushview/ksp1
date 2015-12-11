@@ -85,6 +85,22 @@ struct Patch : public PatchMessage
     const lvtk::Atom add, remove;
 };
 
+struct PatchResponse {
+    PatchResponse (const URIs& uris, const AtomObject& o)
+        : object (o)
+    {
+        assert (object.otype() == uris.patch_Response);
+        lv2_atom_object_get (object,
+            uris.patch_body, &body,
+            uris.patch_request, &request,
+            uris.patch_sequenceNumber, &sequenceNumber,
+        0);
+    }
+
+    const AtomObject object;
+    const Atom body, request, sequenceNumber;
+};
+
 class JobManager;
 class LV2Plugin;
 class SampleCache;

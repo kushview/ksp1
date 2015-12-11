@@ -20,6 +20,7 @@
 #ifndef KSP1_SAMPLER_VIEWS_H
 #define KSP1_SAMPLER_VIEWS_H
 
+#if 0
 #include "editor/SamplerPluginView.h"
 #include "editor/ProgramEditor.h"
 #include "editor/SamplerView.h"

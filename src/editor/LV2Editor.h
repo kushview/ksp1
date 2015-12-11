@@ -32,6 +32,14 @@ namespace Element {
 
 namespace KSP1 {
 class PortWriterInterface;
+class ViewController {
+public:
+    ViewController() { }
+    ~ViewController() { }
+
+    void portEvent (uint32_t port, uint32_t size, uint32_t format, void const* buffer);
+};
+
 namespace Gui {
 
 class KeyboardGetter;

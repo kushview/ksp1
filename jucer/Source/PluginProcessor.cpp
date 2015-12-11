@@ -5,8 +5,8 @@
       * Michael Fisher <mfisher@kushview.net>
 */
 
-#include "../../lvtk/lvtk/plugin.hpp"
-#include "../../lvtk/lvtk/ui.hpp"
+#include "lvtk/plugin.hpp"
+#include "lvtk/ui.hpp"
 #include "KSP1.h"
 #include "engine/LV2Plugin.h"
 #include "engine/SamplerSynth.h"
@@ -193,17 +193,7 @@ namespace KSP1
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    using namespace KSP1;
-
-    if (! globals)
-    {
-        globals = new PluginWorld();
-        ScopedPointer<LV2Feature> feat (globals->createMapFeature());
-        uris = new Element::URIs ((LV2_URID_Map*) feat->getFeature()->data);
-    }
-    
-    PluginProcessor* plugin = new PluginProcessor();
-    return plugin;
+    return KSP1::PluginProcessor::create();
 }
 
 namespace KSP1 {
@@ -236,6 +226,19 @@ PluginProcessor::~PluginProcessor()
         globals = nullptr;
 }
 
+PluginProcessor* PluginProcessor::create()
+{
+    if (! globals)
+    {
+        globals = new PluginWorld();
+        ScopedPointer<LV2Feature> feat (globals->createMapFeature());
+        uris = new Element::URIs ((LV2_URID_Map*) feat->getFeature()->data);
+    }
+
+    PluginProcessor* plugin = new PluginProcessor();
+    return plugin;
+}
+
 void PluginProcessor::fillInPluginDescription (PluginDescription &desc) const
 {
     desc.name               = getName();
@@ -250,7 +253,13 @@ void PluginProcessor::fillInPluginDescription (PluginDescription &desc) const
     desc.pluginFormatName   = "Internal";
 }
 
-const String PluginProcessor::getName() const { return JucePlugin_Name; }
+const String PluginProcessor::getName() const {
+#ifdef JucePlugin_Name
+    return JucePlugin_Name;
+#else
+    return "KSP1";
+#endif
+}
 int PluginProcessor::getNumParameters() { return 0; }
 float PluginProcessor::getParameter (int index) { return 0.0f; }
 void PluginProcessor::setParameter (int index, float newValue) { }
@@ -260,30 +269,13 @@ const String PluginProcessor::getInputChannelName (int channelIndex) const { ret
 
 const String PluginProcessor::getOutputChannelName (int channelIndex) const
 {
-    return String("Main ") + String (channelIndex == 0 ? "Left" : "Right");
+    return String ("Main ") + String (channelIndex == 0 ? "Left" : "Right");
 }
 
 bool PluginProcessor::isInputChannelStereoPair  (int) const { return false; }
 bool PluginProcessor::isOutputChannelStereoPair (int) const { return true; }
-
-bool PluginProcessor::acceptsMidi() const
-{
-   #if JucePlugin_WantsMidiInput
-    return true;
-   #else
-    return false;
-   #endif
-}
-
-bool PluginProcessor::producesMidi() const
-{
-   #if JucePlugin_ProducesMidiOutput
-    return true;
-   #else
-    return false;
-   #endif
-}
-
+bool PluginProcessor::acceptsMidi() const { return true; }
+bool PluginProcessor::producesMidi() const { return true; }
 bool PluginProcessor::silenceInProducesSilenceOut() const { return false; }
 double PluginProcessor::getTailLengthSeconds() const { return 0.0; }
 int PluginProcessor::getNumPrograms() { return globals->factoryInstruments.size(); }

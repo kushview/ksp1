@@ -45,7 +45,10 @@ namespace Gui {
             return handle;
         }
         
-        SamplerView* getView() { return (haveInstance()) ? static_cast<SamplerView*> (widget) : nullptr; }
+        SamplerView* getView() {
+            return (haveInstance()) ? static_cast<SamplerView*> (widget)
+                                    : nullptr;
+        }
 
         bool haveInstance() const { return (handle && editor && widget); }
         
@@ -79,9 +82,9 @@ namespace Gui {
         : AudioProcessorEditor(plug),
           world (pw)
     {
-        setLookAndFeel(&style);
-        setOpaque(true);
-        module = new Module(plug, pw);
+        setLookAndFeel (&style);
+        setOpaque (true);
+        module = new Module (plug, pw);
         if (SamplerView* view = module->getView())
         {
             addAndMakeVisible (view);

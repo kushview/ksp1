@@ -25,6 +25,7 @@
 static int db_init = -100;
 
 // sqlite callback format : int (*callback)(void*,int,char**,char**)
+#if 0
 int ksp1_db_query (void* arg, int count, char** values,  char** fields)
 {
     ValueTree* tree = (ValueTree*) arg;
@@ -36,6 +37,7 @@ int ksp1_db_query (void* arg, int count, char** values,  char** fields)
     tree->addChild (row, -1, nullptr);
     return SQLITE_OK;
 }
+#endif
 
 // sqlite callback format : int (*callback)(void*,int,char**,char**)
 int ksp1_query_var (void* arg, int count, char** values,  char** fields)
@@ -171,7 +173,7 @@ namespace KSP1 {
             }
             
             query << sql.substring (start);
-            res = sqlite3_exec (db, query.toRawUTF8(), ksp1_db_query, &results, &err);
+            res = sqlite3_exec (db, query.toRawUTF8(), ksp1_query_var, &results, &err);
         }
         
         const bool result = (res == SQLITE_OK);
@@ -201,7 +203,7 @@ namespace KSP1 {
         int res = SQLITE_ERROR;
 
         if (! sql.containsChar ('?')) {
-            res = sqlite3_exec (db, sql.toRawUTF8(), ksp1_db_query, this, &err);
+            res = sqlite3_exec (db, sql.toRawUTF8(), ksp1_query_var, this, &err);
         } else {
             String query;
             int start = 0;
@@ -226,7 +228,7 @@ namespace KSP1 {
             }
 
             query << sql.substring (start);
-            res = sqlite3_exec (db, query.toRawUTF8(), ksp1_db_query, this, &err);
+            res = sqlite3_exec (db, query.toRawUTF8(), ksp1_query_var, this, &err);
         }
 
         if (err)
