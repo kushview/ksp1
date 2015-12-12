@@ -29,11 +29,6 @@
 #include "editor/LevelMeter.h"
 #include "editor/Banks.h"
 #include "editor/Panels.h"
-
-namespace KSP1 {
-namespace Gui {
-    class SamplerEditor;
-}}
 //[/Headers]
 
 #include "ArticulationControls.h"

@@ -247,7 +247,8 @@ def build (bld):
                      bld.path.ant_glob ('jucer/Source/**/*.cpp') +
                      bld.path.ant_glob ('standalone/Source/**/*.cpp') +
                      p.getLibraryCode(),
-            includes = ['standalone/JuceLibraryCode', 'standalone/Source', \
+            includes = ['libs/element', 'libs/libjuce/src', \
+                        'standalone/JuceLibraryCode', 'standalone/Source', \
                         'libs/lvtk', 'jucer/Source', 'src'],
             target = 'bin/ksp1',
             use = ['libsqlite3', 'PTHREAD', 'LILV', 'SUIL', 'X11', 'XEXT',
