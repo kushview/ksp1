@@ -1,4 +1,5 @@
 
+#include "KSP1.h"
 #include "AppController.h"
 #include "PluginProcessor.h"
 #include "URIs.h"
@@ -66,11 +67,18 @@ public:
 
         auto* proc = PluginProcessor::create();
         if (auto* ed = proc->createEditor()) {
-            mainWindow->setContentOwned (ed, true);
+            mainWindow->setContentOwned (ed, false);
         }
 
         if (fullScreen)
+        {
             mainWindow->setFullScreen();
+        }
+        else
+        {
+            mainWindow->setUsingNativeTitleBar (true);
+            mainWindow->setResizable (true, false);
+        }
     }
 
     void shutdown() override

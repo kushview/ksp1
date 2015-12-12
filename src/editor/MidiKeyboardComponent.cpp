@@ -672,7 +672,7 @@ void MidiKeyboardComponent::handleNoteOn (MidiKeyboardState*, int /*midiChannel*
     shouldCheckState = true; // (probably being called from the audio thread, so avoid blocking in here)
 }
 
-void MidiKeyboardComponent::handleNoteOff (MidiKeyboardState*, int /*midiChannel*/, int /*midiNoteNumber*/)
+void MidiKeyboardComponent::handleNoteOff (MidiKeyboardState*, int /*midiChannel*/, int /*midiNoteNumber*/, float /*velocity*/)
 {
     shouldCheckState = true; // (probably being called from the audio thread, so avoid blocking in here)
 }
@@ -684,7 +684,7 @@ void MidiKeyboardComponent::resetAnyKeysInUse()
     {
         for (int i = 128; --i >= 0;)
             if (keysPressed[i])
-                state.noteOff (midiChannel, i);
+                state.noteOff (midiChannel, i, 0.0f);
 
         keysPressed.clear();
     }
@@ -695,7 +695,7 @@ void MidiKeyboardComponent::resetAnyKeysInUse()
 
         if (noteDown >= 0)
         {
-            state.noteOff (midiChannel, noteDown);
+            state.noteOff (midiChannel, noteDown, 0.0f);
             mouseDownNotes.set (i, -1);
         }
 
@@ -732,7 +732,7 @@ void MidiKeyboardComponent::updateNoteUnderMouse (Point<int> pos, bool isDown, i
                 mouseDownNotes.set (fingerNum, -1);
 
                 if (! mouseDownNotes.contains (oldNoteDown))
-                    state.noteOff (midiChannel, oldNoteDown);
+                    state.noteOff (midiChannel, oldNoteDown, 0.0f);
             }
 
             if (newNote >= 0)
@@ -750,7 +750,7 @@ void MidiKeyboardComponent::updateNoteUnderMouse (Point<int> pos, bool isDown, i
         mouseDownNotes.set (fingerNum, -1);
 
         if (! mouseDownNotes.contains (oldNoteDown))
-            state.noteOff (midiChannel, oldNoteDown);
+            state.noteOff (midiChannel, oldNoteDown, 0.0f);
     }
 }
 
@@ -900,7 +900,7 @@ bool MidiKeyboardComponent::keyStateChanged (const bool /*isKeyDown*/)
             if (keysPressed [note])
             {
                 keysPressed.clearBit (note);
-                state.noteOff (midiChannel, note);
+                state.noteOff (midiChannel, note, 0.0f);
                 keyPressUsed = true;
             }
         }

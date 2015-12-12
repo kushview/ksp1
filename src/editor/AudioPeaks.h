@@ -39,11 +39,9 @@ class AudioPeak :  public AudioThumbnail,
                    public ReferenceCountedObject
 {
 public:
-
     AudioPeak (AudioPeakFactory& factory)
         : AudioThumbnail (128, factory.getAudioFormatManager(), factory)
     { }
-
 };
 
 typedef ReferenceCountedObjectPtr<AudioPeak> AudioPeakPtr;

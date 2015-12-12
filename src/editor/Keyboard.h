@@ -147,8 +147,7 @@ namespace Gui {
 
         int lastPressedNote;
 
-        inline void
-        handleNoteOn (MidiKeyboardState* s, int chan, int note, float velocity)
+        inline void handleNoteOn (MidiKeyboardState* s, int chan, int note, float velocity)
         {
             lastPressedNote = note;
             midiSignal (MidiMessage::noteOn (chan, note, velocity));
@@ -156,21 +155,17 @@ namespace Gui {
             MidiKeyboardComponent::handleNoteOn (s, chan, note, velocity);
         }
 
-        inline void
-        handleNoteOff (MidiKeyboardState* s, int chan, int note)
+        inline void handleNoteOff (MidiKeyboardState* s, int chan, int note)
         {
             midiSignal (MidiMessage::noteOff (chan, note));
-            MidiKeyboardComponent::handleNoteOff (s, chan, note);
+            MidiKeyboardComponent::handleNoteOff (s, chan, note, 0.0f);
         }
-
     };
-
 
     inline KeySelectedTimer::KeySelectedTimer (KeyboardWidget &k)
         : keyboard (k), lastSentKey(-1) { }
 
-    inline void
-    KeySelectedTimer::timerCallback()
+    inline void KeySelectedTimer::timerCallback()
     {
         if (lastSentKey != keyboard.lastPressedNote)
         {
