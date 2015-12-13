@@ -20,11 +20,11 @@
 #include <functional>
 
 #include "editor/AudioPeaks.h"
-#include "LV2Editor.h"
+#include "editor/DisplayView.h"
+#include "editor/LV2Editor.h"
 #include "PortWriterInterface.h"
 #include "PortWriter.h"
 #include "URIs.h"
-#include "../../libs/lvtk/src/ui.cpp"
 
 #if __linux__
  #if KSP1_STANDALONE
@@ -44,7 +44,6 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 using std::placeholders::_3;
 using std::placeholders::_4;
-
 
 class KeyboardGetter :  private Timer
 {
@@ -83,19 +82,20 @@ private:
 
 static Array<LV2Editor*> editors;
 
+#if KSP1_USE_LV2_MESSAGE_THREAD
 class LV2EditorInit : public DeletedAtShutdown {
 public:
     LV2EditorInit()
     {
-       #if KSP1_USE_LV2_MESSAGE_THREAD
+
         initialiseJuce_GUI();
         MessageManager::getInstance();
-       #endif
     }
 
     ~LV2EditorInit() { }
 };
 static LV2EditorInit* editor_init = nullptr;
+#endif
 
 
 LV2Editor::LV2Editor (const char* plugin)
@@ -103,9 +103,10 @@ LV2Editor::LV2Editor (const char* plugin)
       xwin(0), xwin_parent(0),
       runLoop (false)
 {
+   #if KSP1_USE_LV2_MESSAGE_THREAD
     if (! editor_init)
         editor_init = new LV2EditorInit ();
-
+   #endif
     peaks = new AudioPeakFactory();
 
     // setup the forge and URIs objects
@@ -152,8 +153,8 @@ LV2Editor::~LV2Editor()
     {
        #if KSP1_USE_LV2_MESSAGE_THREAD
         shutdownJuce_GUI();
-       #endif
         editor_init = nullptr;
+       #endif
     }
     else if (runLoop)
     {
@@ -192,7 +193,7 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
             const lvtk::Atom left, right;
             lv2_atom_object_get (atom.as_object().cobj(), 1, &left, 2, &right, 0);
             if (left && right) {
-                view->setMainRMS (left.as_float(), right.as_float());
+                //FIXME: view->setMainRMS (left.as_float(), right.as_float());
             }
         }
         else if (atom.type() == uris->atom_Object && atom.as_object().otype() == uris->patch_Response)
@@ -220,7 +221,7 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
 
         else if (atom.has_object_type (uris->ksp1_SamplerSynth)) {
             interface->getInstrument()->clear();
-            view->stabilizeView();
+            //FIXME: view->stabilizeView();
             keyboard->getKeyboard();
         }
 
@@ -295,7 +296,7 @@ void LV2Editor::port_event (uint32_t port, uint32_t size, uint32_t format, void 
             }
 
             in->setMissingProperties (true);
-            view->setInstrment (in);
+            //FIXME: view->setInstrment (in);
         }
     }
 
@@ -311,24 +312,25 @@ LV2UI_Widget LV2Editor::widget()
    #endif
 }
 
-SamplerView* LV2Editor::create_view()
+DisplayView* LV2Editor::create_view()
 {
     if (nullptr == view)
     {
-        view = new SamplerView();
+        view = new DisplayView();
         view->setLookAndFeel (&style);
 
         PortWriter::WriteFunc f = std::bind (&LV2Editor::write, this, _1, _2, _3, _4);
         writer = new PortWriter (*forge, f);
         interface = new PortWriterInterface (*writer);
-        interface->setInstrument (view->getInstrument());
-        view->setInterface (interface);
+//        interface->setInstrument (view->getInstrument());
+//        view->setInterface (interface);
     }
 
     return view.get();
 }
 
-
 }}
 
-const unsigned ksp1guii = KSP1::Gui::LV2Editor::register_class (KSP1_GUI_URI);
+#include "../../libs/lvtk/src/ui.cpp"
+const unsigned ksp1ui_x11  = KSP1::Gui::LV2Editor::register_class ("http://kushview.net/ns/ksp1/ui/x11");
+const unsigned ksp1ui_juce = KSP1::Gui::LV2Editor::register_class ("http://kushview.net/ns/ksp1/ui/juce");

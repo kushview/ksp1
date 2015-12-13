@@ -25,7 +25,12 @@
         lv2:binary <plugin.so> ;
         rdfs:seeAlso <KSP1.ttl> .
 
-<http://kushview.net/ns/ksp1/gui>
+<http://kushview.net/ns/ksp1/ui/x11>
         a ui:X11UI ;
         ui:binary <ui.so> ;
-        rdfs:seeAlso <silence.ttl> .
+        rdfs:seeAlso <KSP1.ttl> .
+
+<http://kushview.net/ns/ksp1/ui/juce>
+        a ui:JuceUI ;
+        ui:binary <ui.so> ;
+        rdfs:seeAlso <KSP1.ttl> .

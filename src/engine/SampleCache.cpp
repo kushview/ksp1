@@ -17,11 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "Instrument.h"
 #include "engine/LayerData.h"
 #include "engine/SampleCache.h"
 #include "engine/SamplerKeys.h"
-
 
 #define SAMPLE_CACHE_TIMEOUT 50
 

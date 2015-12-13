@@ -42,18 +42,17 @@ namespace Gui {
 
 //[MiscUserDefs]
 
-    // right now this is just a timer that keeps the level meter going
-    // onDisplayUpdate will probably go away
-    class SamplerView::Updater :  public Timer
-    {
-    public:
+// right now this is just a timer that keeps the level meter going
+// onDisplayUpdate will probably go away
+class SamplerView::Updater :  public Timer
+{
+public:
+    Updater (SamplerView& v) : view (v) { }
+    void timerCallback() { view.onDisplayUpdate(); }
 
-        Updater (SamplerView& v) : view (v) { }
-        void timerCallback() { view.onDisplayUpdate(); }
-
-    private:
-        SamplerView& view;
-    };
+private:
+    SamplerView& view;
+};
 
 //[/MiscUserDefs]
 
@@ -579,14 +578,12 @@ void SamplerView::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 
 //[MiscUserCode]
-void
-SamplerView::buttonStateChanged (Button* btn)
+void SamplerView::buttonStateChanged (Button* btn)
 {
 
 }
 
-void
-SamplerView::setVolume (float db, bool notify)
+void SamplerView::setVolume (float db, bool notify)
 {
     NotificationType n = notify ? sendNotification : dontSendNotification;
     volume->setValue (db, n);
@@ -634,26 +631,9 @@ void SamplerView::onKeySelected (int k)
     }
 }
 
-void
-SamplerView::onDisplayUpdate()
+void SamplerView::onDisplayUpdate()
 {
-#if 0
-    if (SamplerEditor* ed = findParentComponentOfClass<SamplerEditor> ())
-    {
-        if (KSP1::SamplerProcessor* proc = ed->sampler())
-        {
-            if (meter)
-            {
-                float left, right;
-                proc->getMainPeaks (left, right);
-                meter->setValue (0, left);
-                meter->setValue (1, right);
-                meter->refresh();
-                meter->repaint();
-            }
-        }
-    }
-#endif
+
 }
 
 void SamplerView::loadFile (const File& file) {
@@ -662,8 +642,7 @@ void SamplerView::loadFile (const File& file) {
     }
 }
 
-void
-SamplerView::loadProgram (const Programming::Item& item)
+void SamplerView::loadProgram (const Programming::Item& item)
 {
 #if 0
     //FIXME:
@@ -675,8 +654,7 @@ SamplerView::loadProgram (const Programming::Item& item)
 #endif
 }
 
-void
-SamplerView::layerChosen()
+void SamplerView::layerChosen()
 {
     if (EditScreen* screen = dynamic_cast<EditScreen*> (display->findChildWithID ("edit-screen")))
     {
@@ -687,8 +665,7 @@ SamplerView::layerChosen()
     updateControls();
 }
 
-void
-SamplerView::updateControls (NotificationType n)
+void SamplerView::updateControls (NotificationType n)
 {
     InstrumentPtr instrument (display->getInstrument());
     LayerItem layer (layersListBox->getSelectedLayer());

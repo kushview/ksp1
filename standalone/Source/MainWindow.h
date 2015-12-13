@@ -8,7 +8,12 @@ class MainWindow : public DocumentWindow
 public:
     MainWindow (String name)  : DocumentWindow (name, Colours::lightgrey, 0)
     {
-        centreWithSize (300, 200);
+        auto* c = getConstrainer();
+        c->setMaximumSize (800, 480);
+        c->setMinimumSize (300, 200);
+        setResizeLimits (300, 200, 800, 480);
+
+        centreWithSize (480, 320);
         setVisible (true);
     }
 

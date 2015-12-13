@@ -20,10 +20,28 @@
 #ifndef KSP1_H_INCLUDED
 #define KSP1_H_INCLUDED
 
-#if KSP1_STANDALONE
- #include "../standalone/JuceLibraryCode/JuceHeader.h"
+#if HAVE_JUCE_CORE
+ #include <juce/JuceHeader.h>
+ #define JUCE_MODULE_AVAILABLE_element_base 1
+ #include "modules/element_base/element_base.h"
+
+ #if KSP1_STANDALONE
+//  #define JUCE_MODULE_AVAILABLE_element_engines 1
+  #define JUCE_MODULE_AVAILABLE_element_gui 1
+  #define JUCE_MODULE_AVAILABLE_element_lv2 1
+  #define JUCE_MODULE_AVAILABLE_element_models 1
+  #include "modules/element_engines/element_engines.h"
+  #include "modules/element_gui/element_gui.h"
+  #include "modules/element_lv2/element_lv2.h"
+  #include "modules/element_models/element_models.h"
+ #endif
+
 #else
- #include "../jucer/JuceLibraryCode/JuceHeader.h"
+ #if KSP1_STANDALONE
+  #include "../standalone/JuceLibraryCode/JuceHeader.h"
+ #else
+  #include "../jucer/JuceLibraryCode/JuceHeader.h"
+ #endif
 #endif
 
 namespace KSP1

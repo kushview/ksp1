@@ -23,13 +23,12 @@
 #include "engine/SamplerKeys.h"
 #include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
-#include "SamplerVoice.h"
-#include "Instrument.h"
+#include "engine/SamplerVoice.h"
 #include "URIs.h"
 
 
-namespace KSP1 {
-
+namespace KSP1
+{
     static ScopedPointer<SampleCache> sSampleCache;
     static Array<SamplerSynth*> sCacheUsers;
 

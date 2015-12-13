@@ -32,19 +32,11 @@ namespace Element {
 
 namespace KSP1 {
 class PortWriterInterface;
-class ViewController {
-public:
-    ViewController() { }
-    ~ViewController() { }
-
-    void portEvent (uint32_t port, uint32_t size, uint32_t format, void const* buffer);
-};
 
 namespace Gui {
-
 class KeyboardGetter;
 class AudioPeakFactory;
-class SamplerView;
+class DisplayView;
 
 class LV2Editor;
 typedef lvtk::UI<LV2Editor, lvtk::URID<true>,
@@ -75,9 +67,9 @@ private:
     ScopedPointer<KeyboardGetter> keyboard;
     Element::Style style;
     ScopedPointer<PortWriter> writer;
-    ScopedPointer<SamplerView> view;
+    ScopedPointer<DisplayView> view;
     ScopedPointer<PortWriterInterface> interface;
-    SamplerView* create_view();
+    DisplayView* create_view();
 };
 
 }}

@@ -185,16 +185,6 @@ void LV2Plugin::run (uint32_t nframes)
 
     audio.applyGainRamp (0, numSamples, lastGain, sampler->getMasterGain());
     lastGain = sampler->getMasterGain();
-
-    forge->frame_time (procFrame);
-    {
-        ForgeFrame rmsFrame;
-        forge->write_object (rmsFrame, 0, 333333);
-        forge->write_key (1); forge->write_float (audio.getRMSLevel (0, 0, numSamples));
-        forge->write_key (2); forge->write_float (audio.getRMSLevel (1, 0, numSamples));
-        forge->pop_frame (rmsFrame);
-    }
-
     midiIn.clear();
 }
 
