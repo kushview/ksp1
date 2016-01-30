@@ -32,7 +32,7 @@ namespace KSP1 {
     static inline Identifier fxSendIdentifier (int sendNumber)
     {
         static const Identifier fxSendSlug      = "fxSend";
-        String s (fxSendSlug);
+        String s (fxSendSlug.toString());
         s << String("-") << String (sendNumber);
         return Identifier (s);
     }
@@ -48,8 +48,8 @@ namespace KSP1 {
                         const String& _ns = NS_SLUGS,
                         bool recurse = false)
             : ns(_ns), node (n), recursive (recurse),
-              forge (f), objectType (otype),
-              objectID (oid), parentID (parent)
+              forge (f), objectID(oid), objectType (otype),
+              parentID (parent)
         {
             slugUsedAsId = Tags::id;
         }

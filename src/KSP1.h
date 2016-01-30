@@ -37,11 +37,14 @@
  #endif
 
 #else
- #if KSP1_STANDALONE
+ #if KSP1_INTERNAL
+  #include "JuceHeader.h"
+ #elif KSP1_STANDALONE
   #include "../standalone/JuceLibraryCode/JuceHeader.h"
  #else
   #include "../jucer/JuceLibraryCode/JuceHeader.h"
  #endif
+
 #endif
 
 namespace KSP1
