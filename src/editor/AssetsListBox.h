@@ -66,7 +66,7 @@ namespace Gui {
         void setResults (const ValueTree& newData);
         var results;
 
-        Element::Icon getIcon() const;
+        // Element::Icon getIcon() const;
         bool isRootItemValid() const { return root != nullptr && root->isValid(); }
 
         void handleAssetSelected (const AssetItem& item);

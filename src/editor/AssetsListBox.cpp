@@ -104,10 +104,10 @@ namespace Gui {
         setHeaderComponent (nullptr);
     }
 
-    Element::Icon AssetsListBox::getIcon() const
+    /* Element::Icon AssetsListBox::getIcon() const
     {
         return  Element::Icon (Element::getIcons().document, Colours::yellow);
-    }
+    } */
 
     void AssetsListBox::setRootItem (const AssetItem &asset)
     {
@@ -147,9 +147,11 @@ namespace Gui {
             g.fillRect (0, 0, w, h);
         }
 
+#if 0
         getIcon().draw (g, Rectangle<float> (4.0f, (float)pady,
                                              getRowHeight(), getRowHeight() - (2.0f * (float)pady)),
                                              false);
+#endif
         g.setColour (Colours::whitesmoke);
         g.setFont (Font (getRowHeight() - 2));
 

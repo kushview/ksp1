@@ -42,7 +42,7 @@ protected:
     bool removeKey (const KeyItem&) override;
     bool addLayer (const LayerItem&) override;
     bool removeLayer (const LayerItem&) override;
-    void clearKeyboard();
+    void clearKeyboard() override;
 
     void loadFile (const File &) override;
 

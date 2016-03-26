@@ -35,27 +35,26 @@ namespace Gui {
 
         ProgramsListBox (Programming&);
         ~ProgramsListBox();
-        int getNumRows();
+        int getNumRows() override;
         void paintListBoxItem (int rowNumber, Graphics& g,
-                               int width, int height, bool rowIsSelected);
+                               int width, int height, bool rowIsSelected) override;
 
         Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
-                                           Component* existingComponentToUpdate);
-        void listBoxItemClicked (int row, const MouseEvent& e);
-        void listBoxItemDoubleClicked (int row, const MouseEvent& e);
+                                           Component* existingComponentToUpdate) override;
+        void listBoxItemClicked (int row, const MouseEvent& e) override;
+        void listBoxItemDoubleClicked (int row, const MouseEvent& e) override;
         void backgroundClicked (const MouseEvent&) override;
-        void selectedRowsChanged (int lastRowSelected);
-        void deleteKeyPressed (int lastRowSelected);
-        void returnKeyPressed (int lastRowSelected);
-        void listWasScrolled();
-        var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows);
-        String getTooltipForRow (int row);
+        void selectedRowsChanged (int lastRowSelected) override;
+        void deleteKeyPressed (int lastRowSelected) override;
+        void returnKeyPressed (int lastRowSelected) override;
+        void listWasScrolled() override;
+        var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows) override;
+        String getTooltipForRow (int row) override;
 
         Programming::Item selectedItem() const;
         Engaged& signalEngaged() { return notifyEngaged; }
 
     private:
-
         Programming& progs;
         int totalRows;
 

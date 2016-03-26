@@ -29,11 +29,11 @@ public:
 
     ~SoundsTimeline() { }
 
-    void mouseDown (const MouseEvent& ev) {
+    void mouseDown (const MouseEvent& ev) override {
         TimelineComponent::mouseDown (ev);
     }
 
-    void timelineBodyClicked (const MouseEvent& ev, int track)
+    void timelineBodyClicked (const MouseEvent& ev, int track) override
     {
 
     }
@@ -467,7 +467,6 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
                 if (f.getFileExtension() == ".xml" ||
                     f.getFileExtension() == ".btdk")
                 {
-                    ProgressSink& sink = display().progressBarSink();
                     if (SamplerView* view = getSamplerView()) {
                         view->loadFile (chooser.getResult());
                     }

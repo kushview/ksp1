@@ -258,7 +258,7 @@ void LV2Plugin::handle_patch_set (const PatchSet& set)
         {
             jassert (set.subject.as_object().id() != 0);
             if (SamplerSound* sound = sampler->moveSound (set.subject.as_object().id(), set.value.as_int()))
-                { }
+            { (void)sound; }
         }
         else
         {

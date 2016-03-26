@@ -44,7 +44,9 @@ namespace KSP1
         class DataLoader
         {
         public:
-            struct Type {
+            struct Type
+            {
+                virtual ~Type() { }
                 virtual bool canLoad (const File&) =0;
             };
 

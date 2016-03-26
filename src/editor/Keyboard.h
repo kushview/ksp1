@@ -96,7 +96,7 @@ namespace Gui {
 
     protected:
 
-        inline void mouseUp (const MouseEvent& ev)
+        inline void mouseUp (const MouseEvent& ev) override
         {
             MidiKeyboardComponent::mouseUp (ev);
             keySelectedSignal (lastPressedNote);
@@ -107,8 +107,7 @@ namespace Gui {
 
         }
 
-        inline bool
-        keyPressed (const KeyPress& key)
+        inline bool keyPressed (const KeyPress& key) override
         {
             const int code = key.getKeyCode();
 

@@ -32,7 +32,7 @@ namespace KSP1 {
     class Controller {
     public:
         Controller();
-        ~Controller();
+        virtual ~Controller();
 
         virtual void initialize();
         Locations& locations();

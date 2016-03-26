@@ -35,13 +35,13 @@ namespace Gui {
 ProgramEditorView::ProgramEditorView (Controller& ctrl)
     : controller (ctrl)
 {
-    addAndMakeVisible (bankList1 = new KSP1::Gui::BankList (controller.programs()));
+    addAndMakeVisible (bankList1 = new KSP1::Gui::BankList (world.programs()));
     bankList1->setName ("bank-list-1");
 
-    addAndMakeVisible (programList = new ProgramsListBox (controller.programs()));
+    addAndMakeVisible (programList = new ProgramsListBox (world.programs()));
     programList->setName ("program-list");
 
-    addAndMakeVisible (banklist2 = new KSP1::Gui::BankList (controller.programs()));
+    addAndMakeVisible (banklist2 = new KSP1::Gui::BankList (world.programs()));
     banklist2->setName ("bank-list-2");
 
 
@@ -82,6 +82,9 @@ void ProgramEditorView::paint (Graphics& g)
 
 void ProgramEditorView::resized()
 {
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     bankList1->setBounds (4, 5, 196, getHeight() - 276);
     programList->setBounds (208, 8, getWidth() - 214, getHeight() - 15);
     banklist2->setBounds (6, getHeight() - 263, 192, 256);

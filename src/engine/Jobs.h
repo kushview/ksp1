@@ -74,7 +74,6 @@ public:
 
 class JobManager {
 public:
-
     JobManager (LV2Plugin& p);
     ~JobManager();
 
@@ -101,7 +100,6 @@ private:
     OwnedArray<Job> working;
     void scheduleWork (uint32_t, const void*);
     void scheduleWork (const lvtk::Atom& atom);
-
 };
 
 /** Helper class for dealing with referenced objects
