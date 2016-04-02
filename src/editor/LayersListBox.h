@@ -43,26 +43,25 @@ namespace Gui {
         LayerItem getSelectedLayer() const;
         void updateLayers();
 
-        void resized();
+        void resized() override;
 
         // list box
-        int getNumRows();
-        void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected);
-        void listBoxItemClicked (int row, const MouseEvent& e);
-        void listBoxItemDoubleClicked (int row, const MouseEvent& e);
-        Component* refreshComponentForRow (int row, bool selected, Component* existing);
+        int getNumRows() override;
+        void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
+        void listBoxItemClicked (int row, const MouseEvent& e) override;
+        void listBoxItemDoubleClicked (int row, const MouseEvent& e) override;
+        Component* refreshComponentForRow (int row, bool selected, Component* existing) override;
         void backgroundClicked (const MouseEvent&) override;
-        void selectedRowsChanged (int lastRowSelected);
-        void deleteKeyPressed (int lastRowSelected);
-        void returnKeyPressed (int lastRowSelected);
-        void listWasScrolled();
-        var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows);
-        String getTooltipForRow (int row);
+        void selectedRowsChanged (int lastRowSelected) override;
+        void deleteKeyPressed (int lastRowSelected) override;
+        void returnKeyPressed (int lastRowSelected) override;
+        void listWasScrolled() override;
+        var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows) override;
+        String getTooltipForRow (int row) override;
 
-        void mouseWheelMove (const MouseEvent &, const MouseWheelDetails &);
+        void mouseWheelMove (const MouseEvent &, const MouseWheelDetails &) override;
 
         Selected& signalSelected() { return notifyChosen; }
-
 
         bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
         void itemDragEnter (const SourceDetails& dragSourceDetails) override;

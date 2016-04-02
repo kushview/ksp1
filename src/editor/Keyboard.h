@@ -146,7 +146,7 @@ namespace Gui {
 
         int lastPressedNote;
 
-        inline void handleNoteOn (MidiKeyboardState* s, int chan, int note, float velocity)
+        inline void handleNoteOn (MidiKeyboardState* s, int chan, int note, float velocity) override
         {
             lastPressedNote = note;
             midiSignal (MidiMessage::noteOn (chan, note, velocity));

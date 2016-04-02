@@ -32,7 +32,7 @@
 
 namespace KSP1 {
 
-static const int32 adsrChannel = 0;
+// TODO: implement ADSR: static const int32 adsrChannel = 0;
 
 SamplerVoice::SamplerVoice (SamplerSynth& parent, int32 voiceId)
     : owner (parent), tempBuffer (1, 1)

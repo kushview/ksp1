@@ -334,15 +334,13 @@ namespace KSP1
             }
         }
 
-        DBG ("mapL: " << layerMap.size() << " mapS: " << getNumSounds()
-             << " loaderL: " << loader.layers.size() << " loaderS: " << loader.sounds.size());
         const bool loaded = (layerMap.size() == loader.layers.size() &&
                              soundMap.size() == loader.sounds.size());
 
         loader.sounds.clearQuick (false);
         loader.layers.clearQuick();
 
-        return true;
+        return loaded;
     }
 
     void SamplerSynth::setProperty (const URIs& uris, const PatchSet& set)

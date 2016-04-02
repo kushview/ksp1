@@ -74,13 +74,13 @@ namespace Gui {
         }
 
         /** Called when the user presses the escape key. */
-        virtual void textEditorEscapeKeyPressed (TextEditor&)
+        virtual void textEditorEscapeKeyPressed (TextEditor&) override
         {
 
         }
 
         /** Called when the text editor loses focus. */
-        virtual void textEditorFocusLost (TextEditor&)
+        virtual void textEditorFocusLost (TextEditor&) override
         {
 
         }

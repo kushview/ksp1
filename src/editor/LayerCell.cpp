@@ -68,12 +68,10 @@ void LayerCell::resized()
 
 
 //[MiscUserCode]
-void
-LayerCell::setLayer (const LayerItem& item)
+void LayerCell::setLayer (const LayerItem& item)
 {
     layer = item;
 
-    LayersListBox* box = getListBox();
     if (layer.isValid() && ! layer.isEmpty())
     {
         String nextResource = layer.fileString();
@@ -85,16 +83,14 @@ LayerCell::setLayer (const LayerItem& item)
     }
 }
 
-LayersListBox*
-LayerCell::getListBox()
+LayersListBox* LayerCell::getListBox()
 {
     LayersListBox* box = findParentComponentOfClass<LayersListBox>();
     assert (box);
     return box;
 }
 
-void
-LayerCell::setSelected (bool yn)
+void LayerCell::setSelected (bool yn)
 {
     const bool changed = (yn != isSelected);
     isSelected = yn;
@@ -109,8 +105,7 @@ LayerCell::setSelected (bool yn)
         repaint();
 }
 
-void
-LayerCell::mouseWheelMove (const MouseEvent&, const MouseWheelDetails &d)
+void LayerCell::mouseWheelMove (const MouseEvent&, const MouseWheelDetails &d)
 {
     if (LayersListBox* box = getListBox())
     {
