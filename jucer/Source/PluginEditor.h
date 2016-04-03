@@ -23,7 +23,7 @@ public:
     
 private:
     PluginWorld& world;
-    Element::Style style;
+    Element::LookAndFeel_E1 style;
     class Module; ScopedPointer<Module> module;
 };
 

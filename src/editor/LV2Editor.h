@@ -66,7 +66,7 @@ private:
     ScopedPointer<Forge> forge;
     ScopedPointer<KSP1::URIs>  uris;
     ScopedPointer<KeyboardGetter> keyboard;
-    Element::Style style;
+    Element::LookAndFeel_E1 style;
     ScopedPointer<PortWriter> writer;
     ScopedPointer<DisplayView> view;
     ScopedPointer<PortWriterInterface> interface;
