@@ -2,14 +2,6 @@
 	path = libs/lvtk
 	url = https://github.com/lvtk/lvtk.git
 	branch = master
-[submodule "libs/element"]
-	path = libs/element
-	url = https://github.com/kushview/element.git
-	branch = develop
-[submodule "libs/libjuce"]
-	path = libs/libjuce
-	url = https://github.com/mfisher31/libjuce.git
-	branch = master
 [submodule "libs/lv2"]
 	path = libs/lv2
 	url = https://github.com/drobilla/lv2.git
