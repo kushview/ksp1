@@ -3,6 +3,7 @@ tools/installer/qt-ifw/packages/com.bketech.BTV/data/*
 tools/installer/qt-ifw/repo
 jucer/JuceLibraryCode/ReadMe.txt
 jucer/JuceLibraryCode/modules
+jucer/JuceLibraryCode/include_*
 src/sampler/ReferenceCode.h
 .lock*
 .waf*
