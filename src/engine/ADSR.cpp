@@ -21,56 +21,53 @@
 
 namespace KSP1 {
 
-    ADSR::ADSR (float a, float d, float s, float r)
-        : adsrState (Attack),
-          adsrValue (0.0f),
-          futureRelease (0.0f),
-          modeTicks (0.0f),
-          totalTicks (0.0f)
-    {
-       setAttack (a);
-       setDecay (d);
-       setSustain (s);
-       setRelease (r);
-    }
+ADSR::ADSR (float a, float d, float s, float r)
+    : adsrState (Attack),
+        adsrValue (0.0f),
+        futureRelease (0.0f),
+        modeTicks (0.0f),
+        totalTicks (0.0f)
+{
+    setAttack (a);
+    setDecay (d);
+    setSustain (s);
+    setRelease (r);
+}
 
 
-    ADSR::ADSR (const ADSR& other)
-    {
-        copy (other);
-    }
+ADSR::ADSR (const ADSR& other)
+{
+    copy (other);
+}
 
-    ADSR::~ADSR() { }
+ADSR::~ADSR() { }
 
-    ADSR&
-    ADSR::operator= (const ADSR& other)
-    {
-        copy (other);
-        return *this;
-    }
+ADSR& ADSR::operator= (const ADSR& other)
+{
+    copy (other);
+    return *this;
+}
 
-    void
-    ADSR::copy (const ADSR& other)
-    {
-        adsrState  = other.adsrState;
-        adsrValue  = other.adsrValue;
-        futureRelease = other.futureRelease;
-        modeTicks  = other.modeTicks;
-        totalTicks = other.totalTicks;
+void ADSR::copy (const ADSR& other)
+{
+    adsrState  = other.adsrState;
+    adsrValue  = other.adsrValue;
+    futureRelease = other.futureRelease;
+    modeTicks  = other.modeTicks;
+    totalTicks = other.totalTicks;
 
-        sync (other, false);
-    }
+    sync (other, false);
+}
 
-    void
-    ADSR::sync (const ADSR &other, bool resetTicks)
-    {
-        if (resetTicks)
-            reset();
+void ADSR::sync (const ADSR &other, bool resetTicks)
+{
+    if (resetTicks)
+        reset();
 
-        setAttack  (other.attackTime);
-        setDecay   (other.decayTime);
-        setSustain (other.sustainLevel);
-        setRelease (other.releaseTime);
-    }
+    setAttack  (other.attackTime);
+    setDecay   (other.decayTime);
+    setSustain (other.sustainLevel);
+    setRelease (other.releaseTime);
+}
 
 }

@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_SAMPLER_BASE_H
-#define KSP1_SAMPLER_BASE_H
+#pragma once
 
 #include "engine/SamplerKeys.h"
 #include "Forge.h"
@@ -89,7 +88,7 @@ namespace KSP1 {
             duration.set (nframes);
         }
 
-        void setProperty (const URIs& uris, const PatchSet& set);
+        
 
         void restoreFromJSON (const var& json);
 
@@ -204,11 +203,14 @@ namespace KSP1 {
         /** create a dynamic object from this sound */
         DynamicObject::Ptr createDynamicObject() const;
 
+       #if defined (HAVE_LVTK)
         /** writes an atom object */
         ForgeRef writeAtomObject (Forge& forge);
+        /** Set a property from a PatchSet message */
+        void setProperty (const URIs& uris, const PatchSet& set);
+       #endif
 
     private:
-
         const int32 id;
         KeyInfo key;
 
@@ -219,7 +221,6 @@ namespace KSP1 {
         BigInteger midiChans;
         BigInteger midiNotes;
 
-
         /** @internal Returns the longest frame count among all layers */
         int64 longestLayerFrames() const;
 
@@ -228,5 +229,3 @@ namespace KSP1 {
 
     };
 }
-
-#endif   // KSP1_SAMPLER_BASE_H

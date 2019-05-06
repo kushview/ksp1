@@ -18,7 +18,6 @@
 */
 
 #include "engine/LayerData.h"
-#include "engine/LV2Plugin.h"
 #include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
 
@@ -49,28 +48,12 @@ namespace KSP1 {
         midiNotes.setBit (keyid);
     }
 
-    void SamplerSound::setProperty (const URIs &uris, const PatchSet &set)
-    {
-        const uint32_t prop (set.property.as_urid());
-
-        if (uris.slugs_voiceGroup == prop) {
-            key.voiceGroup = set.value.as_int();
-        } else if (uris.slugs_triggerMode == prop) {
-            key.triggerMode = set.value.as_int();
-        } else if (uris.slugs_length == prop) {
-            key.length = set.value.as_int();
-        } else if (prop == uris.slugs_note) {
-            key.note = set.value.as_int();
-        } else if (prop == uris.slugs_pitch) {
-            key.pitch = set.value.as_double();
-        } else if (prop == uris.slugs_volume) {
-            setVolume (set.value.as_double());
-        }
-    }
+   
 
     DynamicObject::Ptr SamplerSound::createDynamicObject() const
     {
         DynamicObject::Ptr object = new DynamicObject();
+       #if 0
         object->setProperty (Slugs::id, id);
         object->setProperty (Slugs::note, key.note);
         object->setProperty (Slugs::length, key.length);
@@ -86,7 +69,7 @@ namespace KSP1 {
 
         if (layers.size() > 0)
             object->setProperty ("layers", layers);
-
+       #endif
         return object;
     }
 
@@ -218,17 +201,14 @@ namespace KSP1 {
         key.adsr.setDecay (len);
     }
 
-    void
-    SamplerSound::setSustain (double level)
+    void SamplerSound::setSustain (double level)
     {
-        level = Element::clampNoMoreThan (level, 0.0, 1.0);
-
+        level = jlimit (0.0, 1.0, level);
         Lock sl (*this);
         key.adsr.setSustain (level);
     }
 
-    void
-    SamplerSound::setRelease (double ratio)
+    void SamplerSound::setRelease (double ratio)
     {
         const float len = ratio * ((double) length() / 4.0f);
 
@@ -238,6 +218,7 @@ namespace KSP1 {
 
     void SamplerSound::restoreFromJSON (const var &json)
     {
+       #if 0
         key.volume = (float) json.getProperty (Slugs::volume, 0.0);
         key.gain = Decibels::decibelsToGain (key.volume);
         key.length = (int) json.getProperty (Slugs::length, key.length);
@@ -245,6 +226,7 @@ namespace KSP1 {
         key.pitch = (double) json.getProperty (Slugs::pitch, key.pitch);
         key.voiceGroup = (int) json.getProperty (Tags::voiceGroup, -1);
         key.triggerMode = (int) json.getProperty (Tags::triggerMode, (int) TriggerMode::Retrigger);
+       #endif
     }
 
     void SamplerSound::setRootNote (int n)
@@ -261,6 +243,25 @@ namespace KSP1 {
         }
     }
 
+   #if defined (HAVE_LVTK)
+    void SamplerSound::setProperty (const URIs &uris, const PatchSet &set)
+    {
+        const uint32_t prop (set.property.as_urid());
+
+        if (uris.slugs_voiceGroup == prop) {
+            key.voiceGroup = set.value.as_int();
+        } else if (uris.slugs_triggerMode == prop) {
+            key.triggerMode = set.value.as_int();
+        } else if (uris.slugs_length == prop) {
+            key.length = set.value.as_int();
+        } else if (prop == uris.slugs_note) {
+            key.note = set.value.as_int();
+        } else if (prop == uris.slugs_pitch) {
+            key.pitch = set.value.as_double();
+        } else if (prop == uris.slugs_volume) {
+            setVolume (set.value.as_double());
+        }
+    }
     ForgeRef SamplerSound::writeAtomObject (Forge &forge)
     {
         const URIs& uris (forge.uris);
@@ -277,5 +278,6 @@ namespace KSP1 {
 
         return ref;
     }
+   #endif
 }
 
