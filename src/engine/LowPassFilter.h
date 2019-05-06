@@ -17,92 +17,89 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_LOWPASSFILTER_H
-#define KSP1_LOWPASSFILTER_H
+#pragma once
 
 namespace KSP1 {
 
-    class LowPassFilter
+class LowPassFilter
+{
+public:
+
+    LowPassFilter();
+    LowPassFilter(const LowPassFilter& lpf);
+
+    float getCutoff() const             { return cutoff; }
+    float getResonance() const          { return resonance; }
+    void setCutoff (float c)       { cutoff = c; }
+    void setResonance (float r) { resonance = r; }
+
+    /** Pass a value through the filter updating the buffer values. */
+    inline void processMono (float* sample, int count)
     {
-    public:
-
-        LowPassFilter();
-        LowPassFilter(const LowPassFilter& lpf);
-
-        float getCutoff() const             { return cutoff; }
-        float getResonance() const          { return resonance; }
-        void setCutoff (float c)       { cutoff = c; }
-        void setResonance (float r) { resonance = r; }
-
-        /** Pass a value through the filter updating the buffer values. */
-        inline void processMono (float* sample, int count)
+        while (true)
         {
-            while (true)
-            {
-                bandPassBuffer_L = resonance * bandPassBuffer_L + cutoff
-                        * ((*sample) - lowPassBuffer_L);
+            bandPassBuffer_L = resonance * bandPassBuffer_L + cutoff
+                    * ((*sample) - lowPassBuffer_L);
 
-                lowPassBuffer_L += cutoff * bandPassBuffer_L;
+            lowPassBuffer_L += cutoff * bandPassBuffer_L;
 
-                *sample = lowPassBuffer_L;
+            *sample = lowPassBuffer_L;
 
-                count--;
-                if (0 == count)
-                    break;
+            count--;
+            if (0 == count)
+                break;
 
-                sample++;
-            }
+            sample++;
+        }
+    }
+
+    inline void processStereo (float* sampleL, float* sampleR, int count)
+    {
+        int c = count;
+        while (1)
+        {
+            bandPassBuffer_L = resonance * bandPassBuffer_L + cutoff
+                    * ((*sampleL) - lowPassBuffer_L);
+
+            lowPassBuffer_L += cutoff * bandPassBuffer_L;
+
+            *sampleL = lowPassBuffer_L;
+
+            c--;
+            if (0 == c)
+                break;
+
+            sampleL++;
         }
 
-        inline void processStereo (float* sampleL, float* sampleR, int count)
+        c = count;
+        while (1)
         {
-            int c = count;
-            while (1)
-            {
-                bandPassBuffer_L = resonance * bandPassBuffer_L + cutoff
-                        * ((*sampleL) - lowPassBuffer_L);
+            bandPassBuffer_R = resonance * bandPassBuffer_R + cutoff
+                    * ((*sampleR) - lowPassBuffer_R);
 
-                lowPassBuffer_L += cutoff * bandPassBuffer_L;
+            lowPassBuffer_R += cutoff * bandPassBuffer_R;
 
-                *sampleL = lowPassBuffer_L;
+            *sampleR = lowPassBuffer_R;
 
-                c--;
-                if (0 == c)
-                    break;
+            c--;
+            if (0 == c)
+                break;
 
-                sampleL++;
-            }
-
-            c = count;
-            while (1)
-            {
-                bandPassBuffer_R = resonance * bandPassBuffer_R + cutoff
-                        * ((*sampleR) - lowPassBuffer_R);
-
-                lowPassBuffer_R += cutoff * bandPassBuffer_R;
-
-                *sampleR = lowPassBuffer_R;
-
-                c--;
-                if (0 == c)
-                    break;
-
-                sampleR++;
-            }
+            sampleR++;
         }
+    }
 
-        /** Reset the filter buffers to zero (0.0f) */
-        void resetBuffers();
+    /** Reset the filter buffers to zero (0.0f) */
+    void resetBuffers();
 
-    private:
-        float cutoff;               ///< Filter cutoff (0..1)
-        float resonance;            ///< Filter resonant frequency (0..1)
-        float lowPassBuffer_L;		///< Low pass filter buffer
-        float lowPassBuffer_R;		///< Low pass filter buffer
-        float bandPassBuffer_L;		///< Band pass filter buffer
-        float bandPassBuffer_R;		///< Band pass filter buffer
-    };
+private:
+    float cutoff;               ///< Filter cutoff (0..1)
+    float resonance;            ///< Filter resonant frequency (0..1)
+    float lowPassBuffer_L;		///< Low pass filter buffer
+    float lowPassBuffer_R;		///< Low pass filter buffer
+    float bandPassBuffer_L;		///< Band pass filter buffer
+    float bandPassBuffer_R;		///< Band pass filter buffer
+};
 
 } /* namespace KSP1 */
-
-#endif

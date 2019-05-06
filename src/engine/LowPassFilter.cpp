@@ -21,25 +21,26 @@
 
 namespace KSP1 {
 
-    LowPassFilter::LowPassFilter()
-        : cutoff( 1.0f )
-        , resonance( 0.0f )
-    {
-        this->resetBuffers();
-    }
+LowPassFilter::LowPassFilter()
+    : cutoff( 1.0f )
+    , resonance( 0.0f )
+{
+    this->resetBuffers();
+}
 
-    LowPassFilter::LowPassFilter(const LowPassFilter& lpf)
-        : cutoff( lpf.cutoff )
-        , resonance( lpf.resonance )
-    {
-        this->resetBuffers();
-    }
+LowPassFilter::LowPassFilter(const LowPassFilter& lpf)
+    : cutoff( lpf.cutoff )
+    , resonance( lpf.resonance )
+{
+    this->resetBuffers();
+}
 
-    void LowPassFilter::resetBuffers()
-    {
-        bandPassBuffer_L = 0.0f;
-        bandPassBuffer_R = 0.0f;
-        lowPassBuffer_L  = 0.0f;
-        lowPassBuffer_R  = 0.0f;
-    }
+void LowPassFilter::resetBuffers()
+{
+    bandPassBuffer_L = 0.0f;
+    bandPassBuffer_R = 0.0f;
+    lowPassBuffer_L  = 0.0f;
+    lowPassBuffer_R  = 0.0f;
+}
+
 }

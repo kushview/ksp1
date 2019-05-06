@@ -423,7 +423,6 @@ return;
     }
 }
 
-
 void SamplerVoice::stopNote (float,  bool allowTailOff)
 {
     const KeyInfo& key (sound->getKeyInfo());

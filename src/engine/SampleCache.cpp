@@ -21,189 +21,187 @@
 #include "engine/SampleCache.h"
 #include "engine/SamplerKeys.h"
 
-#define SAMPLE_CACHE_TIMEOUT 50
+#define KSP1_SAMPLE_CACHE_TIMEOUT 50
 
 namespace KSP1 {
 
-    SampleCache::SampleCache()
-#if 0
-        : thumbs (128)
-#endif
+SampleCache::SampleCache (AudioFormatManager& f)
+    : formats (f)
+{
+    setThreadPriority (3);
+}
+
+SampleCache::~SampleCache()
+{
+
+}
+
+void SampleCache::activate (double samplerate, uint32 buffersize)
+{
+    ignoreUnused (samplerate, buffersize);
+
+    while (threads.size() <= 4)
     {
-        formats.registerBasicFormats();
-        setThreadPriority (3);
+        String name = "sc";
+        name << threads.size() + 1;
+        threads.add (new TimeSliceThread (name));
     }
 
-    SampleCache::~SampleCache()
-    {
-
-    }
-
-    void SampleCache::activate (double samplerate, uint32 buffersize)
-    {
-        while (threads.size() <= 4) {
-            String name = "SampleCache-";
-            name << threads.size() + 1;
-            threads.add (new TimeSliceThread (name));
-        }
-
-        for (TimeSliceThread* t : threads) {
-            t->startThread (threadPriority);
-        }
-    }
+    for (auto* const t : threads)
+        t->startThread (threadPriority);
+}
 
 
-    void SampleCache::deacitvate()
-    {
-        for (TimeSliceThread* t : threads) {
-            t->stopThread (SAMPLE_CACHE_TIMEOUT);
-        }
-    }
+void SampleCache::deacitvate()
+{
+    for (TimeSliceThread* t : threads)
+        t->stopThread (KSP1_SAMPLE_CACHE_TIMEOUT);
+}
 
-    bool
-    SampleCache::canLoad (const File& file) const
-    {
-        return ! file.isDirectory() && file.existsAsFile();
-    }
+bool SampleCache::canLoad (const File& file) const
+{
+    return ! file.isDirectory() && file.existsAsFile();
+}
 
 #if 0
-    AudioPeak*
-    SampleCache::createPeak (const File& file)
+AudioPeak* SampleCache::createPeak (const File& file)
+{
+    if (AudioPeak* peak = new AudioPeak (*this))
     {
-        if (AudioPeak* peak = new AudioPeak (*this))
-        {
-            peak->setSource (new FileInputSource (file));
-            return peak;
-        }
-
-        return nullptr;
+        peak->setSource (new FileInputSource (file));
+        return peak;
     }
+
+    return nullptr;
+}
 #endif
 
-    LayerData* SampleCache::createLayerSource (const XmlElement& item)
+LayerData* SampleCache::createLayerSource (const XmlElement& item)
+{
+    LayerData* source = nullptr;
+
+    if (Scoped<AudioFormatReader> reader = createReaderFor (item))
     {
-        LayerData* source = nullptr;
-
-        if (Scoped<AudioFormatReader> reader = createReaderFor (item))
-        {
-            source = new LayerData (*this, item.getIntAttribute ("id", 0));
-            source->index = item.getIntAttribute ("index", -1);
-            source->note = item.getIntAttribute ("note", -1);
-            source->numChannels = reader->numChannels;
-            source->sampleRate = reader->sampleRate;
-            source->lengthInSamples = reader->lengthInSamples;
-            source->pitch.set (item.getDoubleAttribute ("pitch"));
-        }
-        else
-        {
-            jassertfalse;
-        }
-
-        return source;
+        source = new LayerData (*this, item.getIntAttribute ("id", 0));
+        source->index = item.getIntAttribute ("index", -1);
+        source->note = item.getIntAttribute ("note", -1);
+        source->numChannels = reader->numChannels;
+        source->sampleRate = reader->sampleRate;
+        source->lengthInSamples = reader->lengthInSamples;
+        source->pitch.set (item.getDoubleAttribute ("pitch"));
+    }
+    else
+    {
+        jassertfalse;
     }
 
+    return source;
+}
 
-    AudioFormatReader*
-    SampleCache::createReaderFor (const XmlElement& item)
+
+AudioFormatReader* SampleCache::createReaderFor (const XmlElement& item)
+{
+    if (item.hasAttribute ("file"))
     {
-        if (item.hasAttribute ("file"))
-        {
-            const File file (item.getStringAttribute ("file", File::nonexistent.getFullPathName()));
-            return createReaderFor (file);
-        }
-        else if (XmlElement* e = item.getChildByName("file"))
-        {
-            const File file (e->getAllSubText());
-            return createReaderFor (file);
-        }
-
-        return nullptr;
+        const auto path = item.getStringAttribute ("file", "");
+        return File::isAbsolutePath (path) ? createReaderFor (File (path)) : nullptr;
+    }
+    else if (auto* e = item.getChildByName ("file"))
+    {
+        const auto path = e->getAllSubText();
+        return File::isAbsolutePath (path) ? createReaderFor (File (path)) : nullptr;
     }
 
-    AudioFormatReader*
-    SampleCache::createReaderFor (const File& file)
-    {
-        return getAudioFormats().createReaderFor (file);
-    }
+    return nullptr;
+}
 
+AudioFormatReader* SampleCache::createReaderFor (const File& file)
+{
+    return getAudioFormats().createReaderFor (file);
+}
 
-    Shared<AudioSampleBuffer>
-    SampleCache::loadAudioFile (const File& sampleFile)
-    {
-        DBG ("Loading: " << sampleFile.getFileName());
+BufferPtr SampleCache::loadAudioFile (const File& sampleFile)
+{
+    DBG ("[KSP1] loading: " << sampleFile.getFileName());
 
-        const int32 slot (sampleFile.hashCode());
+    const int32 slot (sampleFile.hashCode());
 
-        if (audioBuffers.contains (slot))
-            return audioBuffers [slot];
+    if (audioBuffers.contains (slot))
+        return audioBuffers [slot];
 
-        Shared<AudioSampleBuffer> buffer;
+    BufferPtr buffer;
 
-        if (blacklist.contains (slot))
-            return buffer;
-
-        if (AudioFormatReader* reader = getAudioFormats().createReaderFor (sampleFile))
-        {
-            buffer.reset (new AudioSampleBuffer (reader->numChannels, reader->lengthInSamples));
-            reader->read (buffer.get(), 0, reader->lengthInSamples, 0, false, false);
-            audioBuffers.set (slot, buffer);
-            delete reader;
-        }
-        else
-        {
-            blacklist.add (slot);
-        }
-
+    if (blacklist.contains (slot))
         return buffer;
-    }
 
-    TimeSliceThread*
-    SampleCache::nextThread()
+    if (auto reader = std::unique_ptr<AudioFormatReader> (getAudioFormats().createReaderFor (sampleFile)))
     {
-        assert (threads.size() > 0);
-        return threads.getUnchecked(0);
+        buffer.reset (new AudioSampleBuffer (reader->numChannels, reader->lengthInSamples));
+        reader->read (buffer.get(), 0, reader->lengthInSamples, 0, false, false);
+        audioBuffers.set (slot, buffer);
+        reader.reset();
+    }
+    else
+    {
+        blacklist.add (slot);
     }
 
-    LayerData* SampleCache::findLayerData (int32 id) const {
+    return buffer;
+}
+
+TimeSliceThread* SampleCache::nextThread()
+{
+    assert (threads.size() > 0);
+    return threads.getUnchecked(0);
+}
+
+LayerData* SampleCache::findLayerData (int32 id) const
+{
+    for (LayerData* layer : layers)
+    {
+        if (layer && layer->id == id)
+            return layer;
+    }
+
+    return nullptr;
+}
+
+LayerData* SampleCache::getLayerData (const bool createIfNeeded)
+{
+    for (LayerData* l : layers) {
+        if (l && l->note < 0 && l->index < 0)
+            return l;
+    }
+
+    return (createIfNeeded) ? layers.add (new LayerData (*this, 0)) : nullptr;
+}
+
+
+#if defined (HAVE_LVTK)
+LayerData* SampleCache::getLayerData (const URIs& uris, const lvtk::AtomObject& layer, bool realtime)
+{
+    const int layerId = static_cast<int> (layer.id());
+    LayerData* data = nullptr; //getLayerData(); //findLayerData (layer.id());
+
+    if (! data) {
         for (LayerData* l : layers) {
-            if (l && l->id == id)
-                return l;
-        }
-        return nullptr;
-    }
-
-    LayerData* SampleCache::getLayerData (const bool createIfNeeded)
-    {
-        for (LayerData* l : layers) {
-            if (l && l->note < 0 && l->index < 0)
-                return l;
-        }
-
-        return (createIfNeeded) ? layers.add (new LayerData (*this, 0)) : nullptr;
-    }
-
-    LayerData* SampleCache::getLayerData (const URIs& uris, const lvtk::AtomObject& layer, bool realtime)
-    {
-        const int layerId = static_cast<int> (layer.id());
-        LayerData* data = nullptr; //getLayerData(); //findLayerData (layer.id());
-
-        if (! data) {
-            for (LayerData* l : layers) {
-                if (l && l->id == layerId) {
-                    data = l;
-                    break;
-                }
+            if (l && l->id == layerId) {
+                data = l;
+                break;
             }
         }
-
-        if (! data && ! realtime) {
-            data = layers.add (new LayerData (*this, layerId));
-        }
-
-        if (data) {
-            data->setAtomObject (uris, layer, realtime);
-        }
-
-        return data;
     }
+
+    if (! data && ! realtime) {
+        data = layers.add (new LayerData (*this, layerId));
+    }
+
+    if (data) {
+        data->setAtomObject (uris, layer, realtime);
+    }
+
+    return data;
+}
+#endif
+
 }

@@ -1,6 +1,6 @@
 /*
     This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+    Copyright (C) 2014-2019  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_SAMPLERKEYS_H
-#define KSP1_SAMPLERKEYS_H
+#pragma once
 
 #include "engine/ADSR.h"
 #include "engine/LayeringMode.h"
@@ -106,5 +105,3 @@ namespace KSP1 {
         ADSR         adsr;          ///< ADSR for the note
     };
 }
-
-#endif // KSP1_SAMPLERKEYS_H

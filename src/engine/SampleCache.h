@@ -17,97 +17,87 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_SAMPLE_CACHE_H
-#define KSP1_SAMPLE_CACHE_H
+#pragma once
 
 #include "KSP1.h"
 
-namespace lvtk {
-    class Atom;
-    class AtomObject;
-}
 namespace KSP1 {
 
-    class LayerData;
-    typedef Shared<AudioSampleBuffer> BufferPtr;
+class LayerData;
+typedef std::shared_ptr<AudioSampleBuffer> BufferPtr;
 
-    class SampleCache
+class SampleCache
+{
+public:
+    SampleCache (AudioFormatManager& f);
+    ~SampleCache();
+
+    LayerData* getLayerData (const bool createIfNeeded = false);
+
+    /** Returns true if the cache can load a given file in one way
+        or the other */
+    bool canLoad (const File& sampleFile) const;
+
+    /** Load an audio file into an AudioSampleBuffer
+        @note this loads the entire file into memory in one shot
+        */
+    BufferPtr loadAudioFile (const File& sampleFile);
+    AudioFormatManager&  getAudioFormats() { return formats; }
+
+    void activate (double samplerate, uint32 buffersize);
+    void deacitvate();
+
+    inline void setThreadPriority (int priority)
     {
-    public:
+        threadPriority = priority;
+        for (TimeSliceThread* t : threads)
+            if (t) t->setPriority (threadPriority);
+    }
 
-        SampleCache();
-        ~SampleCache();
+    /** Creates a new layer source from an XML element representation
+        of a Layer */
+    LayerData* createLayerSource (const XmlElement& layer);
 
-        LayerData* getLayerData (const URIs& uris, const lvtk::AtomObject& layer, bool realtime);
-        LayerData* getLayerData (const bool createIfNeeded = false);
+    AudioFormatReader* createReaderFor (const XmlElement& item);
+    AudioFormatReader* createReaderFor (const File& file);
 
-        /** Returns true if the cache can load a given file in one way
-            or the other */
-        bool canLoad (const File& sampleFile) const;
+   #if defined (HAVE_LVTK)
+    LayerData* getLayerData (const URIs& uris, const lvtk::AtomObject& layer, bool realtime);
+   #endif
 
-        /** Load an audio file into an AudioSampleBuffer
-            @note this loads the entire file into memory in one shot
-         */
-        BufferPtr loadAudioFile (const File& sampleFile);
-        AudioFormatManager&  getAudioFormats() { return formats; }
+private:
+    LayerData* findLayerData (const int32 id) const;
+    TimeSliceThread* nextThread();
+    HashMap<int32, BufferPtr>   audioBuffers;
+    Array<int32> blacklist;
 
-        void activate (double samplerate, uint32 buffersize);
-        void deacitvate();
+    // HashMap<int32, Shared<MidiMessageSequence> > midiSequences;
 
-        inline void
-        setThreadPriority (int priority)
-        {
-            threadPriority = priority;
-            for (TimeSliceThread* t : threads)
-                if (t) t->setPriority (threadPriority);
-        }
-
-        /** Creates a new layer source from an XML element representation
-            of a Layer */
-        LayerData* createLayerSource (const XmlElement& layer);
-
-        AudioFormatReader* createReaderFor (const XmlElement& item);
-        AudioFormatReader* createReaderFor (const File& file);
-
-    private:
-
-        LayerData* findLayerData (const int32 id) const;
-        TimeSliceThread* nextThread();
-        HashMap<int32, Shared<AudioSampleBuffer> >   audioBuffers;
-        Array<int32> blacklist;
-
-        HashMap<int32, Shared<MidiMessageSequence> > midiSequences;
-
-        AudioFormatManager              formats;
-#if 0
-        AudioThumbnailCache             thumbs;
-#endif
-        OwnedArray<TimeSliceThread>     threads;
-        OwnedArray<LayerData>         layers;
-        OwnedArray<AudioFormatReader>   readers;
-        int threadPriority;
-    };
+    AudioFormatManager&             formats;
+    #if 0
+    AudioThumbnailCache             thumbs;
+    #endif
+    OwnedArray<TimeSliceThread>     threads;
+    OwnedArray<LayerData>           layers;
+    OwnedArray<AudioFormatReader>   readers;
+    int threadPriority;
+};
 
 #if 0
-    class AudioPeak :  public AudioThumbnail
-    {
-    public:
+class AudioPeak :  public AudioThumbnail
+{
+public:
+    AudioPeak (SampleCache& c)
+        : AudioThumbnail (128, c.codecs(), c.peaks()),
+            data (c) { }
 
-        AudioPeak (SampleCache& c)
-            : AudioThumbnail (128, c.codecs(), c.peaks()),
-              data (c)
-        { }
+    SampleCache& sampleCache() { return data; }
 
-        SampleCache& sampleCache() { return data; }
+private:
+    SampleCache& data;
+};
 
-    private:
-
-        SampleCache& data;
-
-    };
-
-    typedef Shared<AudioPeak> AudioPeakPtr;
+typedef Shared<AudioPeak> AudioPeakPtr;
 #endif
+
 }
-
-#endif // KSP1_SAMPLE_CACHE_H

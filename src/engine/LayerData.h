@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_LAYER_DATA_H
-#define KSP1_LAYER_DATA_H
+#pragma once
 
 #include "engine/SamplerKeys.h"
 #include "Forge.h"
@@ -46,6 +45,9 @@ namespace KSP1
 
         /** Create a DynamicObject representing this LayerData */
         DynamicObject::Ptr createDynamicObject() const;
+
+        /** Set the volume of this Layer */
+        void setVolume (const double vol);
 
         /** Returns the audio file this data was loaded from if any */
         const File& getAudioFile() const { return currentFile; }
@@ -78,6 +80,7 @@ namespace KSP1
         /** Restore properties from an XmlElement */
         void restoreFromXml (const XmlElement& e);
 
+       #if defined (HAVE_LVTK)
         /** Set a property using a PatchSet */
         void setProperty (const URIs& uris, const PatchSet& set);
 
@@ -87,25 +90,22 @@ namespace KSP1
         /** Set all properties contained within the given atom object */
         void setAtomObject (const URIs& uris, const lvtk::AtomObject& object, bool realtime = true);
 
-        /** Set the volume of this Layer */
-        void setVolume (const double vol);
-
         /** Write Layer properties to an AtomObject */
         ForgeRef writeAtomObject (Forge& forge);
-
+       #endif
 
     protected:
-        AtomicDouble gain;
-        AtomicDouble pitch;
-        AtomicDouble panning;
-        AtomicDouble cutoff;
-        AtomicDouble resonance;
-        AtomicFrame  in, out;
+        Atomic<double> gain;
+        Atomic<double> pitch;
+        Atomic<double> panning;
+        Atomic<double> cutoff;
+        Atomic<double> resonance;
+        Atomic<int>  in, out;
         Range<double> velocityRange;
         int64 start, offset, length;
 
         /** Set the type (URID) of this Layer (unused) */
-        void setType (const LV2_URID t) { type = t; }
+        void setType (const uint32 t) { type = t; }
 
     private:
         friend class SampleCache;
@@ -114,7 +114,7 @@ namespace KSP1
         friend class SamplerVoice;
 
         SampleCache&    cache;
-        LV2_URID        type;
+        uint32          type;
         int64           lengthInSamples;
         uint32          numChannels;
         double          sampleRate;
@@ -126,8 +126,8 @@ namespace KSP1
         int           note;
         File          currentFile;
 
-        Shared<AudioSampleBuffer> scratch;
-        Element::AtomicValue<AudioSampleBuffer*> renderBuffer;
+        std::shared_ptr<AudioSampleBuffer> scratch;
+        AudioSampleBuffer* renderBuffer = nullptr;
 
         ScopedPointer<LowPassFilter> filter;
 
@@ -135,5 +135,3 @@ namespace KSP1
         const float* getSampleData (int32 chan, int32 frame) const;
     };
 }
-
-#endif // KSP1_LAYER_SOURCE_H
