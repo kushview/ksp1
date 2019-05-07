@@ -1,6 +1,6 @@
 /*
     This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+    Copyright (C) 2014-2019  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,24 +17,21 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_MIDI_FILTER_H
-#define KSP1_MIDI_FILTER_H
+#pragma once
 
 #include "KSP1.h"
 
 namespace KSP1 {
 
-    class MidiFilter
-    {
-    public:
-        MidiFilter() { }
-        virtual ~MidiFilter() { }
+class MidiFilter
+{
+public:
+    MidiFilter() { }
+    virtual ~MidiFilter() { }
 
-        virtual void prepareToPlay (double sampleRate, int32 blockSize) = 0;
-        virtual void processMidi (MidiBuffer& midi, int32 nframes) = 0;
-        virtual void releaseResources() = 0;
-    };
+    virtual void prepareToPlay (double sampleRate, int32 blockSize) = 0;
+    virtual void processMidi (MidiBuffer& midi, int32 nframes) = 0;
+    virtual void releaseResources() = 0;
+};
 
 }
-
-#endif // KSP1_MIDI_FILTER_H

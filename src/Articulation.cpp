@@ -19,8 +19,8 @@
 
 #include "Articulation.h"
 
-namespace KSP1
-{    
+namespace KSP1 {
+   
     void Articulation::setMissingProperties()
     {
         ValueTree n (node());

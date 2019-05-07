@@ -29,7 +29,7 @@ typedef std::shared_ptr<AudioSampleBuffer> BufferPtr;
 class SampleCache
 {
 public:
-    SampleCache (AudioFormatManager& f);
+    SampleCache (AudioFormatManager&, AudioThumbnailCache&);
     ~SampleCache();
 
     LayerData* getLayerData (const bool createIfNeeded = false);
@@ -40,8 +40,9 @@ public:
 
     /** Load an audio file into an AudioSampleBuffer
         @note this loads the entire file into memory in one shot
-        */
+     */
     BufferPtr loadAudioFile (const File& sampleFile);
+
     AudioFormatManager&  getAudioFormats() { return formats; }
 
     void activate (double samplerate, uint32 buffersize);
@@ -50,8 +51,8 @@ public:
     inline void setThreadPriority (int priority)
     {
         threadPriority = priority;
-        for (TimeSliceThread* t : threads)
-            if (t) t->setPriority (threadPriority);
+        for (auto* const thread : threads)
+            if (thread) thread->setPriority (threadPriority);
     }
 
     /** Creates a new layer source from an XML element representation
@@ -74,13 +75,11 @@ private:
     // HashMap<int32, Shared<MidiMessageSequence> > midiSequences;
 
     AudioFormatManager&             formats;
-    #if 0
-    AudioThumbnailCache             thumbs;
-    #endif
+    AudioThumbnailCache&            thumbs;
     OwnedArray<TimeSliceThread>     threads;
     OwnedArray<LayerData>           layers;
     OwnedArray<AudioFormatReader>   readers;
-    int threadPriority;
+    int threadPriority { 3 };
 };
 
 #if 0

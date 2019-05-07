@@ -26,12 +26,12 @@ class LowPassFilter
 public:
 
     LowPassFilter();
-    LowPassFilter(const LowPassFilter& lpf);
+    LowPassFilter (const LowPassFilter& lpf);
 
     float getCutoff() const             { return cutoff; }
     float getResonance() const          { return resonance; }
-    void setCutoff (float c)       { cutoff = c; }
-    void setResonance (float r) { resonance = r; }
+    void setCutoff (float c)            { cutoff = c; }
+    void setResonance (float r)         { resonance = r; }
 
     /** Pass a value through the filter updating the buffer values. */
     inline void processMono (float* sample, int count)

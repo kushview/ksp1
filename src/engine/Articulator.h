@@ -17,31 +17,28 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_ARTICULATOR_H
-#define KSP1_ARTICULATOR_H
+#pragma once
 
-#include "Articulation.h"
 #include "MidiFilter.h"
 
 namespace KSP1 {
-    class StrokeType;
 
-    class Articulator :  public MidiFilter
-    {
-    public:
-        Articulator();
-        ~Articulator();
+class StrokeType;
 
-        bool mutate (const Articulation& art, const Identifier& prop);
-        bool setStrokeType (int32 note, const StrokeType& type);
+class Articulator :  public MidiFilter
+{
+public:
+    Articulator();
+    ~Articulator();
 
-        void prepareToPlay (double sampleRate, int32 blockSize);
-        void processMidi (MidiBuffer& midi, int32 nframes);
-        void releaseResources();
+    bool setStrokeType (int32 note, const StrokeType& type);
 
-    private:
-        class Impl; Scoped<Impl> impl;
-    };
+    void prepareToPlay (double sampleRate, int32 blockSize);
+    void processMidi (MidiBuffer& midi, int32 nframes);
+    void releaseResources();
+
+private:
+    class Impl; Scoped<Impl> impl;
+};
+
 }
-
-#endif /* KSP1_ARTICULATOR_H */

@@ -17,20 +17,20 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_SAMPLER_SYNTH_H
-#define KSP1_SAMPLER_SYNTH_H
+#pragma once
 
 #include "Types.h"
 #include "engine/Disposable.h"
 
-namespace lvtk
-{
-    class Atom;
-    class AtomObject;
+namespace lvtk {
+
+class Atom;
+class AtomObject;
+
 }
 
-namespace KSP1
-{
+namespace KSP1 {
+
     class LayerData;
     class PatchSet;
     class SampleCache;
@@ -79,7 +79,7 @@ namespace KSP1
         inline const double getGain() const { return masterGain.get(); }
 
         /** Get the current MIDI channel this sampler operates on */
-        const int& getMidiChannel() const { return midiChannel.get(); }
+        const int getMidiChannel() const { return midiChannel.get(); }
 
         /** Set the current operating MIDI channel */
         void setMidiChannel (int chan);
@@ -104,16 +104,7 @@ namespace KSP1
 
         float getMasterGain() const { return masterGain.get(); }
 
-        /** Set a property with an LV2 Patch set wrapper
-            This method assumes the subject either is a URID and equals URIS::ksp1_Instrument,
-            or an atom_Object with an otype of ksp1_Instrument
-         */
-        void setProperty (const URIs& uris, const PatchSet& set);
-
-        SamplerSound* getSound (const URIs& uris, const lvtk::AtomObject& key);
-
         LayerData* getLayerData (const int note, const int index);
-        LayerData* getLayerData (const URIs& uris, const lvtk::AtomObject& layer);
 
         void recycleLayerData (LayerData* data);
 
@@ -133,6 +124,16 @@ namespace KSP1
         /** Triggers a note-on event */
         void noteOn (const int midiChannel, const int midiNoteNumber, const float velocity) override;
 
+       #if defined (HAVE_LVTK)
+        /** Set a property with an LV2 Patch set wrapper
+            This method assumes the subject either is a URID and equals URIS::ksp1_Instrument,
+            or an atom_Object with an otype of ksp1_Instrument
+         */
+        void setProperty (const URIs& uris, const PatchSet& set);
+        SamplerSound* getSound (const URIs& uris, const lvtk::AtomObject& key);
+        LayerData* getLayerData (const URIs& uris, const lvtk::AtomObject& layer);
+       #endif
+
     protected:
         SamplerSynth (SampleCache& cache);
         SampleCache& cache;
@@ -146,8 +147,8 @@ namespace KSP1
         friend class DataLoader;
 
     private:
-        AtomicDouble masterGain;
-        AtomicInt midiChannel;
+        Atomic<double> masterGain;
+        Atomic<int> midiChannel;
         HashMap<int, KSP1::SamplerSound*> soundMap;
         typedef HashMap<int, KSP1::SamplerSound*>::Iterator SoundIterator;
         HashMap<int, KSP1::LayerData*> layerMap;
@@ -156,5 +157,3 @@ namespace KSP1
         bool installLoadedData (DataLoader& loader);
     };
 }
-
-#endif // KSP1_SAMPLER_SYNTH_H

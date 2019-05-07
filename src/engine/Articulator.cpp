@@ -18,8 +18,8 @@
 */
 
 #include <memory>
-#include "Articulation.h"
-#include "Articulator.h"
+#include "engine/Articulator.h"
+#include "StrokeType.h"
 
 using namespace std;
 
@@ -374,14 +374,12 @@ namespace KSP1 {
             beatsPerFrame = 1.0f / framesPerBeat;
         }
 
-        NoteData*
-        getNoteData (int32 note)
+        NoteData* getNoteData (int32 note)
         {
             return note < 128 ? data [note] : nullptr;
         }
 
     };
-
 
     Articulator::Articulator()
     {
@@ -406,17 +404,7 @@ namespace KSP1 {
         impl->process (midi, nframes);
     }
 
-    bool
-    Articulator::mutate (const Articulation& art, const Identifier& prop)
-    {
-        if (prop == Tags::type) {
-
-        }
-        return true;
-    }
-
-    bool
-    Articulator::setStrokeType (int32 note, const StrokeType& type)
+    bool Articulator::setStrokeType (int32 note, const StrokeType& type)
     {
         return impl->setStrokeType (note, type);
     }

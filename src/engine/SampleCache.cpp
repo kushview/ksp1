@@ -25,11 +25,9 @@
 
 namespace KSP1 {
 
-SampleCache::SampleCache (AudioFormatManager& f)
-    : formats (f)
-{
-    setThreadPriority (3);
-}
+SampleCache::SampleCache (AudioFormatManager& f, AudioThumbnailCache& c)
+    : formats (f), thumbs (c)
+{ }
 
 SampleCache::~SampleCache()
 {
@@ -168,12 +166,13 @@ LayerData* SampleCache::findLayerData (int32 id) const
 
 LayerData* SampleCache::getLayerData (const bool createIfNeeded)
 {
-    for (LayerData* l : layers) {
-        if (l && l->note < 0 && l->index < 0)
-            return l;
+    for (auto* const data : layers) {
+        if (data && data->note < 0 && data->index < 0)
+            return data;
     }
 
-    return (createIfNeeded) ? layers.add (new LayerData (*this, 0)) : nullptr;
+    return (createIfNeeded) ? layers.add (new LayerData (*this, 0))
+                            : nullptr;
 }
 
 

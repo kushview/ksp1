@@ -1,6 +1,6 @@
 /*
     LayeringMode.h - This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+    Copyright (C) 2014-2019  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef KSP1_LAYERING_MODE_H
-#define KSP1_LAYERING_MODE_H
+
+#pragma once
 
 #include "KSP1.h"
 
@@ -52,16 +52,16 @@ public:
         } else if (id == "combine") {
             mode = VelocityRange;
         } else {
-            assert (false);
+            jassertfalse;
         }
     }
 
     const ID getMode() const { return static_cast<ID> (mode); }
 
-    bool operator== (const LayeringMode& o) const { return o.mode == mode; }
-    bool operator== (const int32& o) const { return o == mode; }
-    bool operator!= (const LayeringMode& o) const { return o.mode != mode; }
-    bool operator!= (const int32& o) const { return o != mode; }
+    bool operator== (const LayeringMode& o)     const { return o.mode == mode; }
+    bool operator== (const int32& o)            const { return o == mode; }
+    bool operator!= (const LayeringMode& o)     const { return o.mode != mode; }
+    bool operator!= (const int32& o)            const { return o != mode; }
 
     LayeringMode& operator= (const LayeringMode& o)
     {
@@ -74,5 +74,3 @@ private:
 };
 
 }
-
-#endif // KSP1_LAYERING_MODE_H
