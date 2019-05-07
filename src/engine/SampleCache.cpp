@@ -175,7 +175,6 @@ LayerData* SampleCache::getLayerData (const bool createIfNeeded)
                             : nullptr;
 }
 
-
 #if defined (HAVE_LVTK)
 LayerData* SampleCache::getLayerData (const URIs& uris, const lvtk::AtomObject& layer, bool realtime)
 {

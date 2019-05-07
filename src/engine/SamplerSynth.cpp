@@ -186,10 +186,10 @@ LayerData* SamplerSynth::DataLoader::createLayerData (SamplerSound &sound)
     return nullptr;
 }
 
-
+//=============================================================================
 SamplerSynth::SamplerSynth (SampleCache& c)
     : cache (c), masterGain (1.0f),
-        soundMap (256), layerMap (256)
+      soundMap (256), layerMap (256)
 {
     midiChannel.set (0);
 
@@ -200,7 +200,7 @@ SamplerSynth::SamplerSynth (SampleCache& c)
 SamplerSynth::~SamplerSynth()
 {
     sCacheUsers.removeFirstMatchingValue (this);
-    
+
     if (sCacheUsers.size() == 0)
     {
         sSampleCache.reset();
@@ -347,7 +347,7 @@ bool SamplerSynth::installLoadedData (DataLoader &loader)
     }
 
     const bool loaded = (layerMap.size() == loader.layers.size() &&
-                            soundMap.size() == loader.sounds.size());
+                         soundMap.size() == loader.sounds.size());
 
     loader.sounds.clearQuick (false);
     loader.layers.clearQuick();
@@ -357,7 +357,7 @@ bool SamplerSynth::installLoadedData (DataLoader &loader)
 
 void SamplerSynth::recycleLayerData (LayerData* data)
 {
-    assert (data);
+    jassert (data);
     layerMap.removeValue (data);
     data->reset();
 }
