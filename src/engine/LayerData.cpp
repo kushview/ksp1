@@ -257,19 +257,24 @@ void LayerData::setProperty (const URIs& uris, uint32_t prop, const lvtk::Atom& 
     {
         length = (sampleRate * value.as_double());
     }
-    else if (prop == uris.slugs_offset) {
+    else if (prop == uris.slugs_offset)
+    {
         offset = (sampleRate * value.as_double());
     }
     else if (prop == uris.slugs_pitch)
     {
         pitch.set (value.as_double());
     }
-    else if (prop == uris.slugs_panning) {
+    else if (prop == uris.slugs_panning)
+    {
         panning.set (value.as_double());
     }
     else if (prop == uris.slugs_note)
+    {
         note = value.as_int();
-    else if (prop == uris.slugs_index) {
+    }
+    else if (prop == uris.slugs_index)
+    {
         index = value.as_int();
     }
     else if (prop == uris.slugs_cutoff) {

@@ -48,8 +48,7 @@ public:
     inline float release() const { return releaseTime; }
 
     /** Set the attack time */
-    inline void
-    setAttack (float attack)
+    inline void setAttack (float attack)
     {
         attackTime = attack;
         if (attack != 0.0f)
@@ -59,8 +58,7 @@ public:
     }
 
     /** Set the decay time */
-    inline void
-    setDecay (float decay)
+    inline void setDecay (float decay)
     {
         decayTime = decay;
         if (decay != 0.0f)
@@ -70,15 +68,13 @@ public:
     }
 
     /** Set the sustain level */
-    inline void
-    setSustain (float sustain)
+    inline void setSustain (float sustain)
     {
         sustainLevel = sustain;
     }
 
     /** Set the release time */
-    inline void
-    setRelease (float release)
+    inline void setRelease (float release)
     {
         releaseTime = release;
 

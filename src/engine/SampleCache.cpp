@@ -120,8 +120,6 @@ AudioFormatReader* SampleCache::createReaderFor (const File& file)
 
 BufferPtr SampleCache::loadAudioFile (const File& sampleFile)
 {
-    DBG ("[KSP1] loading: " << sampleFile.getFileName());
-
     const int32 slot (sampleFile.hashCode());
 
     if (audioBuffers.contains (slot))
@@ -134,6 +132,7 @@ BufferPtr SampleCache::loadAudioFile (const File& sampleFile)
 
     if (auto reader = std::unique_ptr<AudioFormatReader> (getAudioFormats().createReaderFor (sampleFile)))
     {
+        DBG ("[KSP1] loading: " << sampleFile.getFileName());
         buffer.reset (new AudioSampleBuffer (reader->numChannels, reader->lengthInSamples));
         reader->read (buffer.get(), 0, reader->lengthInSamples, 0, false, false);
         audioBuffers.set (slot, buffer);
@@ -141,6 +140,7 @@ BufferPtr SampleCache::loadAudioFile (const File& sampleFile)
     }
     else
     {
+        DBG ("[KSP1] could not load: " << sampleFile.getFileName());
         blacklist.add (slot);
     }
 

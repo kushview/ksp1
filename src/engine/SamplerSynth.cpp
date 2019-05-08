@@ -261,7 +261,6 @@ bool SamplerSynth::insertLayerData (uint32 soundId, LayerData *data)
 
 SamplerSound* SamplerSynth::getSound (int note, bool createIt)
 {        
-    jassertfalse;
     return nullptr;
 }
 

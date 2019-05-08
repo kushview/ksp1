@@ -52,7 +52,7 @@ DynamicObject::Ptr SamplerSound::createDynamicObject() const
 {
     DynamicObject::Ptr object = new DynamicObject();
     jassertfalse;
-    #if 0
+   #if 0
     object->setProperty (Slugs::id, id);
     object->setProperty (Slugs::note, key.note);
     object->setProperty (Slugs::length, key.length);
@@ -68,26 +68,22 @@ DynamicObject::Ptr SamplerSound::createDynamicObject() const
 
     if (layers.size() > 0)
         object->setProperty ("layers", layers);
-    #endif
+   #endif
     return object;
 }
 
 bool SamplerSound::insertLayerData (LayerData* data)
 {
-    if (activeLayers.contains (data)) {
+    if (activeLayers.contains (data) || ! isPositiveAndBelow (activeLayers.size(), 32))
         return false;
-    }
 
-    if (! isPositiveAndBelow (activeLayers.size(), 32)) {
-        return false;
-    }
+    data->parent    = static_cast<uint32> (id);
+    data->sound     = this;
+    data->note      = key.note;
+    data->index     = activeLayers.size() - 1;
 
     dataLock.lock();
     activeLayers.add (data);
-    data->parent = static_cast<uint32> (id);
-    data->sound = this;
-    data->note = key.note;
-    data->index = activeLayers.size() - 1;
     dataLock.unlock();
 
     setDefaultLength();
@@ -129,16 +125,12 @@ bool SamplerSound::appliesToNote (const int note)
 
 bool SamplerSound::appliesToChannel (const int chan)
 {
-    if (chan <= 0 || chan > 16) {
+    if (chan <= 0 || chan > 16)
         return true;
-    }
-
-    bool res = midiChans [chan];
-    return res;
+    return midiChans [chan];
 }
 
-void
-SamplerSound::clearSources()
+void SamplerSound::clearSources()
 {
     Lock sl (*this);
     activeLayers.clearQuick();
