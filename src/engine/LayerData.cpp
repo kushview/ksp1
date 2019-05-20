@@ -177,26 +177,12 @@ bool LayerData::loadAudioFile (const File& audioFile)
     BufferPtr old = scratch;
     scratch = cache.loadAudioFile (audioFile);
 
-    //if (sampleRate == 0.0f)
+    if (ScopedPointer<AudioFormatReader> reader = cache.createReaderFor (audioFile))
     {
-        if (ScopedPointer<AudioFormatReader> reader = cache.createReaderFor (audioFile))
-        {
-            if (sampleRate != reader->sampleRate)
-                sampleRate = reader->sampleRate;
-            if (lengthInSamples != reader->lengthInSamples)
-                lengthInSamples = reader->lengthInSamples;
-            if (numChannels != reader->numChannels)
-                numChannels = reader->numChannels;
-
-            if (length <= 0) {
-                length = lengthInSamples;
-            }
-        }
-    }
-
-    if (! audioFile.existsAsFile())
-    {
-        DBG (audioFile.getFullPathName() << "  DOES NOT EXIST");
+        sampleRate      = reader->sampleRate;
+        lengthInSamples = reader->lengthInSamples;
+        numChannels     = reader->numChannels;
+        length          = lengthInSamples;
     }
     
     currentFile = audioFile;

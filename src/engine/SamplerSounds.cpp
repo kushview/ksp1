@@ -93,41 +93,45 @@ bool SamplerSound::insertLayerData (LayerData* data)
 void SamplerSound::setDefaultLength()
 {
     start.set (0);
+    
     int64 end = 0;
 
     for (int i = 0; i < activeLayers.size(); ++i)
     {
+        auto* const data = activeLayers.getUnchecked (i);
+
         if (i == 0)
         {
-            start.set (activeLayers.getUnchecked(i)->getStart());
-            end = activeLayers.getUnchecked(i)->getStart() + activeLayers.getUnchecked(i)->getLength();
+            start.set (data->getStart());
+            end = data->getStart() + data->getLength();
         }
         else
         {
-            if (activeLayers.getUnchecked(i)->getStart() < start.get())
-                start.set (activeLayers.getUnchecked(i)->getStart());
+            if (data->getStart() < start.get())
+                start.set (data->getStart());
 
-            if ((activeLayers.getUnchecked(i)->getStart() + activeLayers.getUnchecked(i)->getLength()) > end)
-                end = activeLayers.getUnchecked(i)->getStart() + activeLayers.getUnchecked(i)->getLength();
+            if ((data->getStart() + data->getLength()) > end)
+                end = data->getStart() + data->getLength();
         }
     }
 
-    jassert (end > start.get());
+    if (activeLayers.size() > 0)
+    {
+        // avoid asserting when there are no layers
+        jassert (end > start.get());
+    }
 
     duration.set (end - start.get());
 }
 
 bool SamplerSound::appliesToNote (const int note)
 {
-    const bool res = note >= key.note && note <= (key.note + key.length);
-    return res;
+    return note >= key.note && note <= (key.note + key.length);
 }
 
 bool SamplerSound::appliesToChannel (const int chan)
 {
-    if (chan <= 0 || chan > 16)
-        return true;
-    return midiChans [chan];
+    return chan <= 0 || chan > 16 || midiChans [chan];
 }
 
 void SamplerSound::clearSources()
