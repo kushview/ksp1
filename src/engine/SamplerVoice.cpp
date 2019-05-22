@@ -1,6 +1,6 @@
 /*
     This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+    Copyright (C) 2014-2019  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ void SamplerVoice::startNote (const int midiNote, const float velocity,
 
     for (int32 i = sound->getNumLayers(); --i >= 0;) {
         // sound->getLayer(i)->startNote (this->id, key);
-        layerPosition [i] = static_cast<double> (sound->getLayer(i)->getOffset());
+        layerPosition [i] = static_cast<double> (sound->getLayer(i)->in.get() + sound->getLayer(i)->getOffset());
     }
 
    #if KSP1_USE_ADSR
@@ -118,6 +118,191 @@ void SamplerVoice::startNote (const int midiNote, const float velocity,
 
     setPlaybackState (PlayRequested);
 }
+
+void SamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
+{
+    if (sound == nullptr)
+        return;
+
+    bool isLastCycle = false;
+
+    int endFrame = frame + numSamples;
+    if (endFrame >= sound->length())
+    {
+        numSamples = endFrame - sound->length();
+        endFrame   = frame + numSamples;
+        isLastCycle = true;
+    }
+
+    if (! sound->acquire())
+    {
+        clearCurrentNote(); 
+        sound = nullptr;
+        jassertfalse;
+        return;
+    }
+
+    const KeyInfo& key (sound->getKeyInfo());
+    const int32 numLayers = sound->getNumLayers();
+
+    float* outL = outputBuffer.getWritePointer (0, startSample);
+    float* outR = outputBuffer.getNumChannels() > 1
+                ? outputBuffer.getWritePointer (1, startSample) : nullptr;
+
+   #if KSP1_USE_ADSR
+    tempBuffer.setSize (1, numSamples, false, false, true);
+    float* adsrGain = tempBuffer.getSampleData (adsrChannel, 0);
+    adsr.processBuffer (numSamples, adsrGain);
+   #endif
+
+    const float keyPitch = static_cast<float> (key.pitch) + sound->getPitchOffsetForNote (this->note);
+
+    int32 renderFrame = 0;
+    for (int32 i = 0; i < numLayers; ++i)
+    {
+        LayerData* layer = sound->getLayer (i);
+        if (endFrame < layer->getStart())
+            continue;
+
+        const float* const inL = layer->getSampleData (0, 0);
+        const float* const inR = layer->numChannels > 1  ? layer->getSampleData (1, 0) : nullptr;
+        const double pitchRatio = pow (2.0, (keyPitch + wheelPitch + layer->pitch.get()) / 12.0f)
+                                  * layer->sampleRate / getSampleRate();
+
+        while (renderFrame < numSamples)
+        {
+            if (frame + renderFrame >= layer->getStart())
+            {
+                const int32 layerFrame = static_cast<int32> (layerPosition [i]);
+                if (layerFrame < layer->out.get() && layerFrame < layer->getLength() && layerFrame < layer->lengthInSamples)
+                {
+                    const float alpha = (float) (layerPosition [i] - layerFrame);
+                    const float invAlpha = 1.0f - alpha;
+
+                    // just using a very simple linear interpolation here..
+                    float l = (inL [layerFrame] * invAlpha + inL [layerFrame + 1] * alpha);
+                    float r = (inR != nullptr) ? (inR [layerFrame] * invAlpha + inR [layerFrame + 1] * alpha) : l;
+
+                    l *= (key.gain * layer->gain.get());
+                    r *= (key.gain * layer->gain.get());
+
+                   #if KSP1_USE_PANNING
+                    l *= std::sqrt (layer->panning.get());
+                    r *= std::sqrt (1.0f - layer->panning.get());
+                   #endif
+
+                    outL [renderFrame] += l;
+                    outR [renderFrame] += r;
+                }
+            }
+
+            layerPosition[i] += pitchRatio;
+            ++renderFrame;
+        }
+
+        renderFrame = 0;
+    }
+
+    // done with the sound
+    sound->release();
+
+    // copy the rendering into the fx bus slots
+    const int32 numOuts = outputBuffer.getNumChannels();
+    int32 renderChannel = 0;
+    int32 gainIndex = 0;
+    float gain = 1.0f;
+
+    for (int chan = 2; chan < numOuts; ++chan)
+    {
+        if (chan < 2)
+        {
+            gainIndex = 0;
+            gain = key.gain;
+        }
+        else if (chan < 4)
+        {
+            gainIndex = 1;
+            gain = key.fxGain [0];
+        }
+        else if (chan < 6)
+        {
+            gainIndex = 2;
+            gain = key.fxGain [1];
+        }
+        else if (chan < 8)
+        {
+            gainIndex = 3;
+            gain = key.fxGain [2];
+        }
+        else if (chan < 10)
+        {
+            gainIndex = 4;
+            gain = key.fxGain [3];
+        }
+
+
+        outputBuffer.addFromWithRamp (chan, startSample,
+                                      outputBuffer.getReadPointer (renderChannel, startSample),
+                                      numSamples, lastGains [gainIndex], gain);
+
+        if (++renderChannel == 2)
+            renderChannel = 0;
+
+        lastGains [gainIndex] = gain;
+    }
+
+    frame = endFrame;
+
+    if (isLastCycle) {
+        setPlaybackState (Stopped);
+    }
+}
+
+void SamplerVoice::stopNote (float,  bool allowTailOff)
+{
+    const KeyInfo& key (sound->getKeyInfo());
+
+    if (! allowTailOff || key.triggerMode == TriggerMode::Gate || key.triggerMode == TriggerMode::OneShotGate)
+    {
+        setPlaybackState (StopRequested);
+    }
+    else
+    {
+
+    }
+}
+
+void SamplerVoice::setPlaybackState (State s)
+{
+    if (state == s)
+        return;
+
+    if (StopRequested == s)
+    {
+        return setPlaybackState (Stopped);
+    }
+    else if (Stopped == s)
+    {
+        sound = nullptr;
+        note  = -1;
+        clearCurrentNote();
+    }
+    else if (Playing == s)
+    {
+
+    }
+    else if (Releasing == s)
+    {
+    }
+    else if (PlayRequested == s)
+    {
+
+    }
+
+    state = s;
+}
+
+
 
 void SamplerVoice::_renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
 {
@@ -280,191 +465,6 @@ return;
     if (isLastCycle) {
         setPlaybackState (Stopped);
     }
-}
-
-
-void SamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
-{
-#define BAIL_RENDER clearCurrentNote(); \
-sound = nullptr; \
-jassertfalse; \
-return;
-
-    if (sound == nullptr)
-        return;
-
-    bool isLastCycle = false;
-
-    int endFrame = frame + numSamples;
-    if (endFrame >= sound->length())
-    {
-        numSamples = endFrame - sound->length();
-        endFrame   = frame + numSamples;
-        isLastCycle = true;
-    }
-
-    if (! sound->acquire()) {
-        BAIL_RENDER
-    }
-
-    const KeyInfo& key (sound->getKeyInfo());
-    const int32 numLayers = sound->getNumLayers();
-
-    float* outL = outputBuffer.getWritePointer (0, startSample);
-    float* outR = outputBuffer.getNumChannels() > 1
-                ? outputBuffer.getWritePointer (1, startSample) : nullptr;
-
-   #if KSP1_USE_ADSR
-    tempBuffer.setSize (1, numSamples, false, false, true);
-    float* adsrGain = tempBuffer.getSampleData (adsrChannel, 0);
-    adsr.processBuffer (numSamples, adsrGain);
-   #endif
-
-    const float keyPitch = static_cast<float> (key.pitch) + sound->getPitchOffsetForNote (this->note);
-
-    int32 renderFrame = 0;
-    for (int32 i = 0; i < numLayers; ++i)
-    {
-        LayerData* layer = sound->getLayer (i);
-        if (endFrame < layer->getStart())
-            continue;
-
-        const float* const inL = layer->getSampleData (0, 0);
-        const float* const inR = layer->numChannels > 1  ? layer->getSampleData (1, 0) : nullptr;
-        const double pitchRatio = pow (2.0, (keyPitch + wheelPitch + layer->pitch.get()) / 12.0f)
-                                  * layer->sampleRate / getSampleRate();
-
-        while (renderFrame < numSamples)
-        {
-            if (frame + renderFrame >= layer->getStart())
-            {
-                const int32 layerFrame = static_cast<int32> (layerPosition [i]);
-                if (layerFrame < layer->out.get() && layerFrame < layer->getLength() && layerFrame < layer->lengthInSamples)
-                {
-                    const float alpha = (float) (layerPosition [i] - layerFrame);
-                    const float invAlpha = 1.0f - alpha;
-
-                    // just using a very simple linear interpolation here..
-                    float l = (inL [layerFrame] * invAlpha + inL [layerFrame + 1] * alpha);
-                    float r = (inR != nullptr) ? (inR [layerFrame] * invAlpha + inR [layerFrame + 1] * alpha) : l;
-
-                    l *= (key.gain * layer->gain.get());
-                    r *= (key.gain * layer->gain.get());
-
-                   #if KSP1_USE_PANNING
-                    l *= std::sqrt (layer->panning.get());
-                    r *= std::sqrt (1.0f - layer->panning.get());
-                   #endif
-
-                    outL [renderFrame] += l;
-                    outR [renderFrame] += r;
-                }
-            }
-
-            layerPosition[i] += pitchRatio;
-            ++renderFrame;
-        }
-
-        renderFrame = 0;
-    }
-
-    // done with the sound
-    sound->release();
-
-    // copy the rendering into the fx bus slots
-    const int32 numOuts = outputBuffer.getNumChannels();
-    int32 renderChannel = 0;
-    int32 gainIndex = 0;
-    float gain = 1.0f;
-
-    for (int chan = 2; chan < numOuts; ++chan)
-    {
-        if (chan < 2)
-        {
-            gainIndex = 0;
-            gain = key.gain;
-        }
-        else if (chan < 4)
-        {
-            gainIndex = 1;
-            gain = key.fxGain [0];
-        }
-        else if (chan < 6)
-        {
-            gainIndex = 2;
-            gain = key.fxGain [1];
-        }
-        else if (chan < 8)
-        {
-            gainIndex = 3;
-            gain = key.fxGain [2];
-        }
-        else if (chan < 10)
-        {
-            gainIndex = 4;
-            gain = key.fxGain [3];
-        }
-
-
-        outputBuffer.addFromWithRamp (chan, startSample,
-                                      outputBuffer.getReadPointer (renderChannel, startSample),
-                                      numSamples, lastGains [gainIndex], gain);
-
-        if (++renderChannel == 2)
-            renderChannel = 0;
-
-        lastGains [gainIndex] = gain;
-    }
-
-    frame = endFrame;
-
-    if (isLastCycle) {
-        setPlaybackState (Stopped);
-    }
-}
-
-void SamplerVoice::stopNote (float,  bool allowTailOff)
-{
-    const KeyInfo& key (sound->getKeyInfo());
-
-    if (! allowTailOff || key.triggerMode == TriggerMode::Gate || key.triggerMode == TriggerMode::OneShotGate)
-    {
-        setPlaybackState (StopRequested);
-    }
-    else
-    {
-
-    }
-}
-
-void SamplerVoice::setPlaybackState (State s)
-{
-    if (state == s)
-        return;
-
-    if (StopRequested == s)
-    {
-        return setPlaybackState (Stopped);
-    }
-    else if (Stopped == s)
-    {
-        sound = nullptr;
-        note  = -1;
-        clearCurrentNote();
-    }
-    else if (Playing == s)
-    {
-
-    }
-    else if (Releasing == s)
-    {
-    }
-    else if (PlayRequested == s)
-    {
-
-    }
-
-    state = s;
 }
 
 }

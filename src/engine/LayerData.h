@@ -83,7 +83,7 @@ public:
     /** Restore properties from an XmlElement */
     void restoreFromXml (const XmlElement& e);
 
-    #if defined (HAVE_LVTK)
+   #if defined (HAVE_LVTK)
     /** Set a property using a PatchSet */
     void setProperty (const URIs& uris, const PatchSet& set);
 
@@ -95,7 +95,7 @@ public:
 
     /** Write Layer properties to an AtomObject */
     ForgeRef writeAtomObject (Forge& forge);
-    #endif
+   #endif
 
 protected:
     Atomic<double> gain;
