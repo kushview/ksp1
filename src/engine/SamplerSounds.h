@@ -216,7 +216,8 @@ private:
 
     friend class Lock;
     friend class SamplerSynth;
-
 };
+
+using SamplerSoundPtr = ReferenceCountedObjectPtr<SamplerSound>;
 
 }

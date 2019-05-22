@@ -178,14 +178,14 @@ return;
              const float* const inL = layer->getSampleData (0, 0);
              const float* const inR = layer->numChannels > 1  ? layer->getSampleData (1, 0) : nullptr;
 
-             if (! inL || pos >= layer->out.get() || pos >= layer->lengthInSamples) {
-#if 0
-                 DBG ("Break on layer");
-                 bool isNull = inL == nullptr;
-                 DBG ("inL: " << isNull << " pos: " << pos << " outPoint: " << layer->out.get() << " len: " << layer->lengthInSamples);
-#endif
-                 continue;
-             }
+            if (! inL || pos >= layer->out.get() || pos >= layer->lengthInSamples) {
+               #if 0
+                DBG ("Break on layer");
+                bool isNull = inL == nullptr;
+                DBG ("inL: " << isNull << " pos: " << pos << " outPoint: " << layer->out.get() << " len: " << layer->lengthInSamples);
+               #endif
+                continue;
+            }
 
              const double pitchRatio = pow (2.0, (keyPitch + wheelPitch + layer->pitch.get()) / 12.0f)
                                        * layer->sampleRate / getSampleRate();
@@ -198,8 +198,8 @@ return;
              float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha)
                                         : l;
 
-             l *= (key.gain * layer->gain.get());
-             r *= (key.gain * layer->gain.get());
+             l *= key.gain * layer->gain.get();
+             r *= key.gain * layer->gain.get();
 
             #if KSP1_USE_PANNING
              const float pr = std::sqrt (layer->panning.get());
@@ -339,7 +339,7 @@ return;
             if (frame + renderFrame >= layer->getStart())
             {
                 const int32 layerFrame = static_cast<int32> (layerPosition [i]);
-                if (layerFrame < layer->getLength() && layerFrame < layer->lengthInSamples)
+                if (layerFrame < layer->out.get() && layerFrame < layer->getLength() && layerFrame < layer->lengthInSamples)
                 {
                     const float alpha = (float) (layerPosition [i] - layerFrame);
                     const float invAlpha = 1.0f - alpha;

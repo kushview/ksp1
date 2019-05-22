@@ -1,6 +1,6 @@
 /*
-    Monitor.h - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+    Monitor.h - This file is part of KSP1
+    Copyright (C) 2014-2019  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,45 +17,37 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_MONITOR_H
-#define ELEMENT_MONITOR_H
+#pragma once
 
 #include "KSP1.h"
 
 namespace KSP1 {
 
-    class Monitor
-    {
-    public:
+class Monitor
+{
+public:
 
-        Monitor (const Array<int>& p, const int pt)
-            : path (p), port (pt), value (0.0f)
-        { }
+    Monitor (const Array<int>& p, const int pt)
+        : path (p), port (pt), value (0.0f)
+    { }
 
-        ~Monitor() { }
+    ~Monitor() { }
 
-        const Array<int> path;
-        const int port;
+    const Array<int> path;
+    const int port;
 
-        const int procNode() const { return *path.end(); }
+    const int procNode() const { return *path.end(); }
 
-        /** The non-realtime thread should call this at regular intervals */
-        inline float get() const {
-            return value.get();
-        }
+    /** The non-realtime thread should call this at regular intervals */
+    inline float get() const { return value.get(); }
 
-        /** The audio thread should call this on a regular basis to update
-            with a realtime value.  e.g. audio peaks, transport position, etc.. */
-        inline void set (const float val) {
-            value.set (val);
-        }
+    /** The audio thread should call this on a regular basis to update
+        with a realtime value.  e.g. audio peaks, transport position, etc.. */
+    inline void set (const float val) { value.set (val); }
 
-    private:
+private:
+    AtomicValue<float> value;
 
-        AtomicValue<float> value;
-
-    };
+};
 
 }
-
-#endif // ELEMENT_MONITOR_H

@@ -324,7 +324,6 @@ namespace KSP1 {
     class KeyItem :  public ObjectModel
     {
     public:
-
         explicit KeyItem (bool setMissing = true);
         KeyItem (const int note, const bool setMissing = true);
         KeyItem (const ValueTree& k);
@@ -422,7 +421,8 @@ namespace KSP1 {
         void updateLayerItem (const URIs& uris, const lvtk::AtomObject &object);
         void updateKeyItem (const URIs& uris, const lvtk::AtomObject &object);
 
-        void print() {
+        void print()
+        {
             DBG (objectData.toXmlString());
         }
 

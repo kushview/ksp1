@@ -46,6 +46,9 @@ public:
     /** Create a DynamicObject representing this LayerData */
     DynamicObject::Ptr createDynamicObject() const;
 
+    void setStartTime (double timeIn);
+    void setEndTime (double timeOut);
+
     /** Set the volume of this Layer */
     void setVolume (const double vol);
 
@@ -58,7 +61,7 @@ public:
     /** Get the length frames */
     const int64& getLength() const { return length; }
 
-    /** Get the start frame in the parent */
+    /** Get the start frame in the parent sound */
     const int64& getStart() const { return start; }
 
     /** Get the parent SamplerSound's ID for this LayerData */

@@ -138,6 +138,16 @@ void LayerData::restoreFromXml (const XmlElement& e)
     }
 }
 
+void LayerData::setStartTime (double timeIn)
+{
+    in.set (roundToIntAccurate (timeIn * sampleRate));
+}
+
+void LayerData::setEndTime (double timeOut)
+{
+    out.set (roundToIntAccurate (timeOut * sampleRate));
+}
+
 void LayerData::setVolume (const double vol)
 {
     gain.set (Decibels::decibelsToGain (vol));
@@ -146,7 +156,7 @@ void LayerData::setVolume (const double vol)
 DynamicObject::Ptr LayerData::createDynamicObject() const
 {
     DynamicObject::Ptr object = new DynamicObject();
-    #if 0
+   #if 0
     object->setProperty (Slugs::id, id);
     object->setProperty (Slugs::index, index);
     object->setProperty (Slugs::note, note);
@@ -159,21 +169,21 @@ DynamicObject::Ptr LayerData::createDynamicObject() const
     object->setProperty (Slugs::length, (double)(out.get() - in.get()) / sampleRate);
     object->setProperty (Slugs::file, currentFile.getFullPathName());
     object->setProperty (Slugs::name, currentFile.getFileNameWithoutExtension());
-    #endif
+   #endif
     return object;
 }
 
 const float* LayerData::getSampleData (int32 chan, int32 frame) const
 {
     return renderBuffer != nullptr ? renderBuffer->getReadPointer (chan, frame)
-                                            : nullptr;
+                                   : nullptr;
 }
 
 bool LayerData::loadAudioFile (const File& audioFile)
 {
     if (! audioFile.existsAsFile())
         return false;
-    
+
     BufferPtr old = scratch;
     scratch = cache.loadAudioFile (audioFile);
 
@@ -182,6 +192,8 @@ bool LayerData::loadAudioFile (const File& audioFile)
         sampleRate      = reader->sampleRate;
         lengthInSamples = reader->lengthInSamples;
         numChannels     = reader->numChannels;
+        start           = 0;
+        offset          = 0;
         length          = lengthInSamples;
     }
     
