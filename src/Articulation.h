@@ -17,10 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_ARTICULATION_H
-#define KSP1_ARTICULATION_H
+#pragma once
 
-#include "Types.h"
+#include "./Types.h"
 
 namespace KSP1 {
 

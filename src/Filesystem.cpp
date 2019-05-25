@@ -17,9 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "DataPath.h"
-#include "Filesystem.h"
-#include "Types.h"
+#include "./DataPath.h"
+#include "./Filesystem.h"
+#include "./Types.h"
 
 namespace KSP1 {
 

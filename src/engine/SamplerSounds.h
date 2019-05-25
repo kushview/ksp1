@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "engine/SamplerKeys.h"
-#include "Forge.h"
-#include "Types.h"
+#include "./engine/SamplerKeys.h"
+#include "./Forge.h"
+#include "./Types.h"
 
 namespace KSP1 {
 

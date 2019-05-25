@@ -21,6 +21,7 @@
 
 #include "KSP1.h"
 
+#if 0
 namespace KSP1 {
 
 typedef kv::AtomicValue<int>    AtomicInt;
@@ -51,3 +52,4 @@ static const Identifier resonance       = "resonance";
 static const Identifier cutoff          = "cutoff";
 
 }
+#endif

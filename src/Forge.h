@@ -20,6 +20,8 @@
 #ifndef KSP1_FORGE_H
 #define KSP1_FORGE_H
 
+#if HAVE_LVTK
+
 #include "URIs.h"
 #include "../libs/lvtk/lvtk/ext/atom.hpp"
 
@@ -200,4 +202,5 @@ namespace KSP1
 
 }  /* namespace KSP1 */
 
+#endif
 #endif  /* KSP1_FORGE_H */

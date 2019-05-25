@@ -17,8 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_URIS_H
-#define KSP1_URIS_H
+#pragma once
+
+#if HAVE_LVTK
 
 #include <functional>
 #include <string>
@@ -226,4 +227,4 @@ namespace KSP1 {
     };
 }
 
-#endif /* KSP1_URIS_H */
+#endif
