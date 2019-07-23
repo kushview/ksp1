@@ -64,188 +64,41 @@
       </GROUP>
     </GROUP>
     <GROUP id="{932EA623-E322-0C49-1C37-7180E68A8407}" name="src">
-      <GROUP id="{D6C01650-CAB9-D371-33ED-6C94B51661CF}" name="editor">
-        <FILE id="nL65jO" name="AmpControls.cpp" compile="1" resource="0" file="../src/editor/AmpControls.cpp"/>
-        <FILE id="va3Z6M" name="AmpControls.h" compile="0" resource="0" file="../src/editor/AmpControls.h"/>
-        <FILE id="wenuze" name="ArticulationControls.cpp" compile="1" resource="0"
-              file="../src/editor/ArticulationControls.cpp"/>
-        <FILE id="R224vC" name="ArticulationControls.h" compile="0" resource="0"
-              file="../src/editor/ArticulationControls.h"/>
-        <FILE id="Jvv4Do" name="AssetsListBox.cpp" compile="1" resource="0"
-              file="../src/editor/AssetsListBox.cpp"/>
-        <FILE id="yPHv2j" name="AssetsListBox.h" compile="0" resource="0" file="../src/editor/AssetsListBox.h"/>
-        <FILE id="KRFFWr" name="AudioPeaks.cpp" compile="1" resource="0" file="../src/editor/AudioPeaks.cpp"/>
-        <FILE id="nAwAEW" name="AudioPeaks.h" compile="0" resource="0" file="../src/editor/AudioPeaks.h"/>
-        <FILE id="AAl1I6" name="Banks.h" compile="0" resource="0" file="../src/editor/Banks.h"/>
-        <FILE id="cy5Duq" name="BrowseScreen.cpp" compile="1" resource="0"
-              file="../src/editor/BrowseScreen.cpp"/>
-        <FILE id="MnMdBQ" name="BrowseScreen.h" compile="0" resource="0" file="../src/editor/BrowseScreen.h"/>
-        <FILE id="asBKFU" name="ComponentMixin.h" compile="0" resource="0"
-              file="../src/editor/ComponentMixin.h"/>
-        <FILE id="pts6qX" name="EditScreen.cpp" compile="1" resource="0" file="../src/editor/EditScreen.cpp"/>
-        <FILE id="gQhoTR" name="EditScreen.h" compile="0" resource="0" file="../src/editor/EditScreen.h"/>
-        <FILE id="pAYFMf" name="FilterControls.cpp" compile="1" resource="0"
-              file="../src/editor/FilterControls.cpp"/>
-        <FILE id="BV8Anj" name="FilterControls.h" compile="0" resource="0"
-              file="../src/editor/FilterControls.h"/>
-        <FILE id="tSGAPu" name="Keyboard.cpp" compile="1" resource="0" file="../src/editor/Keyboard.cpp"/>
-        <FILE id="g10ns8" name="Keyboard.h" compile="0" resource="0" file="../src/editor/Keyboard.h"/>
-        <FILE id="bKIsOE" name="LayerCell.cpp" compile="1" resource="0" file="../src/editor/LayerCell.cpp"/>
-        <FILE id="WJs9K5" name="LayerCell.h" compile="0" resource="0" file="../src/editor/LayerCell.h"/>
-        <FILE id="euJCqD" name="LayersListBox.cpp" compile="1" resource="0"
-              file="../src/editor/LayersListBox.cpp"/>
-        <FILE id="sz3Eko" name="LayersListBox.h" compile="0" resource="0" file="../src/editor/LayersListBox.h"/>
-        <FILE id="Zg3qdZ" name="LevelMeter.cpp" compile="1" resource="0" file="../src/editor/LevelMeter.cpp"/>
-        <FILE id="wq8Wbt" name="LevelMeter.h" compile="0" resource="0" file="../src/editor/LevelMeter.h"/>
-        <FILE id="D9cKZw" name="LV2Editor.cpp" compile="1" resource="0" file="../src/editor/LV2Editor.cpp"/>
-        <FILE id="NfFLuz" name="LV2Editor.h" compile="0" resource="0" file="../src/editor/LV2Editor.h"/>
-        <FILE id="MKtNCC" name="MenuButton.h" compile="0" resource="0" file="../src/editor/MenuButton.h"/>
-        <FILE id="HxmhLn" name="MidiFilterScreen.cpp" compile="1" resource="0"
-              file="../src/editor/MidiFilterScreen.cpp"/>
-        <FILE id="XQ3lhv" name="MidiFilterScreen.h" compile="0" resource="0"
-              file="../src/editor/MidiFilterScreen.h"/>
-        <FILE id="YQZyNu" name="MidiKeyboardComponent.cpp" compile="1" resource="0"
-              file="../src/editor/MidiKeyboardComponent.cpp"/>
-        <FILE id="JqbbRa" name="MidiKeyboardComponent.h" compile="0" resource="0"
-              file="../src/editor/MidiKeyboardComponent.h"/>
-        <FILE id="riW7nN" name="MidiNoteSliderPropertyComponent.h" compile="0"
-              resource="0" file="../src/editor/MidiNoteSliderPropertyComponent.h"/>
-        <FILE id="L3TokT" name="PanelButton.h" compile="0" resource="0" file="../src/editor/PanelButton.h"/>
-        <FILE id="i5AQsZ" name="Panels.h" compile="0" resource="0" file="../src/editor/Panels.h"/>
-        <FILE id="zx27Bu" name="PianoRoll.cpp" compile="1" resource="0" file="../src/editor/PianoRoll.cpp"/>
-        <FILE id="Emo2w4" name="PianoRoll.h" compile="0" resource="0" file="../src/editor/PianoRoll.h"/>
-        <FILE id="wbUKZQ" name="ProgramEditor.cpp" compile="1" resource="0"
-              file="../src/editor/ProgramEditor.cpp"/>
-        <FILE id="pjZrpf" name="ProgramEditor.h" compile="0" resource="0" file="../src/editor/ProgramEditor.h"/>
-        <FILE id="W5DPev" name="ProgramsListBox.cpp" compile="1" resource="0"
-              file="../src/editor/ProgramsListBox.cpp"/>
-        <FILE id="DvXGk4" name="ProgramsListBox.h" compile="0" resource="0"
-              file="../src/editor/ProgramsListBox.h"/>
-        <FILE id="HQdjyt" name="PropertiesScreen.cpp" compile="1" resource="0"
-              file="../src/editor/PropertiesScreen.cpp"/>
-        <FILE id="WWA6i9" name="PropertiesScreen.h" compile="0" resource="0"
-              file="../src/editor/PropertiesScreen.h"/>
-        <FILE id="D9Xhrm" name="PropertyPage.h" compile="0" resource="0" file="../src/editor/PropertyPage.h"/>
-        <FILE id="aWfmHg" name="QuickBrowser.cpp" compile="1" resource="0"
-              file="../src/editor/QuickBrowser.cpp"/>
-        <FILE id="gm1UfZ" name="QuickBrowser.h" compile="0" resource="0" file="../src/editor/QuickBrowser.h"/>
-        <FILE id="wReQib" name="SamplerDisplay.cpp" compile="1" resource="0"
-              file="../src/editor/SamplerDisplay.cpp"/>
-        <FILE id="sLU9jt" name="SamplerDisplay.h" compile="0" resource="0"
-              file="../src/editor/SamplerDisplay.h"/>
-        <FILE id="BSFC15" name="SamplerView.cpp" compile="1" resource="0" file="../src/editor/SamplerView.cpp"/>
-        <FILE id="lQpWta" name="SamplerView.h" compile="0" resource="0" file="../src/editor/SamplerView.h"/>
-        <FILE id="onLclS" name="ScreenManager.cpp" compile="1" resource="0"
-              file="../src/editor/ScreenManager.cpp"/>
-        <FILE id="c79hVs" name="ScreenManager.h" compile="0" resource="0" file="../src/editor/ScreenManager.h"/>
-        <FILE id="wcY4WG" name="Screens.cpp" compile="1" resource="0" file="../src/editor/Screens.cpp"/>
-        <FILE id="Rf3s1M" name="Screens.h" compile="0" resource="0" file="../src/editor/Screens.h"/>
-        <FILE id="mSK9OA" name="SendsControls.cpp" compile="1" resource="0"
-              file="../src/editor/SendsControls.cpp"/>
-        <FILE id="Q9S0vb" name="SendsControls.h" compile="0" resource="0" file="../src/editor/SendsControls.h"/>
-        <FILE id="uwtCRn" name="Views.h" compile="0" resource="0" file="../src/editor/Views.h"/>
-        <FILE id="Ct5Mbb" name="Waveform.cpp" compile="1" resource="0" file="../src/editor/Waveform.cpp"/>
-        <FILE id="UwIt2n" name="Waveform.h" compile="0" resource="0" file="../src/editor/Waveform.h"/>
-        <FILE id="P1iPWT" name="Workspace.h" compile="0" resource="0" file="../src/editor/Workspace.h"/>
+      <GROUP id="{486271DD-93A2-F568-BC97-5366A7A9B9A8}" name="plugin">
+        <FILE id="Y9GRTh" name="KSP1.cpp" compile="1" resource="0" file="Source/KSP1.cpp"/>
+        <FILE id="CTGEvy" name="PluginConfig.h" compile="0" resource="0" file="Source/PluginConfig.h"/>
+        <FILE id="nsYT4k" name="PluginEditor.cpp" compile="1" resource="0"
+              file="Source/PluginEditor.cpp"/>
+        <FILE id="IgYrLA" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+        <FILE id="UMRZml" name="PluginProcessor.cpp" compile="1" resource="0"
+              file="Source/PluginProcessor.cpp"/>
+        <FILE id="kHCICx" name="PluginProcessor.h" compile="0" resource="0"
+              file="Source/PluginProcessor.h"/>
       </GROUP>
-      <GROUP id="{9CBC501D-4348-1E44-173D-D041B806C5FF}" name="engine">
-        <FILE id="fxRpCI" name="ADSR.cpp" compile="1" resource="0" file="../src/engine/ADSR.cpp"/>
-        <FILE id="CRJtG2" name="ADSR.h" compile="0" resource="0" file="../src/engine/ADSR.h"/>
-        <FILE id="PjinQ3" name="Articulator.cpp" compile="1" resource="0" file="../src/engine/Articulator.cpp"/>
-        <FILE id="jtgfz6" name="Articulator.h" compile="0" resource="0" file="../src/engine/Articulator.h"/>
-        <FILE id="HrojF4" name="Disposable.h" compile="0" resource="0" file="../src/engine/Disposable.h"/>
-        <FILE id="kkqCvT" name="Jobs.cpp" compile="1" resource="0" file="../src/engine/Jobs.cpp"/>
-        <FILE id="HwzEAc" name="Jobs.h" compile="0" resource="0" file="../src/engine/Jobs.h"/>
-        <FILE id="ngoXdE" name="LayerData.cpp" compile="1" resource="0" file="../src/engine/LayerData.cpp"/>
-        <FILE id="tDY7Sp" name="LayerData.h" compile="0" resource="0" file="../src/engine/LayerData.h"/>
-        <FILE id="XDg9w4" name="LayeringMode.h" compile="0" resource="0" file="../src/engine/LayeringMode.h"/>
-        <FILE id="sPBBfa" name="LowPassFilter.cpp" compile="1" resource="0"
+      <GROUP id="{05CFE782-EBD2-1CFA-972B-2BF0776C47BF}" name="engine">
+        <FILE id="hBXrtC" name="ADSR.cpp" compile="1" resource="0" file="../src/engine/ADSR.cpp"/>
+        <FILE id="SQdX2n" name="ADSR.h" compile="0" resource="0" file="../src/engine/ADSR.h"/>
+        <FILE id="V9cYx5" name="Articulator.cpp" compile="1" resource="0" file="../src/engine/Articulator.cpp"/>
+        <FILE id="q8G8Ww" name="Articulator.h" compile="0" resource="0" file="../src/engine/Articulator.h"/>
+        <FILE id="FN2zLc" name="LayerData.cpp" compile="1" resource="0" file="../src/engine/LayerData.cpp"/>
+        <FILE id="Nnjm5N" name="LayerData.h" compile="0" resource="0" file="../src/engine/LayerData.h"/>
+        <FILE id="AdpTIi" name="LowPassFilter.cpp" compile="1" resource="0"
               file="../src/engine/LowPassFilter.cpp"/>
-        <FILE id="XthRsz" name="LowPassFilter.h" compile="0" resource="0" file="../src/engine/LowPassFilter.h"/>
-        <FILE id="rn4wEg" name="LV2Plugin.cpp" compile="1" resource="0" file="../src/engine/LV2Plugin.cpp"/>
-        <FILE id="PAyn0J" name="LV2Plugin.h" compile="0" resource="0" file="../src/engine/LV2Plugin.h"/>
-        <FILE id="mND1L5" name="MidiFilter.h" compile="0" resource="0" file="../src/engine/MidiFilter.h"/>
-        <FILE id="UwfAiE" name="SampleCache.cpp" compile="1" resource="0" file="../src/engine/SampleCache.cpp"/>
-        <FILE id="e41l61" name="SampleCache.h" compile="0" resource="0" file="../src/engine/SampleCache.h"/>
-        <FILE id="NlI3JI" name="SamplerKeys.h" compile="0" resource="0" file="../src/engine/SamplerKeys.h"/>
-        <FILE id="aoqG5T" name="SamplerSounds.cpp" compile="1" resource="0"
+        <FILE id="AnFoGx" name="LowPassFilter.h" compile="0" resource="0" file="../src/engine/LowPassFilter.h"/>
+        <FILE id="c4be6f" name="SampleCache.cpp" compile="1" resource="0" file="../src/engine/SampleCache.cpp"/>
+        <FILE id="xolJX3" name="SampleCache.h" compile="0" resource="0" file="../src/engine/SampleCache.h"/>
+        <FILE id="oxrFBp" name="SamplerSounds.cpp" compile="1" resource="0"
               file="../src/engine/SamplerSounds.cpp"/>
-        <FILE id="Ab6Uwg" name="SamplerSounds.h" compile="0" resource="0" file="../src/engine/SamplerSounds.h"/>
-        <FILE id="OcDOWU" name="SamplerSynth.cpp" compile="1" resource="0"
+        <FILE id="yjqLIK" name="SamplerSounds.h" compile="0" resource="0" file="../src/engine/SamplerSounds.h"/>
+        <FILE id="oelB5J" name="SamplerSynth.cpp" compile="1" resource="0"
               file="../src/engine/SamplerSynth.cpp"/>
-        <FILE id="rn8ciX" name="SamplerSynth.h" compile="0" resource="0" file="../src/engine/SamplerSynth.h"/>
-        <FILE id="uv2gFF" name="SamplerVoice.cpp" compile="1" resource="0"
+        <FILE id="GiCoaq" name="SamplerSynth.h" compile="0" resource="0" file="../src/engine/SamplerSynth.h"/>
+        <FILE id="zTia0Z" name="SamplerVoice.cpp" compile="1" resource="0"
               file="../src/engine/SamplerVoice.cpp"/>
-        <FILE id="Q1Egd1" name="SamplerVoice.h" compile="0" resource="0" file="../src/engine/SamplerVoice.h"/>
-        <FILE id="V23Wqi" name="SqlQuery.h" compile="0" resource="0" file="../src/engine/SqlQuery.h"/>
+        <FILE id="l1nydl" name="SamplerVoice.h" compile="0" resource="0" file="../src/engine/SamplerVoice.h"/>
       </GROUP>
-      <FILE id="db27og" name="Articulation.cpp" compile="1" resource="0"
-            file="../src/Articulation.cpp"/>
-      <FILE id="AiymSz" name="Articulation.h" compile="0" resource="0" file="../src/Articulation.h"/>
-      <FILE id="cADzMZ" name="BeatThangKitLoader.h" compile="0" resource="0"
-            file="../src/BeatThangKitLoader.h"/>
-      <FILE id="N4Hplk" name="BeatThangPatternLoader.h" compile="0" resource="0"
-            file="../src/BeatThangPatternLoader.h"/>
-      <FILE id="oggLcW" name="ContentScanner.cpp" compile="1" resource="0"
-            file="../src/ContentScanner.cpp"/>
-      <FILE id="lFrU2o" name="ContentScanner.h" compile="0" resource="0"
-            file="../src/ContentScanner.h"/>
-      <FILE id="HRWWPN" name="Controller.cpp" compile="1" resource="0" file="../src/Controller.cpp"/>
-      <FILE id="dng18t" name="Controller.h" compile="0" resource="0" file="../src/Controller.h"/>
-      <FILE id="SEqTmK" name="Database.cpp" compile="1" resource="0" file="../src/Database.cpp"/>
-      <FILE id="CpBJAz" name="Database.h" compile="0" resource="0" file="../src/Database.h"/>
-      <FILE id="LCd1B8" name="DataPath.cpp" compile="1" resource="0" file="../src/DataPath.cpp"/>
-      <FILE id="an5xuS" name="DataPath.h" compile="0" resource="0" file="../src/DataPath.h"/>
-      <FILE id="bqsraJ" name="Filesystem.cpp" compile="1" resource="0" file="../src/Filesystem.cpp"/>
-      <FILE id="djIuXb" name="Filesystem.h" compile="0" resource="0" file="../src/Filesystem.h"/>
-      <FILE id="ZOKIyy" name="Forge.h" compile="0" resource="0" file="../src/Forge.h"/>
-      <FILE id="kgMhWL" name="H2DrumkitLoader.h" compile="0" resource="0"
-            file="../src/H2DrumkitLoader.h"/>
-      <FILE id="ghLgDG" name="Instrument.cpp" compile="1" resource="0" file="../src/Instrument.cpp"/>
-      <FILE id="Te6pyF" name="Instrument.h" compile="0" resource="0" file="../src/Instrument.h"/>
-      <FILE id="PzP4hF" name="InstrumentLoader.cpp" compile="1" resource="0"
-            file="../src/InstrumentLoader.cpp"/>
-      <FILE id="erN1as" name="InstrumentLoader.h" compile="0" resource="0"
-            file="../src/InstrumentLoader.h"/>
-      <FILE id="l8abS4" name="KeyItem.cpp" compile="1" resource="0" file="../src/KeyItem.cpp"/>
-      <FILE id="dFzvf3" name="KSP1.cpp" compile="1" resource="0" file="Source/KSP1.cpp"/>
-      <FILE id="yD8SA8" name="KSP1.h" compile="0" resource="0" file="../src/KSP1.h"/>
-      <FILE id="bLW047" name="LayerItem.cpp" compile="1" resource="0" file="../src/LayerItem.cpp"/>
-      <FILE id="E6RxOJ" name="Locations.cpp" compile="1" resource="0" file="../src/Locations.cpp"/>
-      <FILE id="OE96gg" name="Locations.h" compile="0" resource="0" file="../src/Locations.h"/>
-      <FILE id="nWMpLh" name="MediaLibrary.cpp" compile="1" resource="0"
-            file="../src/MediaLibrary.cpp"/>
-      <FILE id="KaFLiW" name="MediaLibrary.h" compile="0" resource="0" file="../src/MediaLibrary.h"/>
-      <FILE id="PM1GBM" name="MediaObject.h" compile="0" resource="0" file="../src/MediaObject.h"/>
-      <FILE id="VwnBy2" name="Monitor.h" compile="0" resource="0" file="../src/Monitor.h"/>
-      <FILE id="KZ7efH" name="PatternClip.h" compile="0" resource="0" file="../src/PatternClip.h"/>
-      <FILE id="Hga0UQ" name="PatternLoader.h" compile="0" resource="0" file="../src/PatternLoader.h"/>
-      <FILE id="vXt4Dw" name="PluginConfig.h" compile="0" resource="0" file="Source/PluginConfig.h"/>
-      <FILE id="HpdkQc" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="exC6Zd" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="xS8P7S" name="PluginProcessor.cpp" compile="1" resource="0"
-            file="Source/PluginProcessor.cpp"/>
-      <FILE id="GqHs53" name="PluginProcessor.h" compile="0" resource="0"
-            file="Source/PluginProcessor.h"/>
-      <FILE id="SI35MX" name="Ports.h" compile="0" resource="0" file="../src/Ports.h"/>
-      <FILE id="lAAoSv" name="PortWriter.cpp" compile="1" resource="0" file="../src/PortWriter.cpp"/>
-      <FILE id="LlWVaP" name="PortWriter.h" compile="0" resource="0" file="../src/PortWriter.h"/>
-      <FILE id="z82HgI" name="PortWriterInterface.cpp" compile="1" resource="0"
-            file="../src/PortWriterInterface.cpp"/>
-      <FILE id="LyG3SH" name="PortWriterInterface.h" compile="0" resource="0"
-            file="../src/PortWriterInterface.h"/>
-      <FILE id="mS64Do" name="Programming.cpp" compile="1" resource="0" file="../src/Programming.cpp"/>
-      <FILE id="jBsFL9" name="Programming.h" compile="0" resource="0" file="../src/Programming.h"/>
-      <FILE id="YhY5kt" name="SamplerInterface.cpp" compile="1" resource="0"
-            file="../src/SamplerInterface.cpp"/>
-      <FILE id="UfVzTp" name="SamplerInterface.h" compile="0" resource="0"
-            file="../src/SamplerInterface.h"/>
-      <FILE id="DVXYDF" name="StandardLoader.h" compile="0" resource="0"
-            file="../src/StandardLoader.h"/>
-      <FILE id="HUUTjq" name="Types.h" compile="0" resource="0" file="../src/Types.h"/>
-      <FILE id="Qn4HX0" name="URIs.cpp" compile="1" resource="0" file="../src/URIs.cpp"/>
-      <FILE id="ClWzbD" name="URIs.h" compile="0" resource="0" file="../src/URIs.h"/>
+      <FILE id="Ze7HcB" name="DataPath.cpp" compile="1" resource="0" file="../src/DataPath.cpp"/>
+      <FILE id="jkXv0X" name="DataPath.h" compile="0" resource="0" file="../src/DataPath.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>
@@ -274,8 +127,8 @@
                ELEMENT_DOCKING="disabled" ELEMENT_SESSION="disabled" ELEMENT_JACK_DEVICE="disabled"
                LVTK_USE_CXX11="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"/>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="/opt/SDKs/vstsdk" postbuildCommand="&#10;# This script takes the build product and copies it to the AU, VST, and RTAS folders, depending on &#10;# which plugin types you've built&#10;&#10;original=$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME&#10;&#10;frameworks=&quot;$original/Contents/Frameworks&quot;&#10;resources=&quot;$original/Contents/Resources&quot;&#10;topdir=&quot;$original/../../..&quot;&#10;mkdir -p &quot;$frameworks&quot;&#10;rm -f &quot;$frameworks/*&quot;&#10;&#10;# copy factory content&#10;rsync -ar --update &quot;$topdir/data/factory/&quot; &quot;$resources/&quot;&#10;&#10;# this looks inside the binary to detect which platforms are needed.. &#10;copyAU=&#96;nm -g &quot;$CONFIGURATION_BUILD_DIR/$EXECUTABLE_PATH&quot; | grep -i 'AudioUnit' | wc -l&#96;&#10;copyVST=&#96;nm -g &quot;$CONFIGURATION_BUILD_DIR/$EXECUTABLE_PATH&quot; | grep -i 'VSTPlugin' | wc -l&#96;&#10;copyRTAS=&#96;nm -g &quot;$CONFIGURATION_BUILD_DIR/$EXECUTABLE_PATH&quot; | grep -i 'CProcess' | wc -l&#96;&#10;copyAAX=&#96;nm -g &quot;$CONFIGURATION_BUILD_DIR/$EXECUTABLE_PATH&quot; | grep -i 'ACFStartup' | wc -l&#96;&#10;&#10;if [ $copyAU -gt 0 ]; then&#10;  echo &quot;Copying to AudioUnit folder...&quot;&#10;  AU=~/Library/Audio/Plug-Ins/Components/$PRODUCT_NAME.component&#10;  if [ -d &quot;$AU&quot; ]; then &#10;    rm -r &quot;$AU&quot;&#10;  fi&#10;&#10;  cp -r &quot;$original&quot; &quot;$AU&quot;&#10;  sed -i &quot;&quot; -e 's/TDMwPTul/BNDLPTul/g' &quot;$AU/Contents/PkgInfo&quot;&#10;  sed -i &quot;&quot; -e 's/TDMw/BNDL/g' &quot;$AU/Contents/$INFOPLIST_FILE&quot;&#10;&#10;  # Fix info.plist for AUs built with Xcode 3&#10;  if [ -f &quot;$DEVELOPER_DIR/Library/Developer/CoreAudio/AudioUnits/AUPublic/AUBase/AUPlugInDispatch.cpp&quot; ]; then&#10;    echo&#10;  else&#10;    echo &quot;Removing AudioComponents entry from Info.plist because this is not a new-format AU&quot;&#10;    /usr/libexec/PlistBuddy -c &quot;Delete AudioComponents&quot; &quot;$AU/Contents/Info.plist&quot;&#10;  fi&#10;&#10;fi&#10;&#10;if [ $copyVST -gt 0 ]; then&#10;  echo &quot;Copying to VST folder...&quot;&#10;  VST=~/Library/Audio/Plug-Ins/VST/$PRODUCT_NAME.vst&#10;  if [ -d &quot;$VST&quot; ]; then &#10;    rm -r &quot;$VST&quot;&#10;  fi&#10;&#10;  cp -r &quot;$original&quot; &quot;$VST&quot;&#10;  sed -i &quot;&quot; -e 's/TDMwPTul/BNDLPTul/g' &quot;$VST/Contents/PkgInfo&quot;&#10;  sed -i &quot;&quot; -e 's/TDMw/BNDL/g' &quot;$VST/Contents/$INFOPLIST_FILE&quot;&#10;&#10;fi&#10;&#10;if [ $copyRTAS -gt 0 ]; then&#10;  echo &quot;Copying to RTAS folder...&quot;&#10;  RTAS=/Library/Application\ Support/Digidesign/Plug-Ins/$PRODUCT_NAME.dpm&#10;  if [ -d &quot;$RTAS&quot; ]; then&#10;    rm -r &quot;$RTAS&quot;&#10;  fi&#10;&#10;  cp -r &quot;$original&quot; &quot;$RTAS&quot;&#10;fi&#10;&#10;if [ $copyAAX -gt 0 ]; then&#10;  echo &quot;Copying to AAX folder...&quot;&#10;&#10;  if [ -d &quot;/Applications/ProTools_3PDev/Plug-Ins&quot; ]; then&#10;    AAX1=&quot;/Applications/ProTools_3PDev/Plug-Ins/$PRODUCT_NAME.aaxplugin&quot;&#10;&#10;    if [ -d &quot;$AAX1&quot; ]; then&#10;      rm -r &quot;$AAX1&quot;&#10;    fi&#10;&#10;    cp -r &quot;$original&quot; &quot;$AAX1&quot;&#10;  fi&#10;&#10;  if [ -d &quot;/Library/Application Support/Avid/Audio/Plug-Ins&quot; ]; then&#10;    AAX2=&quot;/Library/Application Support/Avid/Audio/Plug-Ins/$PRODUCT_NAME.aaxplugin&quot;&#10;&#10;    if [ -d &quot;$AAX2&quot; ]; then&#10;      rm -r &quot;$AAX2&quot;&#10;    fi&#10;&#10;    cp -r &quot;$original&quot; &quot;$AAX2&quot;&#10;  fi&#10;fi&#10;"
-               externalLibraries="" extraDefs="JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING=1">
+    <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="/opt/SDKs/vstsdk" externalLibraries=""
+               extraDefs="JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING=1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxCompatibility="10.7 SDK" osxArchitecture="64BitUniversal"
                        isDebug="1" optimisation="1" targetName="KSP1" headerPath="../../../libs/lv2&#10;../../../libs/lvtk&#10;../../../libs/sqlite3&#10;../../../src&#10;/opt/kushview/include"

@@ -19,15 +19,7 @@
 
 #pragma once
 
-#include "./Types.h"
 #include "engine/Disposable.h"
-
-namespace lvtk {
-
-class Atom;
-class AtomObject;
-
-}
 
 namespace KSP1 {
 

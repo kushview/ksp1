@@ -20,12 +20,6 @@
 #pragma once
 
 #include "engine/SamplerKeys.h"
-#include "Forge.h"
-
-namespace lvtk {
-class Atom;
-class AtomObject;
-}
 
 namespace KSP1 {
 

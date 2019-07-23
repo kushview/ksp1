@@ -6,15 +6,13 @@
 */
 
 #include "KSP1.h"
-#include "engine/LV2Plugin.h"
 #include "engine/SamplerSynth.h"
-#include "Locations.h"
+#include "DataPath.h"
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
-#include "Ports.h"
 
-namespace KSP1
-{    
+namespace KSP1 {
+   
     PluginWorld::PluginWorld()
     {
 
@@ -72,8 +70,6 @@ namespace KSP1 {
 PluginProcessor::PluginProcessor()
 {
     currentProgram = 0;
-    jassert (lvtk::get_lv2_descriptors().size() == 1);
-    jassert (lvtk::get_lv2g2g_descriptors().size() == 1);
     globals->registerPlugin (this);
 }
 
@@ -95,11 +91,7 @@ PluginProcessor::~PluginProcessor()
 PluginProcessor* PluginProcessor::create()
 {
     if (! globals)
-    {
         globals = new PluginWorld();
-        ScopedPointer<LV2Feature> feat (globals->createMapFeature());
-        uris = new Element::URIs ((LV2_URID_Map*) feat->getFeature()->data);
-    }
 
     PluginProcessor* plugin = new PluginProcessor();
     return plugin;
@@ -129,9 +121,9 @@ const String PluginProcessor::getName() const {
 int PluginProcessor::getNumParameters() { return 0; }
 float PluginProcessor::getParameter (int index) { return 0.0f; }
 void PluginProcessor::setParameter (int index, float newValue) { }
-const String PluginProcessor::getParameterName (int index) { return String::empty; }
-const String PluginProcessor::getParameterText (int index) { return String::empty; }
-const String PluginProcessor::getInputChannelName (int channelIndex) const { return String::empty; }
+const String PluginProcessor::getParameterName (int index) { return String(); }
+const String PluginProcessor::getParameterText (int index) { return String(); }
+const String PluginProcessor::getInputChannelName (int channelIndex) const { return String(); }
 
 const String PluginProcessor::getOutputChannelName (int channelIndex) const
 {

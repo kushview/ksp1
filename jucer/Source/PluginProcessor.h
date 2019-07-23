@@ -7,11 +7,10 @@
 
 #pragma once
 
-#include "Instrument.h"
+#include "KSP1.h"
 
 namespace KSP1 {
 
-class PluginModule;
 class PluginProcessor;
 class PluginEditor;
 
@@ -77,7 +76,6 @@ protected:
 
 private:
     bool useExternalData;
-    ScopedPointer<PluginModule> module;
     ScopedPointer<kv::RingBuffer> ring, uiRing;
     HeapBlock<uint8> block;
 

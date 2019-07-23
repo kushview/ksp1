@@ -29,11 +29,6 @@ PluginEditor::~PluginEditor()
     setLookAndFeel (nullptr);
 }
 
-void PluginEditor::setInstrument (InstrumentPtr i)
-{
-    // FIXME: editor->setInstrument (i);
-}
-
 void PluginEditor::paint (Graphics& g)
 {
     g.fillAll (Colours::black);

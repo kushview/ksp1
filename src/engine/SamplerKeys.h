@@ -21,7 +21,6 @@
 
 #include "engine/ADSR.h"
 #include "engine/LayeringMode.h"
-#include "./Types.h"
 
 namespace KSP1 {
 

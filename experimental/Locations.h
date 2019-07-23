@@ -39,11 +39,8 @@ namespace KSP1 {
         File resolvePath (const String& data) const;
 
     private:
-
         KnownFilesystems fses;
-
     };
-
 }
 
 #endif // KSP1_LOCATIONS_H
