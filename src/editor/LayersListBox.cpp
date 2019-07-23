@@ -24,7 +24,6 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
     LayersListBox::LayersListBox()
     {
@@ -207,4 +206,4 @@ namespace Gui {
 
     bool LayersListBox::shouldDrawDragImageWhenOver() { return true; }
 
-}}
+}

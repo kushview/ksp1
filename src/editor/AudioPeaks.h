@@ -23,7 +23,6 @@
 #include "KSP1.h"
 
 namespace KSP1 {
-namespace Gui {
 
 class AudioPeakFactory : public AudioThumbnailCache {
 public:
@@ -46,6 +45,6 @@ public:
 
 typedef ReferenceCountedObjectPtr<AudioPeak> AudioPeakPtr;
 
-}} /* namespace KSP1::Gui */
+}
 
 #endif // KSP1_AUDIO_PEAK_H

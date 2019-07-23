@@ -1,25 +1,23 @@
 /*
-    This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+  ==============================================================================
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This is an automatically generated GUI class created by the Projucer!
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Created with Projucer version: 5.4.3
 
-    GUI class created by the Introjucer!
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-//[Headers]
+//[Headers] You can add your own extra header files here...
 #include "editor/Screens.h"
 #include "editor/ScreenManager.h"
 #include "InstrumentLoader.h"
@@ -30,9 +28,8 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
-//[MiscUserDefs]
+//[MiscUserDefs] You can add your own user definitions and misc code here...
 
 class SamplerDisplay::Models
 {
@@ -155,9 +152,14 @@ private:
 
 //[/MiscUserDefs]
 
+//==============================================================================
 SamplerDisplay::SamplerDisplay ()
 {
-    addAndMakeVisible (comboBox = new ComboBox ("new combo box"));
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
+    comboBox.reset (new ComboBox ("new combo box"));
+    addAndMakeVisible (comboBox.get());
     comboBox->setEditableText (false);
     comboBox->setJustificationType (Justification::centredLeft);
     comboBox->setTextWhenNothingSelected (TRANS("Chan"));
@@ -180,10 +182,13 @@ SamplerDisplay::SamplerDisplay ()
     comboBox->addItem (TRANS("16"), 16);
     comboBox->addListener (this);
 
-    addAndMakeVisible (title = new Label ("title",
-                                          TRANS("New Instrument")));
+    comboBox->setBounds (6, 4, 48, 16);
+
+    title.reset (new Label ("title",
+                            TRANS("New Instrument")));
+    addAndMakeVisible (title.get());
     title->setTooltip (TRANS("Current Instrument"));
-    title->setFont (Font (18.00f, Font::plain));
+    title->setFont (Font (18.00f, Font::plain).withTypefaceStyle ("Regular"));
     title->setJustificationType (Justification::centredLeft);
     title->setEditable (false, true, false);
     title->setColour (Label::textColourId, Colours::chartreuse);
@@ -191,10 +196,13 @@ SamplerDisplay::SamplerDisplay ()
     title->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     title->addListener (this);
 
-    addAndMakeVisible (noteLabel = new Label ("note-label",
-                                              TRANS("C0-1")));
+    title->setBounds (57, -1, 223, 24);
+
+    noteLabel.reset (new Label ("note-label",
+                                TRANS("C0-1")));
+    addAndMakeVisible (noteLabel.get());
     noteLabel->setTooltip (TRANS("Current Note"));
-    noteLabel->setFont (Font (17.00f, Font::bold));
+    noteLabel->setFont (Font (17.00f, Font::plain).withTypefaceStyle ("Bold"));
     noteLabel->setJustificationType (Justification::centredRight);
     noteLabel->setEditable (false, false, false);
     noteLabel->setColour (Label::textColourId, Colour (0xffb0c19f));
@@ -202,10 +210,12 @@ SamplerDisplay::SamplerDisplay ()
     noteLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     noteLabel->setColour (TextEditor::highlightColourId, Colour (0x40545454));
 
-    addAndMakeVisible (screen = new Component());
+    screen.reset (new Component());
+    addAndMakeVisible (screen.get());
     screen->setName ("screen");
 
-    addAndMakeVisible (progressBar = new DisplayProgressBar (*this));
+    progressBar.reset (new DisplayProgressBar (*this));
+    addAndMakeVisible (progressBar.get());
     progressBar->setName ("progress-bar");
 
 
@@ -219,7 +229,7 @@ SamplerDisplay::SamplerDisplay ()
     setSize (282, 147);
 
 
-    //[Constructor]
+    //[Constructor] You can add your own custom stuff here..
     progressBar->setVisible (false);
     title->addMouseListener (this, false);
     currentLayer = 0;
@@ -231,7 +241,7 @@ SamplerDisplay::SamplerDisplay ()
 
 SamplerDisplay::~SamplerDisplay()
 {
-    //[Destructor_pre]
+    //[Destructor_pre]. You can add your own custom destruction code here..
     stopTimer();
     //[/Destructor_pre]
 
@@ -242,12 +252,13 @@ SamplerDisplay::~SamplerDisplay()
     progressBar = nullptr;
 
 
-    //[Destructor]
+    //[Destructor]. You can add your own custom destruction code here..
     dispatch = nullptr;
     models = nullptr;
     //[/Destructor]
 }
 
+//==============================================================================
 void SamplerDisplay::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
@@ -264,14 +275,10 @@ void SamplerDisplay::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBox->setBounds (6, 4, 48, 16);
-    title->setBounds (57, -1, 223, 24);
     noteLabel->setBounds (getWidth() - 6 - 59, 0, 59, 24);
     screen->setBounds (0, 24, getWidth() - 0, getHeight() - 24);
     progressBar->setBounds ((getWidth() / 2) + -183, (getHeight() / 2) + -22, 368, 41);
     //[UserResized] Add your own custom resize handling here..
-    if (currentScreen)
-        currentScreen->setBounds (0, 24, getWidth() - 0, getHeight() - 24);
     //[/UserResized]
 }
 
@@ -280,7 +287,7 @@ void SamplerDisplay::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     //[UsercomboBoxChanged_Pre]
     //[/UsercomboBoxChanged_Pre]
 
-    if (comboBoxThatHasChanged == comboBox)
+    if (comboBoxThatHasChanged == comboBox.get())
     {
         //[UserComboBoxCode_comboBox] -- add your combo box handling code here..
         //[/UserComboBoxCode_comboBox]
@@ -295,7 +302,7 @@ void SamplerDisplay::labelTextChanged (Label* labelThatHasChanged)
     //[UserlabelTextChanged_Pre]
     //[/UserlabelTextChanged_Pre]
 
-    if (labelThatHasChanged == title)
+    if (labelThatHasChanged == title.get())
     {
         //[UserLabelCode_title] -- add your label text handling code here..
         //[/UserLabelCode_title]
@@ -308,24 +315,18 @@ void SamplerDisplay::labelTextChanged (Label* labelThatHasChanged)
 void SamplerDisplay::mouseDown (const MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
-    if (e.mods.isPopupMenu())
-    {
-    }
     //[/UserCode_mouseDown]
 }
 
 void SamplerDisplay::mouseDoubleClick (const MouseEvent& e)
 {
     //[UserCode_mouseDoubleClick] -- Add your code here...
-    if (e.originalComponent == title) {
-
-    }
     //[/UserCode_mouseDoubleClick]
 }
 
 
 
-//[MiscUserCode]
+//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
 InstrumentPtr SamplerDisplay::getInstrument() const
 {
@@ -426,10 +427,11 @@ SamplerDisplay::timerCallback()
 //[/MiscUserCode]
 
 
+//==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
@@ -452,13 +454,14 @@ BEGIN_JUCER_METADATA
          explicitFocusOrder="0" pos="57 -1 223 24" tooltip="Current Instrument"
          textCol="ff7fff00" edTextCol="ffe4e4e4" edBkgCol="0" labelText="New Instrument"
          editableSingleClick="0" editableDoubleClick="1" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="18" bold="0" italic="0" justification="33"/>
+         fontname="Default font" fontsize="1.8e1" kerning="0" bold="0"
+         italic="0" justification="33"/>
   <LABEL name="note-label" id="b73160220da4fa51" memberName="noteLabel"
          virtualName="" explicitFocusOrder="0" pos="6Rr 0 59 24" tooltip="Current Note"
          textCol="ffb0c19f" edTextCol="ffe8e8e8" edBkgCol="0" hiliteCol="40545454"
          labelText="C0-1" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="17"
-         bold="1" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.7e1"
+         kerning="0" bold="1" italic="0" justification="34" typefaceStyle="Bold"/>
   <GENERICCOMPONENT name="screen" id="13e5e579773c6bbf" memberName="screen" virtualName=""
                     explicitFocusOrder="0" pos="0 24 0M 24M" class="Component" params=""/>
   <GENERICCOMPONENT name="progress-bar" id="f0d97f740b33cc6e" memberName="progressBar"
@@ -471,7 +474,9 @@ END_JUCER_METADATA
 #endif
 
 
-//[EndFile]
+
+} /* KSP1 */
+
+//[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */

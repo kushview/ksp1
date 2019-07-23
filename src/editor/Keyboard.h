@@ -24,7 +24,6 @@
 #include "editor/ComponentMixin.h"
 
 namespace KSP1 {
-namespace Gui {
     class KeyboardWidget;
 
     class KeySelectedTimer : public Timer
@@ -172,6 +171,6 @@ namespace Gui {
             lastSentKey = keyboard.lastPressedNote;
         }
     }
-}}
+}
 
 #endif  /* KSP1_KEYBOARD_WIDGET_H */

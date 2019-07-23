@@ -20,6 +20,7 @@
 #pragma once
 
 #include "JuceHeader.h"
+#include <boost/signals2.hpp>
 
 namespace KSP1 {
 

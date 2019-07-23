@@ -23,7 +23,6 @@
 #include "editor/Screens.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class KitScreen :  public Screen
     {
@@ -34,6 +33,6 @@ namespace Gui {
         Screen::ID type() const { return Screen::kitScreen; }
     };
 
-}}
+}
 
 #endif /* KSP1_KIT_SCREEN_H */

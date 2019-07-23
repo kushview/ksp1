@@ -1,31 +1,51 @@
 /*
-    Copyright 2014, Kushview, LLC
-    This is an automatically generated GUI class created by the Introjucer!
+  ==============================================================================
+
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.4.3
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-//[Headers]
+//[Headers] You can add your own extra header files here...
 //[/Headers]
 
 #include "FilterControls.h"
 
 
 namespace KSP1 {
-namespace Gui {
 
-//[MiscUserDefs]
+//[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
+//==============================================================================
 FilterControls::FilterControls ()
 {
-    addAndMakeVisible (filterTypes = new ComboBox ("filter-types"));
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
+    filterTypes.reset (new ComboBox ("filter-types"));
+    addAndMakeVisible (filterTypes.get());
     filterTypes->setTooltip (TRANS("Filter Type"));
     filterTypes->setEditableText (false);
     filterTypes->setJustificationType (Justification::centredLeft);
-    filterTypes->setTextWhenNothingSelected (String::empty);
+    filterTypes->setTextWhenNothingSelected (String());
     filterTypes->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     filterTypes->addItem (TRANS("High Pass"), 1);
     filterTypes->addItem (TRANS("Low Pass"), 2);
     filterTypes->addListener (this);
+
+    filterTypes->setBounds (24, 8, 127, 24);
 
 
     //[UserPreSize]
@@ -34,22 +54,23 @@ FilterControls::FilterControls ()
     setSize (177, 100);
 
 
-    //[Constructor]
+    //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
 }
 
 FilterControls::~FilterControls()
 {
-    //[Destructor_pre]
+    //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
     filterTypes = nullptr;
 
 
-    //[Destructor]
+    //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
+//==============================================================================
 void FilterControls::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
@@ -61,7 +82,9 @@ void FilterControls::paint (Graphics& g)
 
 void FilterControls::resized()
 {
-    filterTypes->setBounds (24, 8, 127, 24);
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -71,7 +94,7 @@ void FilterControls::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     //[UsercomboBoxChanged_Pre]
     //[/UsercomboBoxChanged_Pre]
 
-    if (comboBoxThatHasChanged == filterTypes)
+    if (comboBoxThatHasChanged == filterTypes.get())
     {
         //[UserComboBoxCode_filterTypes] -- add your combo box handling code here..
         //[/UserComboBoxCode_filterTypes]
@@ -83,14 +106,15 @@ void FilterControls::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 
 
-//[MiscUserCode]
+//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 //[/MiscUserCode]
 
 
+//==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
@@ -111,7 +135,9 @@ END_JUCER_METADATA
 #endif
 
 
-//[EndFile]
+
+} /* KSP1 */
+
+//[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */

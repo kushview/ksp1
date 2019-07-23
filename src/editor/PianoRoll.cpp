@@ -1,9 +1,23 @@
 /*
-    Copyright 2014 Kushview, LLC.  All rights reserved
-    This is an automatically generated GUI class created by the Introjucer!
+  ==============================================================================
+
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.4.3
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-//[Headers]
+//[Headers] You can add your own extra header files here...
 #include "editor/SamplerDisplay.h"
 #include "editor/ProgramsListBox.h"
 #include "editor/Screens.h"
@@ -15,34 +29,39 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
-//[MiscUserDefs]
+//[MiscUserDefs] You can add your own user definitions and misc code here...
 
 //[/MiscUserDefs]
 
+//==============================================================================
 PianoRollScreen::PianoRollScreen (SamplerDisplay& owner)
     : Screen (owner, "Test Screen", Screen::editScreen)
 {
-    addAndMakeVisible (buttonAddSample = new TextButton ("add-sample-button"));
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
+    buttonAddSample.reset (new TextButton ("add-sample-button"));
+    addAndMakeVisible (buttonAddSample.get());
     buttonAddSample->setTooltip (TRANS("Add a Sample"));
     buttonAddSample->setButtonText (TRANS("+"));
     buttonAddSample->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     buttonAddSample->addListener (this);
     buttonAddSample->setColour (TextButton::buttonColourId, Colour (0xc7282828));
     buttonAddSample->setColour (TextButton::buttonOnColourId, Colour (0xe5cbcbcb));
-    buttonAddSample->setColour (TextButton::textColourOnId, Colour (0xff858585));
-    buttonAddSample->setColour (TextButton::textColourOffId, Colour (0xffe2e2e2));
+    buttonAddSample->setColour (TextButton::textColourOffId, Colour (0xff858585));
+    buttonAddSample->setColour (TextButton::textColourOnId, Colour (0xffe2e2e2));
 
-    addAndMakeVisible (buttonRemoveLayer = new TextButton ("button-remove-layer"));
+    buttonRemoveLayer.reset (new TextButton ("button-remove-layer"));
+    addAndMakeVisible (buttonRemoveLayer.get());
     buttonRemoveLayer->setTooltip (TRANS("Remove Sample"));
     buttonRemoveLayer->setButtonText (TRANS("-"));
     buttonRemoveLayer->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     buttonRemoveLayer->addListener (this);
     buttonRemoveLayer->setColour (TextButton::buttonColourId, Colour (0xc72d2d2d));
     buttonRemoveLayer->setColour (TextButton::buttonOnColourId, Colour (0xe5ededed));
-    buttonRemoveLayer->setColour (TextButton::textColourOnId, Colour (0xff858585));
-    buttonRemoveLayer->setColour (TextButton::textColourOffId, Colour (0xffe2e2e2));
+    buttonRemoveLayer->setColour (TextButton::textColourOffId, Colour (0xff858585));
+    buttonRemoveLayer->setColour (TextButton::textColourOnId, Colour (0xffe2e2e2));
 
 
     //[UserPreSize]
@@ -51,24 +70,25 @@ PianoRollScreen::PianoRollScreen (SamplerDisplay& owner)
     setSize (600, 400);
 
 
-    //[Constructor]
+    //[Constructor] You can add your own custom stuff here..
     lastNote = display().selectedKey().getNote();
     //[/Constructor]
 }
 
 PianoRollScreen::~PianoRollScreen()
 {
-    //[Destructor_pre]
+    //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
     buttonAddSample = nullptr;
     buttonRemoveLayer = nullptr;
 
 
-    //[Destructor]
+    //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
+//==============================================================================
 void PianoRollScreen::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
@@ -77,55 +97,33 @@ void PianoRollScreen::paint (Graphics& g)
     g.fillAll (Colours::black);
 
     //[UserPaint] Add your own custom painting code here..
-
     //[/UserPaint]
 }
 
 void PianoRollScreen::resized()
 {
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     buttonAddSample->setBounds (getWidth() - 56, getHeight() - 18, 24, 16);
     buttonRemoveLayer->setBounds (getWidth() - 28, getHeight() - 18, 24, 16);
     //[UserResized] Add your own custom resize handling here..
-
     //[/UserResized]
 }
 
 void PianoRollScreen::buttonClicked (Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
-    KeyItem key (display().selectedKey());
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == buttonAddSample)
+    if (buttonThatWasClicked == buttonAddSample.get())
     {
         //[UserButtonCode_buttonAddSample] -- add your button handler code here..
-#if 0
-        QuickBrowser* box = new QuickBrowser (*this);
-        addAndMakeVisible (box);
-        box->setBounds (getLocalBounds().reduced (4));
-#else
-        FileChooser chooser ("Open media", File(String ("/Users/Shared/SimBeatThang/EDMContent/samples")), "*.btdk;*.xml;*.wav;*.aiff", false);
-        if (chooser.browseForMultipleFilesToOpen())
-        {
-            for (const File& f : chooser.getResults())
-            {
-                if (f.getFileExtension() == ".xml" ||
-                    f.getFileExtension() == ".btdk")
-                {
-                    ProgressSink& sink = display().progressBarSink();
-                    display().getInstrument()->load (f, sink);
-                }
-                else
-                    key.addLayer (f);
-            }
-        }
-#endif
         //[/UserButtonCode_buttonAddSample]
     }
-    else if (buttonThatWasClicked == buttonRemoveLayer)
+    else if (buttonThatWasClicked == buttonRemoveLayer.get())
     {
         //[UserButtonCode_buttonRemoveLayer] -- add your button handler code here..
-        //key.removeLayer (display().currentLayer);
         //[/UserButtonCode_buttonRemoveLayer]
     }
 
@@ -135,7 +133,7 @@ void PianoRollScreen::buttonClicked (Button* buttonThatWasClicked)
 
 
 
-//[MiscUserCode]
+//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void
 PianoRollScreen::keySelectedEvent (const KeyItem& item)
 {
@@ -159,10 +157,11 @@ PianoRollScreen::onDisplayUpdate()
 //[/MiscUserCode]
 
 
+//==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
@@ -188,7 +187,9 @@ END_JUCER_METADATA
 #endif
 
 
-//[EndFile]
+
+} /* KSP1 */
+
+//[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */

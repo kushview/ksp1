@@ -1,28 +1,25 @@
 /*
-    This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+  ==============================================================================
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This is an automatically generated GUI class created by the Projucer!
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Created with Projucer version: 5.4.3
 
-    GUI class created by the Introjucer!
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-#ifndef __JUCE_HEADER_3B19452B55A2A434__
-#define __JUCE_HEADER_3B19452B55A2A434__
+#pragma once
 
-//[Headers]
+//[Headers]     -- You can add your own extra header files here --
 
 #include "editor/Screens.h"
 
@@ -42,8 +39,8 @@ namespace Gui {
 
 
 namespace KSP1 {
-namespace Gui {
 
+//==============================================================================
 /**
                                                                     //[Comments]
     An auto-generated component, created by the Jucer.
@@ -53,14 +50,16 @@ namespace Gui {
 */
 class SamplerDisplay  : public Component,
                         public Timer,
-                        public ComboBoxListener,
-                        public LabelListener
+                        public ComboBox::Listener,
+                        public Label::Listener
 {
 public:
+    //==============================================================================
     SamplerDisplay ();
     ~SamplerDisplay();
 
-    //[UserMethods]
+    //==============================================================================
+    //[UserMethods]     -- You can add your own custom methods in this section.
 
     typedef boost::signals2::connection Connection;
 
@@ -88,17 +87,17 @@ public:
 
     //[/UserMethods]
 
-    void paint (Graphics& g);
-    void resized();
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged);
-    void labelTextChanged (Label* labelThatHasChanged);
-    void mouseDown (const MouseEvent& e);
-    void mouseDoubleClick (const MouseEvent& e);
+    void paint (Graphics& g) override;
+    void resized() override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void labelTextChanged (Label* labelThatHasChanged) override;
+    void mouseDown (const MouseEvent& e) override;
+    void mouseDoubleClick (const MouseEvent& e) override;
 
 
 
 private:
-    //[UserVariables]
+    //[UserVariables]   -- You can add your own custom variables in this section.
     uint32 currentLayer;
     int currentNote;
     Element::Signal updateSignal;
@@ -119,19 +118,20 @@ private:
     friend class ContentComponent;
     //[/UserVariables]
 
-    ScopedPointer<ComboBox> comboBox;
-    ScopedPointer<Label> title;
-    ScopedPointer<Label> noteLabel;
-    ScopedPointer<Component> screen;
-    ScopedPointer<DisplayProgressBar> progressBar;
+    //==============================================================================
+    std::unique_ptr<ComboBox> comboBox;
+    std::unique_ptr<Label> title;
+    std::unique_ptr<Label> noteLabel;
+    std::unique_ptr<Component> screen;
+    std::unique_ptr<DisplayProgressBar> progressBar;
 
 
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SamplerDisplay)
 };
+
+} /* KSP1 */
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */
-
-#endif   // __JUCE_HEADER_3B19452B55A2A434__

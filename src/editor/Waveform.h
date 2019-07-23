@@ -24,7 +24,6 @@
 #include "AudioPeaks.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class Waveform :  public Component,
                       public ChangeListener
@@ -49,6 +48,6 @@ namespace Gui {
         class Sink;
         ScopedPointer<Sink> sink;
     };
-}}
+}
 
 #endif // KSP1_WAVEFORM_H

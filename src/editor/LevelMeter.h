@@ -23,22 +23,21 @@
 #include "KSP1.h"
 
 namespace KSP1 {
-namespace Gui {
 
-    class LevelMeter : public DigitalMeter
+class LevelMeter : public DigitalMeter
+{
+public:
+
+    LevelMeter()
+        : DigitalMeter (2)
     {
-    public:
 
-        LevelMeter()
-            : DigitalMeter (2)
-        {
+    }
 
-        }
+    virtual ~LevelMeter() { }
 
-        virtual ~LevelMeter() { }
+};
 
-    };
-
-}}
+}
 
 #endif // KSP1_LEVELMETER_H

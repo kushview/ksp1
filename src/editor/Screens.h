@@ -25,9 +25,6 @@
 namespace KSP1 {
 
     class KeyItem;
-
-namespace Gui {
-
     class SamplerDisplay;
     class SamplerView;
 
@@ -104,6 +101,6 @@ namespace Gui {
         virtual ~ScreenPage() { }
     };
 
-}}
+}
 
 #endif  /* KSP1_SCREENS_H */

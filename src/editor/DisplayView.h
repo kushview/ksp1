@@ -4,7 +4,6 @@
 #include "editor/SamplerDisplay.h"
 
 namespace KSP1 {
-namespace Gui {
 
 class DisplayView :  public Component
 {
@@ -21,6 +20,6 @@ private:
     SamplerDisplay display;
 };
 
-}}
+}
 
 #endif // DISPLAYVIEW_H

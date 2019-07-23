@@ -16,13 +16,6 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef KSP1_COMPONENTMIXIN_H
-#define KSP1_COMPONENTMIXIN_H
 
-namespace KSP1 {
-namespace Gui {
-
-
-}}
-
-#endif // KSP1_COMPONENTMIXIN_H
+#pragma once
+namespace KSP1 { }

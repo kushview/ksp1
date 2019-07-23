@@ -28,6 +28,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_opengl/juce_opengl.h>
+#include <kv_core/kv_core.h>
 
 
 #if ! DONT_SET_USING_JUCE_NAMESPACE
@@ -41,7 +42,7 @@ namespace ProjectInfo
 {
     const char* const  projectName    = "KSP1";
     const char* const  companyName    = "Kushview";
-    const char* const  versionString  = "0.0.1";
-    const int          versionNumber  = 0x1;
+    const char* const  versionString  = "0.1.0";
+    const int          versionNumber  = 0x100;
 }
 #endif

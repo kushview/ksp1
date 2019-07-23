@@ -1,28 +1,25 @@
 /*
-    This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+  ==============================================================================
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This is an automatically generated GUI class created by the Projucer!
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Created with Projucer version: 5.4.3
 
-    GUI class created by the Introjucer!
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-#ifndef __JUCE_HEADER_8A8B6F6667583E52__
-#define __JUCE_HEADER_8A8B6F6667583E52__
+#pragma once
 
-//[Headers]
+//[Headers]     -- You can add your own extra header files here --
 #include "PortWriter.h"
 #include "editor/Keyboard.h"
 #include "editor/LayersListBox.h"
@@ -36,8 +33,8 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
+//==============================================================================
 /**
                                                                     //[Comments]
     This is the main view used when the sampler is run as a tone module sampler.
@@ -46,15 +43,17 @@ namespace Gui {
 */
 class SamplerView  : public Panel,
                      public DragAndDropContainer,
-                     public ButtonListener,
-                     public SliderListener,
-                     public ComboBoxListener
+                     public Button::Listener,
+                     public Slider::Listener,
+                     public ComboBox::Listener
 {
 public:
+    //==============================================================================
     SamplerView ();
     ~SamplerView();
 
-    //[UserMethods]
+    //==============================================================================
+    //[UserMethods]     -- You can add your own custom methods in this section.
     void setVolume (float db, bool notify = false);
 
     inline SamplerDisplay* getDisplay() const { return display; }
@@ -78,16 +77,16 @@ public:
 
     //[/UserMethods]
 
-    void paint (Graphics& g);
-    void resized();
-    void buttonClicked (Button* buttonThatWasClicked);
-    void sliderValueChanged (Slider* sliderThatWasMoved);
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged);
+    void paint (Graphics& g) override;
+    void resized() override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
 private:
-    //[UserVariables]
+    //[UserVariables]   -- You can add your own custom variables in this section.
     SamplerInterface* interface;
     MidiKeyboardState keyboardState;
 
@@ -108,46 +107,47 @@ private:
 
     //[/UserVariables]
 
-    ScopedPointer<TextButton> layerKeyButton;
-    ScopedPointer<GroupComponent> articulationGroup;
-    ScopedPointer<Label> volLabel;
-    ScopedPointer<Slider> layerVolume;
-    ScopedPointer<Slider> voiceGroup;
-    ScopedPointer<Label> layersLabel;
-    ScopedPointer<LayersListBox> layersListBox;
-    ScopedPointer<ComboBox> triggerMode;
-    ScopedPointer<LevelMeter> meter;
-    ScopedPointer<DecibelScaleComponent> dbScale;
-    ScopedPointer<Slider> volume;
-    ScopedPointer<Slider> layerPan;
-    ScopedPointer<Slider> layerPitch;
-    ScopedPointer<Slider> fxSend1;
-    ScopedPointer<Slider> fxSend2;
-    ScopedPointer<TabbedComponent> mediaTabs;
-    ScopedPointer<ArticulationControls> articulationControls;
-    ScopedPointer<Slider> fxSend3;
-    ScopedPointer<Slider> fxSend4;
-    ScopedPointer<Label> layerVolLabel;
-    ScopedPointer<Label> layerPanLabel;
-    ScopedPointer<Label> layerPitchLabel;
-    ScopedPointer<Label> fx1Label;
-    ScopedPointer<Label> fx1Label2;
-    ScopedPointer<Label> fx1Label3;
-    ScopedPointer<Label> fx1Label4;
-    ScopedPointer<KeyboardWidget> keyboard;
-    ScopedPointer<SamplerDisplay> display;
-    ScopedPointer<Slider> keyLength;
-    ScopedPointer<TextButton> propsButton;
-    ScopedPointer<TextButton> editButton;
+    //==============================================================================
+    std::unique_ptr<TextButton> layerKeyButton;
+    std::unique_ptr<GroupComponent> articulationGroup;
+    std::unique_ptr<Label> volLabel;
+    std::unique_ptr<Slider> layerVolume;
+    std::unique_ptr<Slider> voiceGroup;
+    std::unique_ptr<Label> layersLabel;
+    std::unique_ptr<LayersListBox> layersListBox;
+    std::unique_ptr<ComboBox> triggerMode;
+    std::unique_ptr<LevelMeter> meter;
+    std::unique_ptr<DecibelScaleComponent> dbScale;
+    std::unique_ptr<Slider> volume;
+    std::unique_ptr<Slider> layerPan;
+    std::unique_ptr<Slider> layerPitch;
+    std::unique_ptr<Slider> fxSend1;
+    std::unique_ptr<Slider> fxSend2;
+    std::unique_ptr<TabbedComponent> mediaTabs;
+    std::unique_ptr<ArticulationControls> articulationControls;
+    std::unique_ptr<Slider> fxSend3;
+    std::unique_ptr<Slider> fxSend4;
+    std::unique_ptr<Label> layerVolLabel;
+    std::unique_ptr<Label> layerPanLabel;
+    std::unique_ptr<Label> layerPitchLabel;
+    std::unique_ptr<Label> fx1Label;
+    std::unique_ptr<Label> fx1Label2;
+    std::unique_ptr<Label> fx1Label3;
+    std::unique_ptr<Label> fx1Label4;
+    std::unique_ptr<KeyboardWidget> keyboard;
+    std::unique_ptr<SamplerDisplay> display;
+    std::unique_ptr<Slider> keyLength;
+    std::unique_ptr<TextButton> propsButton;
+    std::unique_ptr<TextButton> editButton;
 
 
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SamplerView)
 };
+
+} /* KSP1 */
 
 //[EndFile] You can add extra defines here...
 
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */
-
-#endif   // __JUCE_HEADER_8A8B6F6667583E52__

@@ -23,7 +23,6 @@
 #include "Panels.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class PanelButton : public Label
     {
@@ -74,7 +73,7 @@ namespace Gui {
         SelectedSignal selectedSignal;
 
     };
-}}
 
+}
 
 #endif /* KSP1_PANEL_BUTTON_H */

@@ -24,7 +24,7 @@
 
 
 namespace KSP1 {
-namespace Gui {
+
     class AssetsListBoxHeader : public Component,
                                 public TextEditor::Listener
     {
@@ -284,4 +284,4 @@ namespace Gui {
 
         return ListBox::keyPressed (key);
     }
-}}
+}

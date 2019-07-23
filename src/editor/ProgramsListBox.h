@@ -24,7 +24,6 @@
 #include "Programming.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class ProgramsListBox: public ListBox,
             public ListBoxModel
@@ -65,5 +64,6 @@ namespace Gui {
         void buildRows();
         Programming::Item getItemForRow (int row) const;
     };
-}}
+}
+
 #endif // KSP1_PROGRAMS_LISTBOX_H

@@ -1,25 +1,23 @@
 /*
-    This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+  ==============================================================================
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This is an automatically generated GUI class created by the Projucer!
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Created with Projucer version: 5.4.3
 
-    GUI class created by the Introjucer!
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-//[Headers]
+//[Headers] You can add your own extra header files here...
 #include <boost/bind.hpp>
 
 #include "Instrument.h"
@@ -38,9 +36,8 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
-//[MiscUserDefs]
+//[MiscUserDefs] You can add your own user definitions and misc code here...
 
 // right now this is just a timer that keeps the level meter going
 // onDisplayUpdate will probably go away
@@ -56,23 +53,30 @@ private:
 
 //[/MiscUserDefs]
 
+//==============================================================================
 SamplerView::SamplerView ()
 {
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
     setName ("samplerView");
-    addAndMakeVisible (layerKeyButton = new TextButton ("layerKeyButton"));
+    layerKeyButton.reset (new TextButton ("layerKeyButton"));
+    addAndMakeVisible (layerKeyButton.get());
     layerKeyButton->setButtonText (TRANS("K"));
     layerKeyButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     layerKeyButton->addListener (this);
     layerKeyButton->setColour (TextButton::buttonColourId, Colour (0xffe4e84f));
     layerKeyButton->setColour (TextButton::buttonOnColourId, Colour (0xfffcab36));
 
-    addAndMakeVisible (articulationGroup = new GroupComponent ("articulationGroup",
-                                                               String::empty));
+    articulationGroup.reset (new GroupComponent ("articulationGroup",
+                                                 String()));
+    addAndMakeVisible (articulationGroup.get());
     articulationGroup->setColour (GroupComponent::outlineColourId, Colour (0x00777777));
     articulationGroup->setColour (GroupComponent::textColourId, Colour (0xffcdcdcd));
 
-    addAndMakeVisible (volLabel = new Label ("volume-label",
-                                             TRANS("Master Vol.\n")));
+    volLabel.reset (new Label ("volume-label",
+                               TRANS("Master Vol.\n")));
+    addAndMakeVisible (volLabel.get());
     volLabel->setFont (Font (11.60f, Font::italic));
     volLabel->setJustificationType (Justification::centredLeft);
     volLabel->setEditable (false, false, false);
@@ -81,7 +85,8 @@ SamplerView::SamplerView ()
     volLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     volLabel->setColour (TextEditor::highlightColourId, Colour (0x261151ee));
 
-    addAndMakeVisible (layerVolume = new Slider ("layerVolume"));
+    layerVolume.reset (new Slider ("layerVolume"));
+    addAndMakeVisible (layerVolume.get());
     layerVolume->setTooltip (TRANS("Key Volume"));
     layerVolume->setRange (-30, 12, 0.001);
     layerVolume->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -92,7 +97,8 @@ SamplerView::SamplerView ()
     layerVolume->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
     layerVolume->addListener (this);
 
-    addAndMakeVisible (voiceGroup = new Slider ("voiceGroup"));
+    voiceGroup.reset (new Slider ("voiceGroup"));
+    addAndMakeVisible (voiceGroup.get());
     voiceGroup->setTooltip (TRANS("Voice Group"));
     voiceGroup->setRange (-1, 7, 1);
     voiceGroup->setSliderStyle (Slider::IncDecButtons);
@@ -103,19 +109,22 @@ SamplerView::SamplerView ()
     voiceGroup->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff565656));
     voiceGroup->addListener (this);
 
-    addAndMakeVisible (layersLabel = new Label ("LayersLabel",
-                                                TRANS("LAYERS")));
-    layersLabel->setFont (Font (15.00f, Font::bold));
+    layersLabel.reset (new Label ("LayersLabel",
+                                  TRANS("LAYERS")));
+    addAndMakeVisible (layersLabel.get());
+    layersLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Bold"));
     layersLabel->setJustificationType (Justification::centred);
     layersLabel->setEditable (false, false, false);
     layersLabel->setColour (Label::textColourId, Colour (0xffcdcdcd));
     layersLabel->setColour (TextEditor::textColourId, Colours::black);
     layersLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (layersListBox = new LayersListBox());
+    layersListBox.reset (new LayersListBox());
+    addAndMakeVisible (layersListBox.get());
     layersListBox->setName ("layers-list-box");
 
-    addAndMakeVisible (triggerMode = new ComboBox ("triggerMode"));
+    triggerMode.reset (new ComboBox ("triggerMode"));
+    addAndMakeVisible (triggerMode.get());
     triggerMode->setTooltip (TRANS("Trigger Mode"));
     triggerMode->setEditableText (false);
     triggerMode->setJustificationType (Justification::centredLeft);
@@ -127,13 +136,16 @@ SamplerView::SamplerView ()
     triggerMode->addItem (TRANS("One Shot Gate"), 4);
     triggerMode->addListener (this);
 
-    addAndMakeVisible (meter = new LevelMeter());
+    meter.reset (new LevelMeter());
+    addAndMakeVisible (meter.get());
     meter->setName ("meter");
 
-    addAndMakeVisible (dbScale = new DecibelScaleComponent());
+    dbScale.reset (new DecibelScaleComponent());
+    addAndMakeVisible (dbScale.get());
     dbScale->setName ("dbScale");
 
-    addAndMakeVisible (volume = new Slider ("volume"));
+    volume.reset (new Slider ("volume"));
+    addAndMakeVisible (volume.get());
     volume->setTooltip (TRANS("Master Volume"));
     volume->setRange (-70, 6, 0.001);
     volume->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -144,7 +156,8 @@ SamplerView::SamplerView ()
     volume->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
     volume->addListener (this);
 
-    addAndMakeVisible (layerPan = new Slider ("layer-pan"));
+    layerPan.reset (new Slider ("layer-pan"));
+    addAndMakeVisible (layerPan.get());
     layerPan->setTooltip (TRANS("Panning"));
     layerPan->setRange (0, 1, 0.001);
     layerPan->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -155,7 +168,8 @@ SamplerView::SamplerView ()
     layerPan->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
     layerPan->addListener (this);
 
-    addAndMakeVisible (layerPitch = new Slider ("layer:pitch"));
+    layerPitch.reset (new Slider ("layer:pitch"));
+    addAndMakeVisible (layerPitch.get());
     layerPitch->setTooltip (TRANS("Pitch"));
     layerPitch->setRange (-24, 24, 0);
     layerPitch->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -166,7 +180,8 @@ SamplerView::SamplerView ()
     layerPitch->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
     layerPitch->addListener (this);
 
-    addAndMakeVisible (fxSend1 = new Slider ("key:fx-send-1"));
+    fxSend1.reset (new Slider ("key:fx-send-1"));
+    addAndMakeVisible (fxSend1.get());
     fxSend1->setTooltip (TRANS("FX Send 1"));
     fxSend1->setRange (0, 1, 0);
     fxSend1->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -177,7 +192,8 @@ SamplerView::SamplerView ()
     fxSend1->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
     fxSend1->addListener (this);
 
-    addAndMakeVisible (fxSend2 = new Slider ("key:fx-send-2"));
+    fxSend2.reset (new Slider ("key:fx-send-2"));
+    addAndMakeVisible (fxSend2.get());
     fxSend2->setTooltip (TRANS("FX Send 2"));
     fxSend2->setRange (0, 1, 0);
     fxSend2->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -188,13 +204,16 @@ SamplerView::SamplerView ()
     fxSend2->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
     fxSend2->addListener (this);
 
-    addAndMakeVisible (mediaTabs = new TabbedComponent (TabbedButtonBar::TabsAtTop));
+    mediaTabs.reset (new TabbedComponent (TabbedButtonBar::TabsAtTop));
+    addAndMakeVisible (mediaTabs.get());
     mediaTabs->setTabBarDepth (25);
     mediaTabs->addTab (TRANS("Asset Library"), Colours::lightgrey, new AssetsListBox(), true);
     mediaTabs->setCurrentTabIndex (0);
 
-    addAndMakeVisible (articulationControls = new ArticulationControls());
-    addAndMakeVisible (fxSend3 = new Slider ("key:fx-send-1"));
+    articulationControls.reset (new ArticulationControls());
+    addAndMakeVisible (articulationControls.get());
+    fxSend3.reset (new Slider ("key:fx-send-1"));
+    addAndMakeVisible (fxSend3.get());
     fxSend3->setTooltip (TRANS("FX Send 1"));
     fxSend3->setRange (0, 1, 0);
     fxSend3->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -205,7 +224,8 @@ SamplerView::SamplerView ()
     fxSend3->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
     fxSend3->addListener (this);
 
-    addAndMakeVisible (fxSend4 = new Slider ("key:fxSend4"));
+    fxSend4.reset (new Slider ("key:fxSend4"));
+    addAndMakeVisible (fxSend4.get());
     fxSend4->setTooltip (TRANS("FX Send 2"));
     fxSend4->setRange (0, 1, 0);
     fxSend4->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -216,8 +236,9 @@ SamplerView::SamplerView ()
     fxSend4->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2929));
     fxSend4->addListener (this);
 
-    addAndMakeVisible (layerVolLabel = new Label ("layerVolLabel",
-                                                  TRANS("Layer Vol.")));
+    layerVolLabel.reset (new Label ("layerVolLabel",
+                                    TRANS("Layer Vol.")));
+    addAndMakeVisible (layerVolLabel.get());
     layerVolLabel->setFont (Font (11.60f, Font::italic));
     layerVolLabel->setJustificationType (Justification::centred);
     layerVolLabel->setEditable (false, false, false);
@@ -226,8 +247,9 @@ SamplerView::SamplerView ()
     layerVolLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     layerVolLabel->setColour (TextEditor::highlightColourId, Colour (0x261151ee));
 
-    addAndMakeVisible (layerPanLabel = new Label ("layerPanLabel",
-                                                  TRANS("Layer Pan")));
+    layerPanLabel.reset (new Label ("layerPanLabel",
+                                    TRANS("Layer Pan")));
+    addAndMakeVisible (layerPanLabel.get());
     layerPanLabel->setFont (Font (11.60f, Font::italic));
     layerPanLabel->setJustificationType (Justification::centred);
     layerPanLabel->setEditable (false, false, false);
@@ -236,8 +258,9 @@ SamplerView::SamplerView ()
     layerPanLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     layerPanLabel->setColour (TextEditor::highlightColourId, Colour (0x261151ee));
 
-    addAndMakeVisible (layerPitchLabel = new Label ("layerPitchLabel",
-                                                    TRANS("Layer Pitch")));
+    layerPitchLabel.reset (new Label ("layerPitchLabel",
+                                      TRANS("Layer Pitch")));
+    addAndMakeVisible (layerPitchLabel.get());
     layerPitchLabel->setFont (Font (11.60f, Font::italic));
     layerPitchLabel->setJustificationType (Justification::centred);
     layerPitchLabel->setEditable (false, false, false);
@@ -246,8 +269,9 @@ SamplerView::SamplerView ()
     layerPitchLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     layerPitchLabel->setColour (TextEditor::highlightColourId, Colour (0x261151ee));
 
-    addAndMakeVisible (fx1Label = new Label ("fx1Label",
-                                             TRANS("Aux 1")));
+    fx1Label.reset (new Label ("fx1Label",
+                               TRANS("Aux 1")));
+    addAndMakeVisible (fx1Label.get());
     fx1Label->setFont (Font (11.60f, Font::italic));
     fx1Label->setJustificationType (Justification::centredLeft);
     fx1Label->setEditable (false, false, false);
@@ -256,8 +280,9 @@ SamplerView::SamplerView ()
     fx1Label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     fx1Label->setColour (TextEditor::highlightColourId, Colour (0x261151ee));
 
-    addAndMakeVisible (fx1Label2 = new Label ("fx1Label",
-                                              TRANS("Aux 2")));
+    fx1Label2.reset (new Label ("fx1Label",
+                                TRANS("Aux 2")));
+    addAndMakeVisible (fx1Label2.get());
     fx1Label2->setFont (Font (11.60f, Font::italic));
     fx1Label2->setJustificationType (Justification::centredLeft);
     fx1Label2->setEditable (false, false, false);
@@ -266,8 +291,9 @@ SamplerView::SamplerView ()
     fx1Label2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     fx1Label2->setColour (TextEditor::highlightColourId, Colour (0x261151ee));
 
-    addAndMakeVisible (fx1Label3 = new Label ("fx1Label",
-                                              TRANS("Aux 3")));
+    fx1Label3.reset (new Label ("fx1Label",
+                                TRANS("Aux 3")));
+    addAndMakeVisible (fx1Label3.get());
     fx1Label3->setFont (Font (11.60f, Font::italic));
     fx1Label3->setJustificationType (Justification::centredLeft);
     fx1Label3->setEditable (false, false, false);
@@ -276,8 +302,9 @@ SamplerView::SamplerView ()
     fx1Label3->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     fx1Label3->setColour (TextEditor::highlightColourId, Colour (0x261151ee));
 
-    addAndMakeVisible (fx1Label4 = new Label ("fx1Label",
-                                              TRANS("Aux 4")));
+    fx1Label4.reset (new Label ("fx1Label",
+                                TRANS("Aux 4")));
+    addAndMakeVisible (fx1Label4.get());
     fx1Label4->setFont (Font (11.60f, Font::italic));
     fx1Label4->setJustificationType (Justification::centredLeft);
     fx1Label4->setEditable (false, false, false);
@@ -286,31 +313,36 @@ SamplerView::SamplerView ()
     fx1Label4->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     fx1Label4->setColour (TextEditor::highlightColourId, Colour (0x261151ee));
 
-    addAndMakeVisible (keyboard = new KeyboardWidget (keyboardState));
+    keyboard.reset (new KeyboardWidget (keyboardState));
+    addAndMakeVisible (keyboard.get());
     keyboard->setName ("keyboard");
 
-    addAndMakeVisible (display = new SamplerDisplay());
-    addAndMakeVisible (keyLength = new Slider ("keyLength"));
+    display.reset (new SamplerDisplay());
+    addAndMakeVisible (display.get());
+    keyLength.reset (new Slider ("keyLength"));
+    addAndMakeVisible (keyLength.get());
     keyLength->setTooltip (TRANS("Set the keyspan of the selected note(s)"));
     keyLength->setRange (0, 127, 1);
     keyLength->setSliderStyle (Slider::IncDecButtons);
     keyLength->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
     keyLength->addListener (this);
 
-    addAndMakeVisible (propsButton = new TextButton ("propsButton"));
+    propsButton.reset (new TextButton ("propsButton"));
+    addAndMakeVisible (propsButton.get());
     propsButton->setButtonText (TRANS("PROPS"));
     propsButton->addListener (this);
     propsButton->setColour (TextButton::buttonColourId, Colour (0xfffffed9));
     propsButton->setColour (TextButton::buttonOnColourId, Colour (0xfffce828));
-    propsButton->setColour (TextButton::textColourOnId, Colours::white);
-    propsButton->setColour (TextButton::textColourOffId, Colours::black);
+    propsButton->setColour (TextButton::textColourOffId, Colours::white);
+    propsButton->setColour (TextButton::textColourOnId, Colours::black);
 
-    addAndMakeVisible (editButton = new TextButton ("editButton"));
+    editButton.reset (new TextButton ("editButton"));
+    addAndMakeVisible (editButton.get());
     editButton->setButtonText (TRANS("EDIT"));
     editButton->addListener (this);
     editButton->setColour (TextButton::buttonColourId, Colour (0xffffe9bb));
     editButton->setColour (TextButton::buttonOnColourId, Colour (0xffff9433));
-    editButton->setColour (TextButton::textColourOnId, Colours::white);
+    editButton->setColour (TextButton::textColourOffId, Colours::white);
 
 
     //[UserPreSize]
@@ -328,7 +360,7 @@ SamplerView::SamplerView ()
     setSize (960, 540);
 
 
-    //[Constructor]
+    //[Constructor] You can add your own custom stuff here..
 
     display->setScreen (Screen::kitScreen);
     volume->setRange (-70.0f, 12.0f);
@@ -348,7 +380,7 @@ SamplerView::SamplerView ()
 
 SamplerView::~SamplerView()
 {
-    //[Destructor_pre]
+    //[Destructor_pre]. You can add your own custom destruction code here..
     updater->stopTimer();
     updater = nullptr;
     //[/Destructor_pre]
@@ -386,10 +418,11 @@ SamplerView::~SamplerView()
     editButton = nullptr;
 
 
-    //[Destructor]
+    //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
+//==============================================================================
 void SamplerView::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
@@ -397,12 +430,20 @@ void SamplerView::paint (Graphics& g)
 
     g.fillAll (Colour (0xff8c3131));
 
-    g.setGradientFill (ColourGradient (Colour (0xff747474),
-                                       285.0f, 2.0f,
-                                       Colour (0xff353535),
-                                       283.0f, 651.0f,
+    {
+        int x = 0, y = 0, width = proportionOfWidth (1.0000f), height = proportionOfHeight (1.0000f);
+        Colour fillColour1 = Colour (0xff747474), fillColour2 = Colour (0xff353535);
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setGradientFill (ColourGradient (fillColour1,
+                                       285.0f - 0.0f + x,
+                                       2.0f - 0.0f + y,
+                                       fillColour2,
+                                       283.0f - 0.0f + x,
+                                       651.0f - 0.0f + y,
                                        false));
-    g.fillRect (0, 0, proportionOfWidth (1.0000f), proportionOfHeight (1.0000f));
+        g.fillRect (x, y, width, height);
+    }
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -445,7 +486,6 @@ void SamplerView::resized()
     propsButton->setBounds (getWidth() - 55, 4, 49, 18);
     editButton->setBounds (getWidth() - 107, 4, 49, 18);
     //[UserResized] Add your own custom resize handling here..
-
     //[/UserResized]
 }
 
@@ -454,39 +494,19 @@ void SamplerView::buttonClicked (Button* buttonThatWasClicked)
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == layerKeyButton)
+    if (buttonThatWasClicked == layerKeyButton.get())
     {
         //[UserButtonCode_layerKeyButton] -- add your button handler code here..
-        layerKeyButton->setToggleState (! layerKeyButton->getToggleState(), dontSendNotification);
-        if (layerKeyButton->getToggleState())
-            layerKeyButton->setButtonText ("L");
-        else
-            layerKeyButton->setButtonText ("K");
-        updateControls();
         //[/UserButtonCode_layerKeyButton]
     }
-    else if (buttonThatWasClicked == propsButton)
+    else if (buttonThatWasClicked == propsButton.get())
     {
         //[UserButtonCode_propsButton] -- add your button handler code here..
-        if (! propsButton->getToggleState())
-        {
-            propsButton->setToggleState (true, dontSendNotification);
-            editButton->setToggleState (false, dontSendNotification);
-            display->setScreen (Screen::kitScreen);
-            display->selectNote (display->selectedNote(), true);
-        }
         //[/UserButtonCode_propsButton]
     }
-    else if (buttonThatWasClicked == editButton)
+    else if (buttonThatWasClicked == editButton.get())
     {
         //[UserButtonCode_editButton] -- add your button handler code here..
-        if (! editButton->getToggleState())
-        {
-            propsButton->setToggleState (false, dontSendNotification);
-            editButton->setToggleState (true, dontSendNotification);
-            display->setScreen (Screen::editScreen);
-            display->selectNote (display->selectedNote(), true);
-        }
         //[/UserButtonCode_editButton]
     }
 
@@ -497,57 +517,54 @@ void SamplerView::buttonClicked (Button* buttonThatWasClicked)
 void SamplerView::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
-    InstrumentPtr inst (display->getInstrument());
-    LayerItem layer (layersListBox->getSelectedLayer());
-    KeyItem key (inst->getKey (layer.getNote ()));
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == layerVolume)
+    if (sliderThatWasMoved == layerVolume.get())
     {
         //[UserSliderCode_layerVolume] -- add your slider handling code here..
         //[/UserSliderCode_layerVolume]
     }
-    else if (sliderThatWasMoved == voiceGroup)
+    else if (sliderThatWasMoved == voiceGroup.get())
     {
         //[UserSliderCode_voiceGroup] -- add your slider handling code here..
         //[/UserSliderCode_voiceGroup]
     }
-    else if (sliderThatWasMoved == volume)
+    else if (sliderThatWasMoved == volume.get())
     {
         //[UserSliderCode_volume] -- add your slider handling code here..
         //[/UserSliderCode_volume]
     }
-    else if (sliderThatWasMoved == layerPan)
+    else if (sliderThatWasMoved == layerPan.get())
     {
         //[UserSliderCode_layerPan] -- add your slider handling code here..
         //[/UserSliderCode_layerPan]
     }
-    else if (sliderThatWasMoved == layerPitch)
+    else if (sliderThatWasMoved == layerPitch.get())
     {
         //[UserSliderCode_layerPitch] -- add your slider handling code here..
         //[/UserSliderCode_layerPitch]
     }
-    else if (sliderThatWasMoved == fxSend1)
+    else if (sliderThatWasMoved == fxSend1.get())
     {
         //[UserSliderCode_fxSend1] -- add your slider handling code here..
         //[/UserSliderCode_fxSend1]
     }
-    else if (sliderThatWasMoved == fxSend2)
+    else if (sliderThatWasMoved == fxSend2.get())
     {
         //[UserSliderCode_fxSend2] -- add your slider handling code here..
         //[/UserSliderCode_fxSend2]
     }
-    else if (sliderThatWasMoved == fxSend3)
+    else if (sliderThatWasMoved == fxSend3.get())
     {
         //[UserSliderCode_fxSend3] -- add your slider handling code here..
         //[/UserSliderCode_fxSend3]
     }
-    else if (sliderThatWasMoved == fxSend4)
+    else if (sliderThatWasMoved == fxSend4.get())
     {
         //[UserSliderCode_fxSend4] -- add your slider handling code here..
         //[/UserSliderCode_fxSend4]
     }
-    else if (sliderThatWasMoved == keyLength)
+    else if (sliderThatWasMoved == keyLength.get())
     {
         //[UserSliderCode_keyLength] -- add your slider handling code here..
         //[/UserSliderCode_keyLength]
@@ -560,14 +577,11 @@ void SamplerView::sliderValueChanged (Slider* sliderThatWasMoved)
 void SamplerView::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
     //[UsercomboBoxChanged_Pre]
-    LayerItem layer (layersListBox->getSelectedLayer());
-    KeyItem key (display->getInstrument()->getKey (layer.getNote()));
     //[/UsercomboBoxChanged_Pre]
 
-    if (comboBoxThatHasChanged == triggerMode)
+    if (comboBoxThatHasChanged == triggerMode.get())
     {
         //[UserComboBoxCode_triggerMode] -- add your combo box handling code here..
-        key.setTriggerMode (triggerMode->getSelectedItemIndex());
         //[/UserComboBoxCode_triggerMode]
     }
 
@@ -577,7 +591,7 @@ void SamplerView::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 
 
-//[MiscUserCode]
+//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void SamplerView::buttonStateChanged (Button* btn)
 {
 
@@ -762,10 +776,11 @@ void SamplerView::stabilizeView()
 //[/MiscUserCode]
 
 
+//==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
@@ -790,25 +805,27 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="113R 129R 71 16" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Master Vol.&#10;"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="11.599999999999999645" bold="0"
-         italic="1" justification="33"/>
+         fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
+         italic="1" justification="33" typefaceStyle="Italic"/>
   <SLIDER name="layerVolume" id="bf65c3b220f44da5" memberName="layerVolume"
           virtualName="" explicitFocusOrder="0" pos="207 178R 56 56" tooltip="Key Volume"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
-          min="-30" max="12" int="0.0010000000000000000208" style="RotaryVerticalDrag"
+          min="-3e1" max="1.2e1" int="1e-3" style="RotaryVerticalDrag"
           textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1"/>
+          textBoxHeight="20" skewFactor="1" needsCallback="1"/>
   <SLIDER name="voiceGroup" id="947ac3f3088f71a6" memberName="voiceGroup"
           virtualName="" explicitFocusOrder="0" pos="103 24R 85 13" posRelativeX="5fe3d96c50772121"
           posRelativeY="5fe3d96c50772121" tooltip="Voice Group" bkgcol="0"
           trackcol="7fffffff" rotarysliderfill="ffaeaeae" rotaryslideroutline="ff565656"
           min="-1" max="7" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"/>
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
   <LABEL name="LayersLabel" id="b92c4c02f15c9879" memberName="layersLabel"
          virtualName="" explicitFocusOrder="0" pos="4 152R 172 24" textCol="ffcdcdcd"
          edTextCol="ff000000" edBkgCol="0" labelText="LAYERS" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" bold="1" italic="0" justification="36"/>
+         fontsize="1.5e1" kerning="0" bold="1" italic="0" justification="36"
+         typefaceStyle="Bold"/>
   <GENERICCOMPONENT name="layers-list-box" id="8a15718f78e152e0" memberName="layersListBox"
                     virtualName="" explicitFocusOrder="0" pos="4 132R 172 128" class="LayersListBox"
                     params=""/>
@@ -826,31 +843,33 @@ BEGIN_JUCER_METADATA
   <SLIDER name="volume" id="47a6f6acb9d0b4b3" memberName="volume" virtualName=""
           explicitFocusOrder="0" pos="112R 177R 61 58" tooltip="Master Volume"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="ff5591ad" rotaryslideroutline="ff2a2a2a"
-          min="-70" max="6" int="0.0010000000000000000208" style="RotaryVerticalDrag"
-          textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1"/>
+          min="-7e1" max="6" int="1e-3" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
   <SLIDER name="layer-pan" id="1de5ef00d853a1b0" memberName="layerPan"
           virtualName="" explicitFocusOrder="0" pos="273 162R 56 56" tooltip="Panning"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
-          min="0" max="1" int="0.0010000000000000000208" style="RotaryVerticalDrag"
-          textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1"/>
+          min="0" max="1" int="1e-3" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
   <SLIDER name="layer:pitch" id="86fb2e7a1567e16" memberName="layerPitch"
           virtualName="" explicitFocusOrder="0" pos="336 178R 56 56" tooltip="Pitch"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
-          min="-24" max="24" int="0" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"/>
+          min="-2.4e1" max="2.4e1" int="0" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
   <SLIDER name="key:fx-send-1" id="19fcb4fb69e6ec74" memberName="fxSend1"
           virtualName="" explicitFocusOrder="0" pos="283R 154R 40 40" tooltip="FX Send 1"
           bkgcol="0" trackcol="ffeeeeee" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
           min="0" max="1" int="0" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"/>
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
   <SLIDER name="key:fx-send-2" id="69422f84d84ad59c" memberName="fxSend2"
           virtualName="" explicitFocusOrder="0" pos="244R 176R 40 40" tooltip="FX Send 2"
           bkgcol="ff000000" trackcol="7fffffff" rotarysliderfill="73000000"
           rotaryslideroutline="ff2a2a2a" min="0" max="1" int="0" style="RotaryVerticalDrag"
           textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
-          textBoxHeight="20" skewFactor="1"/>
+          textBoxHeight="20" skewFactor="1" needsCallback="1"/>
   <TABBEDCOMPONENT name="mediaTabs" id="8dd080e8355410ba" memberName="mediaTabs"
                    virtualName="" explicitFocusOrder="0" pos="4 4 172 162M" orientation="top"
                    tabBarDepth="25" initialTab="0">
@@ -865,54 +884,56 @@ BEGIN_JUCER_METADATA
           virtualName="" explicitFocusOrder="0" pos="204R 155R 40 40" tooltip="FX Send 1"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
           min="0" max="1" int="0" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"/>
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
   <SLIDER name="key:fxSend4" id="d533f517dda027c3" memberName="fxSend4"
           virtualName="" explicitFocusOrder="0" pos="164R 173R 40 40" tooltip="FX Send 2"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2929"
           min="0" max="1" int="0" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"/>
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
   <LABEL name="layerVolLabel" id="4c9d302bf2827bcb" memberName="layerVolLabel"
          virtualName="" explicitFocusOrder="0" pos="206 128R 58 15" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Layer Vol."
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="11.599999999999999645" bold="0"
-         italic="1" justification="36"/>
+         fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
+         italic="1" justification="36" typefaceStyle="Italic"/>
   <LABEL name="layerPanLabel" id="aad53eaeda5c6183" memberName="layerPanLabel"
          virtualName="" explicitFocusOrder="0" pos="274 177R 58 15" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Layer Pan"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="11.599999999999999645" bold="0"
-         italic="1" justification="36"/>
+         fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
+         italic="1" justification="36" typefaceStyle="Italic"/>
   <LABEL name="layerPitchLabel" id="9bd479de36829fb4" memberName="layerPitchLabel"
          virtualName="" explicitFocusOrder="0" pos="336 126R 58 15" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Layer Pitch"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="11.599999999999999645" bold="0"
-         italic="1" justification="36"/>
+         fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
+         italic="1" justification="36" typefaceStyle="Italic"/>
   <LABEL name="fx1Label" id="157d12cf7acd6a0d" memberName="fx1Label" virtualName=""
          explicitFocusOrder="0" pos="278R 170R 31 18" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Aux 1"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="11.599999999999999645" bold="0"
-         italic="1" justification="33"/>
+         fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
+         italic="1" justification="33" typefaceStyle="Italic"/>
   <LABEL name="fx1Label" id="672db88d55e40cd9" memberName="fx1Label2"
          virtualName="" explicitFocusOrder="0" pos="238R 144R 31 18" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Aux 2"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="11.599999999999999645" bold="0"
-         italic="1" justification="33"/>
+         fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
+         italic="1" justification="33" typefaceStyle="Italic"/>
   <LABEL name="fx1Label" id="278b158d0bb943f9" memberName="fx1Label3"
          virtualName="" explicitFocusOrder="0" pos="200R 170R 31 18" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Aux 3"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="11.599999999999999645" bold="0"
-         italic="1" justification="33"/>
+         fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
+         italic="1" justification="33" typefaceStyle="Italic"/>
   <LABEL name="fx1Label" id="71864d4f9ce36d52" memberName="fx1Label4"
          virtualName="" explicitFocusOrder="0" pos="159R 141R 31 18" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Aux 4"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="11.599999999999999645" bold="0"
-         italic="1" justification="33"/>
+         fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
+         italic="1" justification="33" typefaceStyle="Italic"/>
   <GENERICCOMPONENT name="keyboard" id="99aac150ed63807" memberName="keyboard" virtualName=""
                     explicitFocusOrder="0" pos="187 4Rr 223M 101" class="KeyboardWidget"
                     params="keyboardState"/>
@@ -922,8 +943,9 @@ BEGIN_JUCER_METADATA
   <SLIDER name="keyLength" id="a09d8e14cc07f187" memberName="keyLength"
           virtualName="" explicitFocusOrder="0" pos="-84C 25R 80 13" posRelativeX="5fe3d96c50772121"
           posRelativeY="5fe3d96c50772121" tooltip="Set the keyspan of the selected note(s)"
-          min="0" max="127" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"/>
+          min="0" max="1.27e2" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          needsCallback="1"/>
   <TEXTBUTTON name="propsButton" id="3e804b5eb108fcd1" memberName="propsButton"
               virtualName="" explicitFocusOrder="0" pos="55R 4 49 18" bgColOff="fffffed9"
               bgColOn="fffce828" textCol="ffffffff" textColOn="ff000000" buttonText="PROPS"
@@ -939,7 +961,9 @@ END_JUCER_METADATA
 #endif
 
 
-//[EndFile]
+
+} /* KSP1 */
+
+//[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */

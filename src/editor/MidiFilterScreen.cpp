@@ -21,7 +21,6 @@
 #include "editor/PropertyPage.h"
 
 namespace KSP1 {
-namespace Gui {
 
 class ArticulationPropertyPage :  public PropertyPage
 {
@@ -47,5 +46,5 @@ private:
     }
 
     MidiFilterScreen::~MidiFilterScreen() { }
-}
+
 }

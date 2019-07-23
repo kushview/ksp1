@@ -23,7 +23,6 @@
 #include "editor/Screens.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class MidiFilterScreen :  public Screen
     {
@@ -32,6 +31,6 @@ namespace Gui {
         ~MidiFilterScreen();
     };
 
-}}
+}
 
 #endif /* KSP1_MIDI_FILTER_SCREEN_H */

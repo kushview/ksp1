@@ -20,7 +20,6 @@
 #include "editor/AudioPeaks.h"
 
 namespace KSP1 {
-namespace Gui {
 
 AudioPeakFactory::AudioPeakFactory()
     : AudioThumbnailCache (32)
@@ -30,4 +29,4 @@ AudioPeakFactory::AudioPeakFactory()
 
 AudioPeakFactory::~AudioPeakFactory() { }
 
-}}
+}

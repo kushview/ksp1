@@ -28,7 +28,6 @@
 #include "editor/Waveform.h"
 
 namespace KSP1 {
-namespace Gui {
 
 class LayersTimeline;
 class SoundsTimeline;
@@ -68,6 +67,6 @@ private:
 };
 
 
-}} /* namespace KSP1::Gui */
+} 
 
 #endif   // KSP1_EDIT_SCREEN_H

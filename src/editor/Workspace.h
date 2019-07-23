@@ -24,7 +24,6 @@
 #include "editor/Panels.h"
 
 namespace KSP1 {
-namespace Gui {
 
     /** A light weight container for showing Panels */
     class Workspace : public Component
@@ -107,6 +106,6 @@ namespace Gui {
 
     };
 
-}}
+}
 
 #endif /* KSP1_WORKSPACE_H */

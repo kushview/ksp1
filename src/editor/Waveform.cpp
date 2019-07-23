@@ -22,7 +22,6 @@
 #include "InstrumentLoader.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class Waveform::Sink :  public ProgressSink
     {
@@ -115,5 +114,4 @@ namespace Gui {
         }
     }
 
-}}
-
+}

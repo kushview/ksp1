@@ -22,7 +22,6 @@
 #include "editor/SamplerView.h"
 
 namespace KSP1 {
-namespace Gui {
 
 bool KeyboardWidget::isInterestedInDragSource (const SourceDetails& details)
 {
@@ -71,4 +70,4 @@ bool KeyboardWidget::shouldDrawDragImageWhenOver()
     return true;
 }
 
-}}
+}

@@ -23,7 +23,6 @@
 #include "KSP1.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class PropertyPage :  public Component
     {
@@ -50,6 +49,6 @@ namespace Gui {
         PropertyPanel panel;
 
     };
-}}
+}
 
 #endif /* KSP1_PROPERTY_PAGE_H */

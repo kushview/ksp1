@@ -24,22 +24,20 @@
 
 namespace KSP1 {
 
-    class MediaObject :  public MediaModel,
+    class MediaObject :  public kv::ObjectModel,
                          public ReferenceCountedObject
     {
     public:
-        inline MediaObject () : MediaModel() { }
-        inline MediaObject (const Identifier& type) : MediaModel (type) { }
-        inline MediaObject (const ValueTree& data) : MediaModel (data) { }
+        inline MediaObject () : kv::ObjectModel() { }
+        inline MediaObject (const Identifier& type) : kv::ObjectModel (type) { }
+        inline MediaObject (const ValueTree& data) : kv::ObjectModel (data) { }
         virtual ~MediaObject() { }
 
     private:
-
         friend class MediaManager;
     };
 
     typedef ReferenceCountedObjectPtr<MediaObject> MediaObjectPtr;
-
 }
 
 #endif // KSP1_MEDIA_OBJECT_H

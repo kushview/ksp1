@@ -1,25 +1,23 @@
 /*
-    This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+  ==============================================================================
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This is an automatically generated GUI class created by the Projucer!
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Created with Projucer version: 5.4.3
 
-    GUI class created by the Introjucer!
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-//[Headers]
+//[Headers] You can add your own extra header files here...
 #include "editor/ProgramsListBox.h"
 //[/Headers]
 
@@ -27,21 +25,27 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
-//[MiscUserDefs]
+//[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
+//==============================================================================
 ProgramEditorView::ProgramEditorView (Controller& ctrl)
     : controller (ctrl)
 {
-    addAndMakeVisible (bankList1 = new KSP1::Gui::BankList (world.programs()));
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
+    bankList1.reset (new KSP1::Gui::BankList (world.programs()));
+    addAndMakeVisible (bankList1.get());
     bankList1->setName ("bank-list-1");
 
-    addAndMakeVisible (programList = new ProgramsListBox (world.programs()));
+    programList.reset (new ProgramsListBox (world.programs()));
+    addAndMakeVisible (programList.get());
     programList->setName ("program-list");
 
-    addAndMakeVisible (banklist2 = new KSP1::Gui::BankList (world.programs()));
+    banklist2.reset (new KSP1::Gui::BankList (world.programs()));
+    addAndMakeVisible (banklist2.get());
     banklist2->setName ("bank-list-2");
 
 
@@ -51,13 +55,13 @@ ProgramEditorView::ProgramEditorView (Controller& ctrl)
     setSize (584, 350);
 
 
-    //[Constructor]
+    //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
 }
 
 ProgramEditorView::~ProgramEditorView()
 {
-    //[Destructor_pre]
+    //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
     bankList1 = nullptr;
@@ -65,10 +69,11 @@ ProgramEditorView::~ProgramEditorView()
     banklist2 = nullptr;
 
 
-    //[Destructor]
+    //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
+//==============================================================================
 void ProgramEditorView::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
@@ -94,14 +99,15 @@ void ProgramEditorView::resized()
 
 
 
-//[MiscUserCode]
+//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 //[/MiscUserCode]
 
 
+//==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
@@ -128,7 +134,9 @@ END_JUCER_METADATA
 #endif
 
 
-//[EndFile]
+
+} /* KSP1 */
+
+//[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */

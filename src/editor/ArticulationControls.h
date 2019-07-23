@@ -1,28 +1,25 @@
 /*
-    This file is part of KSP1
-    Copyright (C) 2014  Kushview, LLC. All rights reserved.
+  ==============================================================================
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This is an automatically generated GUI class created by the Projucer!
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Created with Projucer version: 5.4.3
 
-    GUI class created by the Introjucer!
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-#ifndef __JUCE_HEADER_3D552BD7566568E__
-#define __JUCE_HEADER_3D552BD7566568E__
+#pragma once
 
-//[Headers]
+//[Headers]     -- You can add your own extra header files here --
 #include "KSP1.h"
 
 
@@ -34,8 +31,8 @@ namespace KSP1 {
 
 
 namespace KSP1 {
-namespace Gui {
 
+//==============================================================================
 /**
                                                                     //[Comments]
     An auto-generated component, created by the Introjucer.
@@ -44,35 +41,38 @@ namespace Gui {
                                                                     //[/Comments]
 */
 class ArticulationControls  : public Component,
-                              public ComboBoxListener
+                              public ComboBox::Listener
 {
 public:
+    //==============================================================================
     ArticulationControls ();
     ~ArticulationControls();
 
-    //[UserMethods]
+    //==============================================================================
+    //[UserMethods]     -- You can add your own custom methods in this section.
     void setModel (const KSP1::Articulation& model);
     //[/UserMethods]
 
-    void paint (Graphics& g);
-    void resized();
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged);
+    void paint (Graphics& g) override;
+    void resized() override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
 private:
-    //[UserVariables]
+    //[UserVariables]   -- You can add your own custom variables in this section.
     //[/UserVariables]
 
-    ScopedPointer<ComboBox> articulationType;
+    //==============================================================================
+    std::unique_ptr<ComboBox> articulationType;
 
 
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ArticulationControls)
 };
+
+} /* KSP1 */
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */
-
-#endif   // __JUCE_HEADER_3D552BD7566568E__

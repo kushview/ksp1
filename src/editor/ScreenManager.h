@@ -22,7 +22,6 @@
 #include "KSP1.h"
 
 namespace KSP1 {
-namespace Gui {
 
 class Screen;
 class SamplerDisplay;
@@ -42,6 +41,6 @@ private:
 
 };
 
-}}
+}
 
 #endif // KSP1_SCREEN_MANAGER_H

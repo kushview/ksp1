@@ -21,7 +21,6 @@
 #include "editor/ScreenManager.h"
 
 namespace KSP1 {
-namespace Gui {
 
     ScreenManager::ScreenManager() { }
     ScreenManager::~ScreenManager() { }
@@ -43,4 +42,4 @@ namespace Gui {
         return nullptr;
     }
 
-}}
+}

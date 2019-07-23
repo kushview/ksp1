@@ -1,9 +1,23 @@
 /*
-    Copyright 2014, Kushview, LLC
-    This is an automatically generated GUI class created by the Introjucer!
+  ==============================================================================
+
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.4.3
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-//[Headers]
+//[Headers] You can add your own extra header files here...
 
 
 #include "ProgramsListBox.h"
@@ -16,10 +30,8 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
-
-//[MiscUserDefs]
+//[MiscUserDefs] You can add your own user definitions and misc code here...
 #if 0
     // FIXME:
     QuickBrowser::QuickBrowser (Programming &progs, Instrument &i)
@@ -75,13 +87,19 @@ namespace Gui {
 
 //[/MiscUserDefs]
 
+//==============================================================================
 QuickBrowser::QuickBrowser (Programming& progs)
     : programs (progs)
 {
-    addAndMakeVisible (listBox = new ProgramsListBox (programs));
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
+    listBox.reset (new ProgramsListBox (programs));
+    addAndMakeVisible (listBox.get());
     listBox->setName ("list-box");
 
-    addAndMakeVisible (textButton = new TextButton ("new button"));
+    textButton.reset (new TextButton ("new button"));
+    addAndMakeVisible (textButton.get());
     textButton->setButtonText (TRANS("X"));
     textButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     textButton->addListener (this);
@@ -94,24 +112,25 @@ QuickBrowser::QuickBrowser (Programming& progs)
     setSize (600, 400);
 
 
-    //[Constructor]
+    //[Constructor] You can add your own custom stuff here..
     inst = nullptr;
     //[/Constructor]
 }
 
 QuickBrowser::~QuickBrowser()
 {
-    //[Destructor_pre]
+    //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
     listBox = nullptr;
     textButton = nullptr;
 
 
-    //[Destructor]
+    //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
+//==============================================================================
 void QuickBrowser::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
@@ -125,6 +144,9 @@ void QuickBrowser::paint (Graphics& g)
 
 void QuickBrowser::resized()
 {
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     listBox->setBounds (8, 8, getWidth() - 15, getHeight() - 20);
     textButton->setBounds (getWidth() - 31, 8, 24, 16);
     //[UserResized] Add your own custom resize handling here..
@@ -136,10 +158,9 @@ void QuickBrowser::buttonClicked (Button* buttonThatWasClicked)
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == textButton)
+    if (buttonThatWasClicked == textButton.get())
     {
         //[UserButtonCode_textButton] -- add your button handler code here..
-        delete this;
         //[/UserButtonCode_textButton]
     }
 
@@ -149,14 +170,15 @@ void QuickBrowser::buttonClicked (Button* buttonThatWasClicked)
 
 
 
-//[MiscUserCode]
+//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 //[/MiscUserCode]
 
 
+//==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
@@ -180,8 +202,10 @@ END_JUCER_METADATA
 #endif
 
 
-//[EndFile]
+
+} /* KSP1 */
+
+//[EndFile] You can add extra defines here...
 #endif
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */

@@ -24,7 +24,6 @@
 #include "Instrument.h"
 
 namespace KSP1 {
-namespace Gui {
 
 
 
@@ -171,4 +170,4 @@ void KitScreen::keySelectedEvent (const KeyItem& key)
         kpp->setKeyItem (key);
 }
 
-}}
+}

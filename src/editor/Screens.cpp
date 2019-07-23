@@ -25,7 +25,6 @@
 #include "Screens.h"
 
 namespace KSP1 {
-namespace Gui {
 
     SamplerDisplay& Screen::display() { return owner; }
 
@@ -73,4 +72,4 @@ namespace Gui {
     {
         return findParentComponentOfClass<SamplerView>();
     }
-}}
+}

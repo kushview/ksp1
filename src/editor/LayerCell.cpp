@@ -1,9 +1,23 @@
 /*
-    Copyright 2014, Kushview, LLC
-    This is an automatically generated GUI class created by the Introjucer!
+  ==============================================================================
+
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.4.3
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-//[Headers]
+//[Headers] You can add your own extra header files here...
 #include "LayersListBox.h"
 //[/Headers]
 
@@ -11,13 +25,20 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
-//[MiscUserDefs]
+//[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
+//==============================================================================
 LayerCell::LayerCell ()
 {
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
+    internalPath1.startNewSubPath (784.0f, 0.0f);
+    internalPath1.lineTo (static_cast<float> (-8), 0.0f);
+    internalPath1.closeSubPath();
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -25,21 +46,22 @@ LayerCell::LayerCell ()
     setSize (500, 300);
 
 
-    //[Constructor]
+    //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
 }
 
 LayerCell::~LayerCell()
 {
-    //[Destructor_pre]
+    //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
 
 
-    //[Destructor]
+    //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
+//==============================================================================
 void LayerCell::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
@@ -47,8 +69,14 @@ void LayerCell::paint (Graphics& g)
 
     g.fillAll (Colour (0xff7d8272));
 
-    g.setColour (Colours::white);
-    g.fillPath (internalPath1);
+    {
+        float x = 0, y = 0;
+        Colour fillColour = Colours::white;
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setColour (fillColour);
+        g.fillPath (internalPath1, AffineTransform::translation(x, y));
+    }
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -56,10 +84,8 @@ void LayerCell::paint (Graphics& g)
 
 void LayerCell::resized()
 {
-    internalPath1.clear();
-    internalPath1.startNewSubPath (784.0f, 0.0f);
-    internalPath1.lineTo (static_cast<float> (-8), 0.0f);
-    internalPath1.closeSubPath();
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -67,7 +93,7 @@ void LayerCell::resized()
 
 
 
-//[MiscUserCode]
+//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void LayerCell::setLayer (const LayerItem& item)
 {
     layer = item;
@@ -119,10 +145,11 @@ void LayerCell::mouseWheelMove (const MouseEvent&, const MouseWheelDetails &d)
 //[/MiscUserCode]
 
 
+//==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
@@ -141,7 +168,9 @@ END_JUCER_METADATA
 #endif
 
 
-//[EndFile]
+
+} /* KSP1 */
+
+//[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace KSP1::Gui */

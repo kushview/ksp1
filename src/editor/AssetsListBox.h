@@ -23,7 +23,6 @@
 #include "KSP1.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class AssetsListBoxHeader;
 
@@ -74,6 +73,6 @@ namespace Gui {
         friend class AssetsListBoxHeader;
     };
 
-}}
+}
 
 #endif /* KSP1_ASSETS_LIST_BOX_H */

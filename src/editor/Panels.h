@@ -23,7 +23,6 @@
 #include "KSP1.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class Panel :  public Component
     {
@@ -66,6 +65,6 @@ namespace Gui {
         int32 type() const { return Panel::numPanels; }
     };
 
-}}
+}
 
 #endif /* KSP1_PANELS_H */

@@ -24,7 +24,6 @@
 #include "Instrument.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class LayerCell;
 
@@ -76,6 +75,6 @@ namespace Gui {
         LayerCell* cellForRow (int row);
         friend class LayerCell;
     };
-}}
+}
 
 #endif  /* KSP1_LAYERS_LISTBOX_H */

@@ -1,7 +1,6 @@
 #include "DisplayView.h"
 
 namespace KSP1 {
-namespace Gui {
 
 DisplayView::DisplayView()
 {
@@ -23,4 +22,4 @@ void DisplayView::resized()
     display.setBounds (getLocalBounds());
 }
 
-}}
+}

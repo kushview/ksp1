@@ -21,7 +21,6 @@
 #include "editor/ProgramsListBox.h"
 
 namespace KSP1 {
-namespace Gui {
 
     ProgramsListBox::ProgramsListBox (Programming& p)
         : progs (p), item (p, p.getEntries())
@@ -138,4 +137,4 @@ namespace Gui {
 
     String ProgramsListBox::getTooltipForRow (int row) { return String::empty; }
 
-}}
+}

@@ -23,7 +23,6 @@
 #include "../Programming.h"
 
 namespace KSP1 {
-namespace Gui {
 
     class BankList : public Component,
                      public ListBoxModel
@@ -140,6 +139,6 @@ String getTooltipForRow (int row);
     private:
 
     };
-}}
+}
 
 #endif /* KSP1_BANKS_H */

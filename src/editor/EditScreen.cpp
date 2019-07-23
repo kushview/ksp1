@@ -13,8 +13,6 @@
 #include "Instrument.h"
 
 namespace KSP1 {
-namespace Gui {
-
 
 class SoundsTimeline : public TimelineComponent
 {
@@ -532,6 +530,4 @@ EditScreen::onDisplayUpdate()
 
 //[/MiscUserCode]
 
-
-
-}} /* namespace KSP1::Gui */
+}

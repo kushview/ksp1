@@ -22,11 +22,10 @@
 
 
 namespace KSP1 {
-namespace Gui {
 
     class MenuButton { };
 
-}}
+}
 
 
 #endif /* KSP1_MENU_BUTTON_H */
