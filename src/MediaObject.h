@@ -17,27 +17,25 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_MEDIA_OBJECT_H
-#define KSP1_MEDIA_OBJECT_H
+#pragma once
 
 #include "KSP1.h"
 
 namespace KSP1 {
 
-    class MediaObject :  public kv::ObjectModel,
-                         public ReferenceCountedObject
-    {
-    public:
-        inline MediaObject () : kv::ObjectModel() { }
-        inline MediaObject (const Identifier& type) : kv::ObjectModel (type) { }
-        inline MediaObject (const ValueTree& data) : kv::ObjectModel (data) { }
-        virtual ~MediaObject() { }
+class MediaObject :  public kv::ObjectModel,
+                        public ReferenceCountedObject
+{
+public:
+    inline MediaObject () : kv::ObjectModel() { }
+    inline MediaObject (const Identifier& type) : kv::ObjectModel (type) { }
+    inline MediaObject (const ValueTree& data) : kv::ObjectModel (data) { }
+    virtual ~MediaObject() { }
 
-    private:
-        friend class MediaManager;
-    };
+private:
+    friend class MediaManager;
+};
 
-    typedef ReferenceCountedObjectPtr<MediaObject> MediaObjectPtr;
+typedef ReferenceCountedObjectPtr<MediaObject> MediaObjectPtr;
+
 }
-
-#endif // KSP1_MEDIA_OBJECT_H
