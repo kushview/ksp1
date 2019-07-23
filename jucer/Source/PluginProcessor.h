@@ -5,8 +5,7 @@
       * Michael Fisher <mfisher@kushview.net>
 */
 
-#ifndef KSP1_PLUGIN_PROCESSOR_H
-#define KSP1_PLUGIN_PROCESSOR_H
+#pragma once
 
 #include "Instrument.h"
 
@@ -14,30 +13,23 @@ namespace KSP1 {
 
 class PluginModule;
 class PluginProcessor;
+class PluginEditor;
 
-namespace Gui {
-    class PluginEditor;
-}
-    
 class PluginWorld
 {
 public:
     PluginWorld();
     ~PluginWorld();
 
-    LV2Feature* createMapFeature();
-    LV2Feature* createUnmapFeature();
     void registerPlugin (PluginProcessor* plug);
     bool unregisterPlugin (PluginProcessor* plug);
     AudioProcessor* load (const String& uri);
-    WorkThread& getWorkThread();
-    LV2_URID map (const char* uri);
+    kv::WorkThread& getWorkThread();
     
 private:
     friend class PluginProcessor;
     Array<PluginProcessor*> instances;
-    SymbolMap symbols;
-    ScopedPointer<WorkThread> workThread;
+    ScopedPointer<kv::WorkThread> workThread;
     Array<File> factoryInstruments;
     
     void init();
@@ -78,7 +70,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     void fillInPluginDescription (PluginDescription &description) const;
-    void unregisterEditor (Gui::PluginEditor*);
+    void unregisterEditor (PluginEditor*);
 
 protected:
     PluginProcessor();
@@ -86,11 +78,10 @@ protected:
 private:
     bool useExternalData;
     ScopedPointer<PluginModule> module;
-    ScopedPointer<RingBuffer> ring, uiRing;
+    ScopedPointer<kv::RingBuffer> ring, uiRing;
     HeapBlock<uint8> block;
 
-    ScopedPointer<PortBuffer> atomIn, atomOut;
-    Array<Gui::PluginEditor*> editors;
+    Array<PluginEditor*> editors;
     int currentProgram;
     
     friend class Timer;
@@ -100,5 +91,3 @@ private:
 };
 
 }
-
-#endif  // KSP1_PLUGIN_PROCESSOR_H
