@@ -58,7 +58,6 @@ private:
     ScopedPointer<Updater> updater;
     ScopedPointer<LayersTimeline> timeline;
     ScopedPointer<SoundsTimeline> sounds;
-
     ScopedPointer<TextButton> buttonAddSample;
     ScopedPointer<TextButton> buttonRemoveLayer;
 

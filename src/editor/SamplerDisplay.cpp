@@ -278,6 +278,8 @@ void SamplerDisplay::resized()
     screen->setBounds (0, 24, getWidth() - 0, getHeight() - 24);
     progressBar->setBounds ((getWidth() / 2) + -183, (getHeight() / 2) + -22, 368, 41);
     //[UserResized] Add your own custom resize handling here..
+    if (currentScreen)
+        currentScreen->setBounds (screen->getBoundsInParent());
     //[/UserResized]
 }
 

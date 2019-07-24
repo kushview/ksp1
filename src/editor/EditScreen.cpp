@@ -199,7 +199,6 @@ public:
 
     ~LayersTimeline() { }
 
-
     int getNumTracks() const override
     {
         return (key && key->isValid()) ? key->countLayers() : 0;
@@ -394,7 +393,7 @@ private:
 
 
 EditScreen::EditScreen (SamplerDisplay& owner)
-    : Screen (owner, "Test Screen", Screen::editScreen)
+    : Screen (owner, "Edit Screen", Screen::editScreen)
 {
     addAndMakeVisible (buttonAddSample = new TextButton ("add-sample-button"));
     buttonAddSample->setTooltip (TRANS("Add a Sample"));

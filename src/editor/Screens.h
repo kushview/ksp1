@@ -68,7 +68,8 @@ namespace KSP1 {
 
         virtual void onDisplayUpdate() { }
 
-        virtual void resized() {
+        virtual void resized()
+        {
             pages.setBounds (getLocalBounds());
         }
 

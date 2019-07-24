@@ -34,7 +34,8 @@ static std::unique_ptr<SampleCache> sSampleCache;
 
 static Array<SamplerSynth*> sCacheUsers;
 
-struct ZoneSorter {
+struct ZoneSorter
+{
     static int compareElements (const SamplerSound* first, const SamplerSound* second)
     {
         if (first->getRootNote() < second->getRootNote())
@@ -146,7 +147,8 @@ protected:
 
     bool createLayer (SamplerSound& sound, const XmlElement& layer)
     {
-        if (LayerData* data = DataLoader::createLayerData (sound)) {
+        if (LayerData* data = DataLoader::createLayerData (sound))
+        {
             data->restoreFromXml (layer);
             return true;
         }
@@ -156,9 +158,9 @@ protected:
     }
 };
 
-
 SamplerSynth::DataLoader::DataLoader (SampleCache& c) : cache (c) { }
-SamplerSynth::DataLoader::~DataLoader() {
+SamplerSynth::DataLoader::~DataLoader()
+{
     for (auto *s : sounds)
         s->layerSources().clearQuick();
     sounds.clear();
