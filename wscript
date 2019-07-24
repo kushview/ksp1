@@ -113,10 +113,10 @@ def build (bld):
 def macdeploy (ctx):
     call (["tools/macdeploy/appbundle.py",
            "-verbose", "3",
-           "-dmg", "versicap-osx-%s" % VERSION,
-           "-volname", "Versicap",
+           "-dmg", "ksp1-osx-%s" % VERSION,
+           "-volname", "KSP1",
            "-fancy", "tools/macdeploy/fancy.plist",
-           "build/Applications/Versicap.app"])
+           "build/Applications/KSP1.app"])
 
 def macrelease (ctx):
     call (["bash", "tools/macdeploy/sync-jucer.sh"])
