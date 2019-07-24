@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_DATAPATH_H
-#define KSP1_DATAPATH_H
+#pragma once
 
 #include "KSP1.h"
 
@@ -68,5 +67,3 @@ namespace KSP1 {
     };
 
 }
-
-#endif /* KSP1_DATAPATH_H */

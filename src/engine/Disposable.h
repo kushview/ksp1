@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef DISPOSABLE_H
-#define DISPOSABLE_H
+#pragma once
 
 #include "KSP1.h"
 
@@ -29,5 +28,3 @@ namespace KSP1 {
         virtual ~Disposable() { }
     };
 }
-
-#endif // DISPOSABLE_H

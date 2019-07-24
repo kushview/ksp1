@@ -24,7 +24,7 @@
 namespace KSP1 {
 
 class MediaObject :  public kv::ObjectModel,
-                        public ReferenceCountedObject
+                     public ReferenceCountedObject
 {
 public:
     inline MediaObject () : kv::ObjectModel() { }

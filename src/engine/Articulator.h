@@ -38,7 +38,7 @@ public:
     void releaseResources();
 
 private:
-    class Impl; Scoped<Impl> impl;
+    class Impl; ScopedPointer<Impl> impl;
 };
 
 }

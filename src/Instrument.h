@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_INSTRUMENT_H
-#define KSP1_INSTRUMENT_H
+#pragma once
 
 #include "KSP1.h"
 #include "MediaObject.h"
@@ -440,5 +439,3 @@ namespace KSP1 {
 
     typedef ReferenceCountedObjectPtr<Instrument> InstrumentPtr;
 }
-
-#endif /* KSP1_INSTRUMENT_H */
