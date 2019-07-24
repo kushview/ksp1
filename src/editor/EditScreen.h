@@ -19,8 +19,7 @@
     GUI class created by the Introjucer!
 */
 
-#ifndef KSP1_EDIT_SCREEN_H
-#define KSP1_EDIT_SCREEN_H
+#pragma once
 
 //[Headers]
 #include "editor/LayersListBox.h"
@@ -66,7 +65,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditScreen)
 };
 
-
 } 
-
-#endif   // KSP1_EDIT_SCREEN_H

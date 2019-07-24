@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_KEYBOARD_WIDGET_H
-#define KSP1_KEYBOARD_WIDGET_H
+#pragma once
 
 #include "editor/MidiKeyboardComponent.h"
 
@@ -171,5 +170,3 @@ namespace KSP1 {
         }
     }
 }
-
-#endif  /* KSP1_KEYBOARD_WIDGET_H */

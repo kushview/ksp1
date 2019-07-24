@@ -25,8 +25,7 @@
   ==============================================================================
 */
 
-#ifndef KSP1_MIDIKEYBOARDCOMPONENT_H_INCLUDED
-#define KSP1_MIDIKEYBOARDCOMPONENT_H_INCLUDED
+#pragma once
 
 #include "KSP1.h"
 
@@ -425,5 +424,3 @@ private:
 };
 
 }
-
-#endif   // JUCE_MIDIKEYBOARDCOMPONENT_H_INCLUDED

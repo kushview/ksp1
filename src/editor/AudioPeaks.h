@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_AUDIO_PEAK_H
-#define KSP1_AUDIO_PEAK_H
+#pragma once
 
 #include "KSP1.h"
 
@@ -46,5 +45,3 @@ public:
 typedef ReferenceCountedObjectPtr<AudioPeak> AudioPeakPtr;
 
 }
-
-#endif // KSP1_AUDIO_PEAK_H

@@ -16,8 +16,8 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef KSP1_SCREEN_MANAGER_H
-#define KSP1_SCREEN_MANAGER_H
+
+#pragma once
 
 #include "KSP1.h"
 
@@ -42,5 +42,3 @@ private:
 };
 
 }
-
-#endif // KSP1_SCREEN_MANAGER_H
