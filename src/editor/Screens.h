@@ -47,7 +47,8 @@ namespace KSP1 {
         Screen::ID type() const { return id; }
         static Screen* create (SamplerDisplay& disp, Screen::ID type);
 
-        inline int getNumPages() const { return pages.getNumTabs(); }
+        inline int getNumPages()        const { return pages.getNumTabs(); }
+        inline int getCurrentPage()     const { return pages.getCurrentTabIndex(); }
         inline void addPage (const String& name, Component* page)
         {
             pages.addTab (name, Colours::transparentBlack, page, true);

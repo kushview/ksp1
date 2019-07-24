@@ -418,9 +418,9 @@ EditScreen::EditScreen (SamplerDisplay& owner)
     setSize (600, 400);
 
     lastNote = display().selectedKey().getNote();
-    addPage ("Instrument", sounds = new SoundsTimeline());
+    addPage ("Sounds", sounds = new SoundsTimeline());
     sounds->setInstrument (owner.getInstrument());
-    addPage ("Key", timeline = new LayersTimeline());
+    addPage ("Layers", timeline = new LayersTimeline());
 
     buttonAddSample->setAlwaysOnTop (true);
     buttonRemoveLayer->setAlwaysOnTop (true);
@@ -455,36 +455,45 @@ void EditScreen::resized()
 void EditScreen::buttonClicked (Button* buttonThatWasClicked)
 {
     KeyItem key (display().selectedKey());
+
     if (buttonThatWasClicked == buttonAddSample)
     {
-        FileChooser chooser ("Open media", File (String ("./content")), "*.btdk;*.xml;*.wav;*.aiff;*.flac", false);
-        if (chooser.browseForMultipleFilesToOpen())
+        if (getCurrentPage() == 1)
         {
-            for (const File& f : chooser.getResults())
+            FileChooser chooser ("Open media", File (String ("./content")), "*.btdk;*.xml;*.wav;*.aiff;*.flac", false);
+            if (chooser.browseForMultipleFilesToOpen())
             {
-                if (f.getFileExtension() == ".xml" ||
-                    f.getFileExtension() == ".btdk")
+                for (const File& f : chooser.getResults())
                 {
-                    if (SamplerView* view = getSamplerView()) {
-                        view->loadFile (chooser.getResult());
-                    }
-                }
-                else
-                {
-                    if (! key.isValid()) {
-                        key = display().getInstrument()->getOrCreateKey (display().selectedNote());
-                    }
-
-                    if (key.isValid())
+                    if (f.getFileExtension() == ".xml" ||
+                        f.getFileExtension() == ".btdk")
                     {
-                        key.addLayer (f);
+                        if (SamplerView* view = getSamplerView()) {
+                            view->loadFile (chooser.getResult());
+                        }
                     }
                     else
                     {
-                        jassertfalse;
+                        if (! key.isValid()) {
+                            key = display().getInstrument()->getOrCreateKey (display().selectedNote());
+                        }
+
+                        if (key.isValid())
+                        {
+                            key.addLayer (f);
+                        }
+                        else
+                        {
+                            jassertfalse;
+                        }
                     }
                 }
             }
+        }
+        else
+        {
+            auto i = display().getInstrument();
+            keySelectedEvent (i->addKey (display().selectedNote()));
         }
     }
     else if (buttonThatWasClicked == buttonRemoveLayer)

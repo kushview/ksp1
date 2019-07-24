@@ -23,6 +23,8 @@ PluginEditor::PluginEditor (PluginProcessor* plug, PluginWorld& pw)
     setSize (view->getWidth(), view->getHeight());
     
     InstrumentPtr instrument = new Instrument ("Instrument");
+    auto zone = instrument->addKey (0, 128);
+    zone.addLayer (File());
     view->setInstrment (instrument);
 }
 

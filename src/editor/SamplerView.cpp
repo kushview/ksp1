@@ -614,6 +614,7 @@ void SamplerView::onKeySelected (int k)
     display->selectNote (k, true);
     const KeyItem item (display->selectedKey());
     layersListBox->setKeyItem (item);
+    DBG(item.getValueTree().toXmlString());
     updateControls (dontSendNotification);
 }
 

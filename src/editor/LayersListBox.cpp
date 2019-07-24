@@ -36,14 +36,12 @@ namespace KSP1 {
         setModel (nullptr);
     }
 
-    void
-    LayersListBox::resized()
+    void LayersListBox::resized()
     {
         ListBox::resized();
     }
 
-    LayerItem
-    LayersListBox::getSelectedLayer() const
+    LayerItem LayersListBox::getSelectedLayer() const
     {
         return keyItem.getLayer (getSelectedRow());
     }
@@ -60,7 +58,8 @@ namespace KSP1 {
                       int width, int height, bool rowIsSelected)
     {
 
-        if (rowIsSelected) {
+        if (rowIsSelected)
+        {
             g.setColour (Colours::darkorange);
             g.fillAll();
         }
@@ -97,19 +96,23 @@ namespace KSP1 {
         }
     }
 
-    Component*
-    LayersListBox::refreshComponentForRow (int row, bool selected, Component* existing)
+    Component* LayersListBox::refreshComponentForRow (int row, bool selected, Component* existing)
     {
         return ListBoxModel::refreshComponentForRow (row, selected, existing);
     }
 
 
-    void LayersListBox::backgroundClicked (const MouseEvent&)
+    void LayersListBox::backgroundClicked (const MouseEvent& ev)
     {
+        if (ev.mods.isPopupMenu())
+        {
+            FileChooser chooser ("Open Sample");
+            if (chooser.browseForFileToOpen())
+                DBG(chooser.getResult().getFullPathName());
+        }
     }
 
-    void
-    LayersListBox::mouseWheelMove (const MouseEvent &e, const MouseWheelDetails &d)
+    void LayersListBox::mouseWheelMove (const MouseEvent &e, const MouseWheelDetails &d)
     {
         ListBox::mouseWheelMove (e, d);
     }
@@ -143,20 +146,15 @@ namespace KSP1 {
     void LayersListBox::setKeyItem (const KeyItem& key)
     {
         keyItem = key;
-        if (keyItem.isValid())
-        {
-            updateLayers();
-        }
+        updateLayers();
     }
 
-    LayerCell*
-    LayersListBox::cellForRow (int row)
+    LayerCell* LayersListBox::cellForRow (int row)
     {
         return dynamic_cast<LayerCell*> (this->getComponentForRowNumber (row));
     }
 
-    void
-    LayersListBox::updateLayers()
+    void LayersListBox::updateLayers()
     {
         for (int i = 0; i < getNumRows(); ++i)
             if (LayerCell* cell = cellForRow (i))
