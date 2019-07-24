@@ -75,6 +75,8 @@ protected:
     PluginProcessor();
 
 private:
+    std::unique_ptr<SamplerSynth> synth;
+    
     bool useExternalData;
     ScopedPointer<kv::RingBuffer> ring, uiRing;
     HeapBlock<uint8> block;

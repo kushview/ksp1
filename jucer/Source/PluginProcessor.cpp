@@ -13,10 +13,7 @@
 
 namespace KSP1 {
    
-    PluginWorld::PluginWorld()
-    {
-
-    }
+    PluginWorld::PluginWorld() { }
     
     PluginWorld::~PluginWorld()
     {
@@ -68,9 +65,16 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 namespace KSP1 {
 
 PluginProcessor::PluginProcessor()
+    : AudioProcessor (BusesProperties()
+        .withOutput ("Main", AudioChannelSet::stereo(), true)
+        .withOutput ("Aux 1", AudioChannelSet::stereo(), true)
+        .withOutput ("Aux 2", AudioChannelSet::stereo(), true)
+        .withOutput ("Aux 3", AudioChannelSet::stereo(), true)
+        .withOutput ("Aux 4", AudioChannelSet::stereo(), true))
 {
     currentProgram = 0;
     globals->registerPlugin (this);
+    synth.reset (SamplerSynth::create());
 }
 
 PluginProcessor::~PluginProcessor()

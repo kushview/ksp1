@@ -63,7 +63,6 @@ namespace KSP1 {
 
     private:
         File file;
-
     };
 
 }

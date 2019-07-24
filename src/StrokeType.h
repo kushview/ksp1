@@ -24,11 +24,13 @@ namespace KSP1 {
 class StrokeType
 {
 public:
-    enum ID {
+    enum ID
+    {
         SingleStroke = 0,
         DoubleStroke = 1,
         Roll         = 2
     };
+    
     static const int numTypes = 3;
 
     inline StrokeType () : type (SingleStroke) { }
