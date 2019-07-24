@@ -21,10 +21,8 @@
 #define KSP1_INSTRUMENT_H
 
 #include "KSP1.h"
-#include "Forge.h"
 #include "MediaObject.h"
 #include "InstrumentLoader.h"
-#include "Programming.h"
 #include "engine/SamplerKeys.h"
 
 namespace KSP1 {
@@ -37,6 +35,7 @@ namespace KSP1 {
         return Identifier (s);
     }
 
+#if 0
     /** Writes all properties in a ValueTree into an LV2 Atom Object */
     struct PropertyWriter
     {
@@ -167,13 +166,13 @@ namespace KSP1 {
         Identifier slugUsedAsId;
     };
 
-    class SamplerInterface;
+#endif
+
     class SamplerSynth;
 
-    class LayerItem :  public ClipModel
+    class LayerItem :  public kv::ObjectModel
     {
     public:
-
         LayerItem();
         LayerItem (const ValueTree& data);
         ~LayerItem();
@@ -184,9 +183,13 @@ namespace KSP1 {
                                         && (int32) objectData.getProperty (Tags::note, -1) >= 0; }
         int32 index() const;
         int32 getNote() const;
-
+        
+        double getStart() const     { return objectData.getProperty ("start"); }
+        double getLength() const    { return objectData.getProperty ("length"); }
+        
         inline String fileString() const { return get (Tags::file); }
 
+#if 0
         inline void setAtomObject (const URIs& uris, const lvtk::AtomObject& object)
         {
             setProperty (Tags::id, static_cast<int> (object.id()));
@@ -218,9 +221,9 @@ namespace KSP1 {
                 setFile (file);
             }
         }
+#endif
 
-        inline void
-        setFile (const File& file)
+        inline void setFile (const File& file)
         {
             set (Tags::file, file.getFullPathName());
             set (Tags::name, file.getFileNameWithoutExtension());
@@ -292,6 +295,7 @@ namespace KSP1 {
             return *this;
         }
 
+#if 0
         inline ForgeRef writeAtomObject (Forge& forge) const
         {
             const ValueTree parent = getParentValueTree();
@@ -309,6 +313,7 @@ namespace KSP1 {
             PropertyWriter writer (forge, objectData, forge.uris.ksp1_Layer, oid, pid);
             return writer.writeAtomObjectIncluding ({ Tags::parent, Tags::index });
         }
+#endif
 
     private:
         const var& get (const Identifier& prop) const;
@@ -321,7 +326,7 @@ namespace KSP1 {
     };
 
     /** The model representation of a key on the sampler */
-    class KeyItem :  public ObjectModel
+    class KeyItem :  public kv::ObjectModel
     {
     public:
         explicit KeyItem (bool setMissing = true);
@@ -354,6 +359,7 @@ namespace KSP1 {
 
         KeyItem& operator= (const KeyItem& other);
 
+#if 0
         ForgeRef writeAtomObject (Forge& forge) const
         {
             const uint32 id = (uint32)(int) getProperty (Tags::id, (int) 0);
@@ -370,6 +376,7 @@ namespace KSP1 {
 
         void setAtomObject (const URIs& uris, const lvtk::AtomObject& object);
         void setProperty (const URIs& uris, uint32_t prop, const lvtk::Atom& value);
+#endif
 
     private:
 
@@ -404,7 +411,6 @@ namespace KSP1 {
         XmlElement* createXml();
         void loadFromXml (const XmlElement& node);
         void load (const File& file, ProgressSink& sink);
-        void load (const Programming::Item& file, ProgressSink& sink);
 
         inline float getVolume() const { return (float) node().getProperty (Tags::volume, 0.0f); }
         inline void setVolume (float vol) { node().setProperty (Tags::volume, vol, nullptr); }
@@ -417,9 +423,6 @@ namespace KSP1 {
 
         inline void setFile (const File& f) { file = f; }
         inline File getFile() const { return file; }
-
-        void updateLayerItem (const URIs& uris, const lvtk::AtomObject &object);
-        void updateKeyItem (const URIs& uris, const lvtk::AtomObject &object);
 
         void print()
         {

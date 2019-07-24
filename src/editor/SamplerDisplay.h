@@ -25,14 +25,11 @@
 
 #include "Instrument.h"
 #include "KSP1.h"
-#include "Controller.h"
 
 namespace KSP1 {
-    class SamplerInterface;
-namespace Gui {
-    class ScreenManager;
-    class DisplayProgressBar;
-}}
+class ScreenManager;
+class DisplayProgressBar;
+}
 
 //[/Headers]
 
@@ -100,13 +97,13 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     uint32 currentLayer;
     int currentNote;
-    Element::Signal updateSignal;
+    boost::signals2::signal<void()> updateSignal;
 
     class Dispatch;
     friend class Dispatch;
     ScopedPointer<Dispatch> dispatch;
 
-    void timerCallback();
+    void timerCallback() override;
     void runDispatchLoop();
 
     class Models;

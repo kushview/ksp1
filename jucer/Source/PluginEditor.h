@@ -7,6 +7,7 @@ namespace KSP1 {
 
 class PluginProcessor;
 class PluginWorld;
+class SamplerView;
 
 class PluginEditor  : public AudioProcessorEditor
 {
@@ -19,7 +20,8 @@ public:
     
 private:
     PluginWorld& world;
-    LookAndFeel_V3 style;
+    kv::LookAndFeel_KV1 style;
+    std::unique_ptr<SamplerView> view;
 };
 
 }

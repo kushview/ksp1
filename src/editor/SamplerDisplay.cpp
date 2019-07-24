@@ -21,7 +21,6 @@
 #include "editor/Screens.h"
 #include "editor/ScreenManager.h"
 #include "InstrumentLoader.h"
-#include "Locations.h"
 //[/Headers]
 
 #include "SamplerDisplay.h"
@@ -336,12 +335,11 @@ InstrumentPtr SamplerDisplay::getInstrument() const
 
 ProgressSink& SamplerDisplay::progressBarSink()
 {
-    assert (progressBar.get());
+    jassert (progressBar.get());
     return *progressBar;
 }
 
-void
-SamplerDisplay::runDispatchLoop()
+void SamplerDisplay::runDispatchLoop()
 {
 #if 1
     if (nullptr != getInstrument() && currentNote != getInstrument()->currentKeyId())
@@ -367,8 +365,7 @@ LayerItem SamplerDisplay::selectedLayer()
     return getInstrument()->getLayer (item.getNote(), whichLayer);
 }
 
-void
-SamplerDisplay::selectNote (int32 note, bool notify)
+void SamplerDisplay::selectNote (int32 note, bool notify)
 {
     KeyItem item = getInstrument()->getKey (note);
     if (currentScreen && notify)
@@ -377,8 +374,7 @@ SamplerDisplay::selectNote (int32 note, bool notify)
     setNote (note);
 }
 
-void
-SamplerDisplay::setInstrument (InstrumentPtr inst)
+void SamplerDisplay::setInstrument (InstrumentPtr inst)
 {
     if (inst == nullptr)
         return;
@@ -386,19 +382,15 @@ SamplerDisplay::setInstrument (InstrumentPtr inst)
     models->setInstrument (0, inst);
 }
 
-void
-SamplerDisplay::setNote (int32 n)
+void SamplerDisplay::setNote (int32 n)
 {
-    String letter = Midi::noteToText (n);
-    letter << String("-") << String (currentLayer + 1);
+    String letter = MidiMessage::getMidiNoteName (n, false, true, 4);
     noteLabel->setText (letter, dontSendNotification);
     noteLabel->repaint();
-
     currentNote = n;
 }
 
-void
-SamplerDisplay::setScreen (Screen::ID s)
+void SamplerDisplay::setScreen (Screen::ID s)
 {
     if (currentScreen)
         removeChildComponent (currentScreen);
@@ -411,15 +403,13 @@ SamplerDisplay::setScreen (Screen::ID s)
 }
 
 
-void
-SamplerDisplay::setTitle (const String& t)
+void SamplerDisplay::setTitle (const String& t)
 {
     title->setText (t, dontSendNotification);
 }
 
 
-void
-SamplerDisplay::timerCallback()
+void SamplerDisplay::timerCallback()
 {
 
 }

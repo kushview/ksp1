@@ -122,10 +122,10 @@ namespace KSP1 {
 
     private:
 
-        Signal notifyStart;
-        Signal notifyFinished;
-        FloatSignal notifyProgress;
-        StringSignal notifyStatus;
+        boost::signals2::signal<void()> notifyStart;
+        boost::signals2::signal<void()> notifyFinished;
+        boost::signals2::signal<void(float)> notifyProgress;
+        boost::signals2::signal<void(const String&)> notifyStatus;
 
         String statusMessage;
         int currentStep;

@@ -28,6 +28,7 @@ namespace KSP1 {
     LayersListBox::LayersListBox()
     {
         setModel (this);
+        updateContent();
     }
 
     LayersListBox::~LayersListBox()
@@ -47,8 +48,7 @@ namespace KSP1 {
         return keyItem.getLayer (getSelectedRow());
     }
 
-    int
-    LayersListBox::getNumRows()
+    int LayersListBox::getNumRows()
     {
         const int count = keyItem.countLayers();
         if (count > 0)
@@ -56,8 +56,7 @@ namespace KSP1 {
         return 1;
     }
 
-    void
-    LayersListBox::paintListBoxItem (int rowNumber, Graphics& g,
+    void LayersListBox::paintListBoxItem (int rowNumber, Graphics& g,
                       int width, int height, bool rowIsSelected)
     {
 
@@ -66,7 +65,7 @@ namespace KSP1 {
             g.fillAll();
         }
 
-        String txt = String::empty;
+        String txt;
 
         if (keyItem.countLayers() > 0) {
             LayerItem item = keyItem.getLayer (rowNumber);
@@ -83,16 +82,15 @@ namespace KSP1 {
 
     }
 
-    void
-    LayersListBox::listBoxItemClicked (int row, const MouseEvent& e)
+    void LayersListBox::listBoxItemClicked (int row, const MouseEvent& e)
     {
         updateLayers();
     }
 
-    void
-    LayersListBox::listBoxItemDoubleClicked (int row, const MouseEvent& e)
+    void LayersListBox::listBoxItemDoubleClicked (int row, const MouseEvent& e)
     {
-        if (keyItem.isValid()) {
+        if (keyItem.isValid())
+        {
             LayerItem layer (keyItem.getLayer(row));
             if (layer.isValid())
                 notifyChosen();

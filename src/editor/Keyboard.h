@@ -21,7 +21,6 @@
 #define KSP1_KEYBOARD_WIDGET_H
 
 #include "editor/MidiKeyboardComponent.h"
-#include "editor/ComponentMixin.h"
 
 namespace KSP1 {
     class KeyboardWidget;

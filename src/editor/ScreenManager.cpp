@@ -37,9 +37,10 @@ namespace KSP1 {
                 return screen;
 
         if (screenType < Screen::numScreens)
-            return screens.add (Screen::create (d, (Screen::ID) screenType));
-
+            if (auto* const screen = Screen::create (d, (Screen::ID) screenType))
+            return screens.add (screen);
+        
+        jassertfalse;
         return nullptr;
     }
-
 }

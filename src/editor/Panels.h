@@ -27,7 +27,6 @@ namespace KSP1 {
     class Panel :  public Component
     {
     public:
-
         /** Panel types */
         enum ID {
             assetsPanel   = 0,

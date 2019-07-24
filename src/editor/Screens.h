@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_SCREENS_H
-#define KSP1_SCREENS_H
+#pragma once
 
 #include "KSP1.h"
 
@@ -28,11 +27,11 @@ namespace KSP1 {
     class SamplerDisplay;
     class SamplerView;
 
-    class Screen  :  public Component
+    class Screen : public Component
     {
     public:
-
-        enum ID {
+        enum ID
+        {
             browseFilesystem = 0,
             browseScreen,
             composeScreen,
@@ -77,11 +76,9 @@ namespace KSP1 {
         SamplerView* getSamplerView() const;
 
     protected:
-
         Screen (SamplerDisplay& disp, const String& name, Screen::ID t);
 
     private:
-
         SamplerDisplay& owner;
         TabbedComponent pages;
         ValueTree props;
@@ -91,16 +88,4 @@ namespace KSP1 {
         boost::signals2::connection displayConnection;
 
     };
-
-    template <class CompType>
-    class ScreenPage :  public CompType
-    {
-    public:
-
-        ScreenPage() { }
-        virtual ~ScreenPage() { }
-    };
-
 }
-
-#endif  /* KSP1_SCREENS_H */

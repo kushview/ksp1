@@ -5,12 +5,12 @@
 
 #include "KSP1.h"
 #include "editor/EditScreen.h"
-#include "editor/ProgramsListBox.h"
 #include "editor/SamplerDisplay.h"
 #include "editor/SamplerView.h"
 #include "editor/Screens.h"
-#include "editor/QuickBrowser.h"
 #include "Instrument.h"
+
+using namespace kv;
 
 namespace KSP1 {
 
@@ -21,8 +21,8 @@ public:
         : TimelineComponent()
     {
         setTrackWidth (64);
-        const_cast<TimeScale&> (timeScale()).setPixelsPerBeat (32);
-        const_cast<TimeScale&> (timeScale()).updateScale();
+        const_cast<kv::TimeScale&> (timeScale()).setPixelsPerBeat (32);
+        const_cast<kv::TimeScale&> (timeScale()).updateScale();
     }
 
     ~SoundsTimeline() { }
@@ -98,14 +98,12 @@ private:
     InstrumentPtr instrument;
     ComponentDragger dragger;
 
-    class KeyItemClip : public Element::TimelineClip
+    class KeyItemClip : public kv::TimelineClip
     {
     public:
         KeyItemClip (SoundsTimeline& timeline, const KeyItem& item)
-            : Element::TimelineClip (timeline),
-              key (item)
-        {
-        }
+            : kv::TimelineClip (timeline),
+              key (item) { }
 
         virtual bool moveable() const { return true; }
         virtual bool resizable() const { return true; }
@@ -190,13 +188,13 @@ class LayersTimeline : public TimelineComponent {
 public:
 
     LayersTimeline()
-        : Element::TimelineComponent(),
+        : kv::TimelineComponent(),
           key (nullptr)
     {
         //setTrackHeightsOffset (120, false);
         setTrackWidth (128);
-        const_cast<TimeScale&> (timeScale()).setPixelsPerBeat (640);
-        const_cast<TimeScale&> (timeScale()).updateScale();
+        const_cast<kv::TimeScale&> (timeScale()).setPixelsPerBeat (640);
+        const_cast<kv::TimeScale&> (timeScale()).updateScale();
     }
 
     ~LayersTimeline() { }
@@ -209,7 +207,7 @@ public:
 
     void mouseWheelMove (const MouseEvent& ev, const MouseWheelDetails& md) override
     {
-        TimeScale& ts = const_cast<TimeScale&> (timeScale());
+        auto& ts = const_cast<kv::TimeScale&> (timeScale());
 
         if (md.deltaY > 0.0)
             ts.setHorizontalZoom (ts.horizontalZoom() + 10);
@@ -253,11 +251,11 @@ public:
 private:
     AudioPeakFactory peaks;
     ScopedPointer<KeyItem> key;
-    class LayerClip : public Element::TimelineClip
+    class LayerClip : public kv::TimelineClip
     {
     public:
         LayerClip (LayersTimeline& tl, const LayerItem& item)
-            : Element::TimelineClip (tl),
+            : kv::TimelineClip (tl),
               layer (item)
         {
             const File file (item.fileString());
@@ -276,8 +274,8 @@ private:
         {
             if (layer.isValid())
             {
-                loc.setStart (layer.start());
-                loc.setLength (layer.length());
+                loc.setStart (layer.getStart());
+                loc.setLength (layer.getLength());
                 loc.setOffset ((double) layer.getProperty (Slugs::offset));
             }
         }
@@ -320,9 +318,12 @@ private:
 
             g.setColour (Colours::black);
             String txt ("Pos: ");
+            #if 0
+            // FIXME
             txt << roundDoubleToInt (layer.offset() * timeline().timeScale().getSampleRate())
                 << " : " << roundDoubleToInt (layer.start() * timeline().timeScale().getSampleRate())
                 << " : " << roundDoubleToInt (layer.end() * timeline().timeScale().getSampleRate());
+            #endif
             g.drawText (txt, 1, 1, getWidth(), getHeight(), Justification::topLeft);
         }
 

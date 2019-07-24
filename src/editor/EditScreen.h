@@ -34,7 +34,7 @@ class SoundsTimeline;
 
 class EditScreen  : public Screen,
                     public Timer,
-                    public ButtonListener
+                    public Button::Listener
 {
 public:
     EditScreen (SamplerDisplay& owner);

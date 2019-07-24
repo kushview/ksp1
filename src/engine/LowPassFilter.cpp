@@ -22,17 +22,17 @@
 namespace KSP1 {
 
 LowPassFilter::LowPassFilter()
-    : cutoff (1.0f)
-    , resonance (0.0f)
+    : cutoff (1.0f),
+      resonance (0.0f)
 {
-    this->resetBuffers();
+    resetBuffers();
 }
 
 LowPassFilter::LowPassFilter(const LowPassFilter& lpf)
     : cutoff( lpf.cutoff )
     , resonance( lpf.resonance )
 {
-    this->resetBuffers();
+    resetBuffers();
 }
 
 void LowPassFilter::resetBuffers()

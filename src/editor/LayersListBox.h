@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_LAYERS_LISTBOX_H
-#define KSP1_LAYERS_LISTBOX_H
+#pragma once
 
 #include "KSP1.h"
 #include "Instrument.h"
@@ -32,7 +31,7 @@ namespace KSP1 {
                           public DragAndDropTarget
     {
     public:
-        typedef Signal Selected;
+        typedef boost::signals2::signal<void()> Selected;
 
         LayersListBox();
         ~LayersListBox();
@@ -76,5 +75,3 @@ namespace KSP1 {
         friend class LayerCell;
     };
 }
-
-#endif  /* KSP1_LAYERS_LISTBOX_H */

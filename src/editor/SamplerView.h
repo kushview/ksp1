@@ -20,15 +20,12 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "PortWriter.h"
-#include "editor/Keyboard.h"
-#include "editor/LayersListBox.h"
 #include "editor/LevelMeter.h"
-#include "editor/Banks.h"
+#include "editor/LayersListBox.h"
+#include "editor/Keyboard.h"
 #include "editor/Panels.h"
 //[/Headers]
 
-#include "ArticulationControls.h"
 #include "SamplerDisplay.h"
 
 
@@ -56,22 +53,21 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     void setVolume (float db, bool notify = false);
 
-    inline SamplerDisplay* getDisplay() const { return display; }
+    inline SamplerDisplay* getDisplay() const { return display.get(); }
 
-    inline int32 type() const { return Panel::samplerPanel; }
+    inline int32 type() const override { return Panel::samplerPanel; }
 
     LevelMeter* levelMeter() const;
 
     InstrumentPtr getInstrument (const int track = 0) const;
     void setInstrment (InstrumentPtr i);
-    void setInterface (SamplerInterface* iface);
 
     // signal/callback handlers
     void loadFile (const File&);
     void onDisplayUpdate();
     void onKeyboardMidi (const MidiMessage& midi);
     void onKeySelected (int k);
-    void buttonStateChanged (Button*);
+    void buttonStateChanged (Button*) override;
     void stabilizeView();
     void setMainRMS (const float rmsL, const float rmsR);
 
@@ -87,19 +83,11 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    SamplerInterface* interface;
     MidiKeyboardState keyboardState;
-
-    //Globals& world;
-    //SamplerEditor& editor;
 
     class Updater; friend class Updater;
     ScopedPointer<Updater> updater;
 
-    ScopedPointer<AssetTree> tree;
-
-    /** @internal load a program into the current instrument */
-    void loadProgram (const Programming::Item&);
     /** @internal Called when a layer is chosen in the listbox */
     void layerChosen();
     /** @internal Update all of the controls in this view */
@@ -117,14 +105,13 @@ private:
     std::unique_ptr<LayersListBox> layersListBox;
     std::unique_ptr<ComboBox> triggerMode;
     std::unique_ptr<LevelMeter> meter;
-    std::unique_ptr<DecibelScaleComponent> dbScale;
+    std::unique_ptr<kv::DecibelScaleComponent> dbScale;
     std::unique_ptr<Slider> volume;
     std::unique_ptr<Slider> layerPan;
     std::unique_ptr<Slider> layerPitch;
     std::unique_ptr<Slider> fxSend1;
     std::unique_ptr<Slider> fxSend2;
     std::unique_ptr<TabbedComponent> mediaTabs;
-    std::unique_ptr<ArticulationControls> articulationControls;
     std::unique_ptr<Slider> fxSend3;
     std::unique_ptr<Slider> fxSend4;
     std::unique_ptr<Label> layerVolLabel;

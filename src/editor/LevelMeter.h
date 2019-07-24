@@ -17,14 +17,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_LEVELMETER_H
-#define KSP1_LEVELMETER_H
+#pragma once
 
 #include "KSP1.h"
 
 namespace KSP1 {
 
-class LevelMeter : public DigitalMeter
+class LevelMeter : public kv::DigitalMeter
 {
 public:
 
@@ -39,5 +38,3 @@ public:
 };
 
 }
-
-#endif // KSP1_LEVELMETER_H

@@ -64,16 +64,38 @@
       </GROUP>
     </GROUP>
     <GROUP id="{932EA623-E322-0C49-1C37-7180E68A8407}" name="src">
-      <GROUP id="{486271DD-93A2-F568-BC97-5366A7A9B9A8}" name="plugin">
-        <FILE id="Y9GRTh" name="KSP1.cpp" compile="1" resource="0" file="Source/KSP1.cpp"/>
-        <FILE id="CTGEvy" name="PluginConfig.h" compile="0" resource="0" file="Source/PluginConfig.h"/>
-        <FILE id="nsYT4k" name="PluginEditor.cpp" compile="1" resource="0"
-              file="Source/PluginEditor.cpp"/>
-        <FILE id="IgYrLA" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-        <FILE id="UMRZml" name="PluginProcessor.cpp" compile="1" resource="0"
-              file="Source/PluginProcessor.cpp"/>
-        <FILE id="kHCICx" name="PluginProcessor.h" compile="0" resource="0"
-              file="Source/PluginProcessor.h"/>
+      <GROUP id="{6BBD5528-7F62-DCEC-F48B-2289908BC808}" name="editor">
+        <FILE id="oQ3gGa" name="AudioPeaks.cpp" compile="1" resource="0" file="../src/editor/AudioPeaks.cpp"/>
+        <FILE id="A2DXxT" name="AudioPeaks.h" compile="0" resource="0" file="../src/editor/AudioPeaks.h"/>
+        <FILE id="TnVeU1" name="EditScreen.cpp" compile="1" resource="0" file="../src/editor/EditScreen.cpp"/>
+        <FILE id="ejh1oU" name="EditScreen.h" compile="0" resource="0" file="../src/editor/EditScreen.h"/>
+        <FILE id="nClKFg" name="Keyboard.cpp" compile="1" resource="0" file="../src/editor/Keyboard.cpp"/>
+        <FILE id="kRi3Ja" name="Keyboard.h" compile="0" resource="0" file="../src/editor/Keyboard.h"/>
+        <FILE id="tOF4Xg" name="LayerCell.cpp" compile="1" resource="0" file="../src/editor/LayerCell.cpp"/>
+        <FILE id="iT3yA6" name="LayerCell.h" compile="0" resource="0" file="../src/editor/LayerCell.h"/>
+        <FILE id="QfXrSl" name="LayersListBox.cpp" compile="1" resource="0"
+              file="../src/editor/LayersListBox.cpp"/>
+        <FILE id="ftqJwI" name="LayersListBox.h" compile="0" resource="0" file="../src/editor/LayersListBox.h"/>
+        <FILE id="ZGcGWh" name="LevelMeter.cpp" compile="1" resource="0" file="../src/editor/LevelMeter.cpp"/>
+        <FILE id="bvoc9a" name="LevelMeter.h" compile="0" resource="0" file="../src/editor/LevelMeter.h"/>
+        <FILE id="B9yMGF" name="MidiKeyboardComponent.cpp" compile="1" resource="0"
+              file="../src/editor/MidiKeyboardComponent.cpp"/>
+        <FILE id="bsS78P" name="MidiKeyboardComponent.h" compile="0" resource="0"
+              file="../src/editor/MidiKeyboardComponent.h"/>
+        <FILE id="gxUzOz" name="Panels.h" compile="0" resource="0" file="../src/editor/Panels.h"/>
+        <FILE id="Ag6sNA" name="SamplerDisplay.cpp" compile="1" resource="0"
+              file="../src/editor/SamplerDisplay.cpp"/>
+        <FILE id="L0KSjZ" name="SamplerDisplay.h" compile="0" resource="0"
+              file="../src/editor/SamplerDisplay.h"/>
+        <FILE id="XgMKPP" name="SamplerView.cpp" compile="1" resource="0" file="../src/editor/SamplerView.cpp"/>
+        <FILE id="nuZdl6" name="SamplerView.h" compile="0" resource="0" file="../src/editor/SamplerView.h"/>
+        <FILE id="uhNCj0" name="ScreenManager.cpp" compile="1" resource="0"
+              file="../src/editor/ScreenManager.cpp"/>
+        <FILE id="Gc8xeT" name="ScreenManager.h" compile="0" resource="0" file="../src/editor/ScreenManager.h"/>
+        <FILE id="wSoDjF" name="Screens.cpp" compile="1" resource="0" file="../src/editor/Screens.cpp"/>
+        <FILE id="k2PNnE" name="Screens.h" compile="0" resource="0" file="../src/editor/Screens.h"/>
+        <FILE id="THdx70" name="Waveform.cpp" compile="1" resource="0" file="../src/editor/Waveform.cpp"/>
+        <FILE id="tnqxJe" name="Waveform.h" compile="0" resource="0" file="../src/editor/Waveform.h"/>
       </GROUP>
       <GROUP id="{05CFE782-EBD2-1CFA-972B-2BF0776C47BF}" name="engine">
         <FILE id="hBXrtC" name="ADSR.cpp" compile="1" resource="0" file="../src/engine/ADSR.cpp"/>
@@ -97,8 +119,30 @@
               file="../src/engine/SamplerVoice.cpp"/>
         <FILE id="l1nydl" name="SamplerVoice.h" compile="0" resource="0" file="../src/engine/SamplerVoice.h"/>
       </GROUP>
+      <GROUP id="{486271DD-93A2-F568-BC97-5366A7A9B9A8}" name="plugin">
+        <FILE id="Y9GRTh" name="KSP1.cpp" compile="1" resource="0" file="Source/KSP1.cpp"/>
+        <FILE id="CTGEvy" name="PluginConfig.h" compile="0" resource="0" file="Source/PluginConfig.h"/>
+        <FILE id="nsYT4k" name="PluginEditor.cpp" compile="1" resource="0"
+              file="Source/PluginEditor.cpp"/>
+        <FILE id="IgYrLA" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+        <FILE id="UMRZml" name="PluginProcessor.cpp" compile="1" resource="0"
+              file="Source/PluginProcessor.cpp"/>
+        <FILE id="kHCICx" name="PluginProcessor.h" compile="0" resource="0"
+              file="Source/PluginProcessor.h"/>
+      </GROUP>
       <FILE id="Ze7HcB" name="DataPath.cpp" compile="1" resource="0" file="../src/DataPath.cpp"/>
       <FILE id="jkXv0X" name="DataPath.h" compile="0" resource="0" file="../src/DataPath.h"/>
+      <FILE id="sWhxWH" name="Instrument.cpp" compile="1" resource="0" file="../src/Instrument.cpp"/>
+      <FILE id="akYP4F" name="Instrument.h" compile="0" resource="0" file="../src/Instrument.h"/>
+      <FILE id="WXuKbo" name="InstrumentLoader.cpp" compile="1" resource="0"
+            file="../src/InstrumentLoader.cpp"/>
+      <FILE id="BJ3Hv2" name="InstrumentLoader.h" compile="0" resource="0"
+            file="../src/InstrumentLoader.h"/>
+      <FILE id="Za0E7t" name="KeyItem.cpp" compile="1" resource="0" file="../src/KeyItem.cpp"/>
+      <FILE id="G16Jbp" name="KSP1.h" compile="0" resource="0" file="../src/KSP1.h"/>
+      <FILE id="gEmf8I" name="LayerItem.cpp" compile="1" resource="0" file="../src/LayerItem.cpp"/>
+      <FILE id="aofrzs" name="MediaObject.h" compile="0" resource="0" file="../src/MediaObject.h"/>
+      <FILE id="jK8GdA" name="StrokeType.h" compile="0" resource="0" file="../src/StrokeType.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>
@@ -117,15 +161,18 @@
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="kv_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_engines" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_gui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_models" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
-  <JUCEOPTIONS JUCE_QUICKTIME="disabled" JUCE_WEB_BROWSER="1" JUCE_ASIO="0"
+  <JUCEOPTIONS JUCE_QUICKTIME="disabled" JUCE_WEB_BROWSER="0" JUCE_ASIO="0"
                JUCE_WASAPI="0" JUCE_DIRECTSOUND="0" JUCE_ALSA="0" JUCE_JACK="0"
                JUCE_USE_ANDROID_OPENSLES="0" JUCE_USE_CDREADER="0" JUCE_USE_CDBURNER="0"
                JUCE_USE_FLAC="1" JUCE_USE_OGGVORBIS="1" JUCE_USE_MP3AUDIOFORMAT="0"
                JUCE_USE_LAME_AUDIO_FORMAT="0" JUCE_USE_WINDOWS_MEDIA_FORMAT="0"
                JUCE_PLUGINHOST_LV2="enabled" ELEMENT_PLUGINHOST_LV2="enabled"
                ELEMENT_DOCKING="disabled" ELEMENT_SESSION="disabled" ELEMENT_JACK_DEVICE="disabled"
-               LVTK_USE_CXX11="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"/>
+               LVTK_USE_CXX11="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled" KV_DOCKING_WINDOWS="0"/>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="/opt/SDKs/vstsdk" externalLibraries=""
                extraDefs="JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING=1">
@@ -156,6 +203,9 @@
         <MODULEPATH id="juce_audio_devices"/>
         <MODULEPATH id="juce_audio_processors"/>
         <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <LINUX_MAKE targetFolder="Builds/Linux" vstFolder="~/SDKs/vstsdk2.4" vst3Folder="~/SDKs/VST3 SDK">
@@ -181,6 +231,9 @@
         <MODULEPATH id="juce_audio_devices"/>
         <MODULEPATH id="juce_audio_processors"/>
         <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <VS2017 targetFolder="Builds/VisualStudio2017">
@@ -204,6 +257,9 @@
         <MODULEPATH id="juce_audio_formats"/>
         <MODULEPATH id="juce_audio_devices"/>
         <MODULEPATH id="juce_audio_basics"/>
+        <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>

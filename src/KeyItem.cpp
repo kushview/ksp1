@@ -18,8 +18,9 @@
 */
 
 #include "KSP1.h"
-#include "Articulation.h"
 #include "Instrument.h"
+
+using namespace kv;
 
 namespace KSP1 {
 
@@ -170,33 +171,7 @@ namespace KSP1 {
         }
     }
 
-    void KeyItem::setAtomObject (const URIs& uris, const lvtk::AtomObject& object)
-    {
-        jassert (object.otype() == uris.ksp1_Key || object.otype() == uris.ksp1_SamplerSound);
-        objectData.setProperty (Slugs::id, (int32) object.id(), nullptr);
-        for (const auto& p : object) {
-            const lvtk::Atom value (&p.value);
-            setProperty (uris, p.key, value);
-        }
-    }
-
-    void KeyItem::setProperty (const URIs& uris, uint32_t prop, const lvtk::Atom& atom)
-    {
-        if (prop == uris.slugs_note) {
-            objectData.setProperty (Slugs::note, atom.as_int(), nullptr);
-        } else if (prop == uris.slugs_length) {
-            objectData.setProperty (Slugs::length, atom.as_int(), nullptr);
-        } else if (prop == uris.slugs_volume) {
-            objectData.setProperty (Slugs::volume, atom.as_double(), nullptr);
-        } else if (prop == uris.slugs_triggerMode) {
-            objectData.setProperty (Tags::triggerMode, atom.as_int(), nullptr);
-        } else if (prop == uris.slugs_voiceGroup) {
-            objectData.setProperty (Tags::voiceGroup, atom.as_int(), nullptr);
-        }
-    }
-
-    void
-    KeyItem::setAdsr (float a, float d, float s, float r)
+    void KeyItem::setAdsr (float a, float d, float s, float r)
     {
         set (Slugs::attack, a);
         set (Slugs::decay, d);
@@ -204,8 +179,7 @@ namespace KSP1 {
         set (Slugs::release, r);
     }
 
-    KeyItem&
-    KeyItem::operator= (const KeyItem& other)
+    KeyItem& KeyItem::operator= (const KeyItem& other)
     {
         nlayers = other.nlayers;
         this->objectData = other.objectData;

@@ -21,18 +21,19 @@
 
 namespace KSP1 {
 
+using namespace kv;
+
 LayerItem::LayerItem (const ValueTree& data)
-    : ClipModel (data)
+    : kv::ObjectModel (data)
 {
     setMissingProperties();
 }
 
 LayerItem::LayerItem()
-    : ClipModel (Tags::layer)
+    : kv::ObjectModel (Tags::layer)
 {
     setMissingProperties();
 }
-
 
 LayerItem::~LayerItem()
 {
@@ -58,15 +59,14 @@ int32 LayerItem::getNote() const
 
 void LayerItem::setMissingProperties()
 {
-    ClipModel::setMissingProperties();
     Random rand (Time::currentTimeMillis());
     stabilizePropertyPOD (Slugs::id, rand.nextInt (Range<int> (1, std::numeric_limits<int>::max())));
     stabilizePropertyString (Slugs::name, "Invalid");
-    stabilizePropertyPOD (Slugs::start, (double) 0);
-    stabilizePropertyPOD (Slugs::length, (double) 0.0f);
-    stabilizePropertyPOD (Slugs::index, (int32) -1);
-    stabilizePropertyPOD (Slugs::note, (int32) -1);
-    stabilizePropertyPOD (Slugs::volume, (double) 0.0f);
+    stabilizePropertyPOD (Tags::start, (double) 0);
+    stabilizePropertyPOD (Tags::length, (double) 0.0f);
+    stabilizePropertyPOD (Tags::index, (int32) -1);
+    stabilizePropertyPOD (Tags::note, (int32) -1);
+    stabilizePropertyPOD (Tags::volume, (double) 0.0f);
     stabilizePropertyPOD (Tags::cutoff, (double)1.0f);
     stabilizePropertyPOD (Tags::resonance, (double) 0.0f);
     stabilizePropertyPOD (Tags::panning, (double) 0.5f);
@@ -76,12 +76,12 @@ void LayerItem::setMissingProperties()
 
 void LayerItem::fixPropertyTypes()
 {
-    set (Slugs::name, get (Slugs::name).toString());
-    set (Slugs::start, start());
-    set (Slugs::length, length());
-    set (Slugs::index, (int32) get (Slugs::index));
-    set (Slugs::note, (int32) objectData.getProperty (Slugs::note, -1));
-    set (Slugs::volume, (double) get (Slugs::volume));
+    set (Tags::name, get (Slugs::name).toString());
+    set (Tags::start, getStart());
+    set (Tags::length, getLength());
+    set (Tags::index, (int32) get (Slugs::index));
+    set (Tags::note, (int32) objectData.getProperty (Slugs::note, -1));
+    set (Tags::volume, (double) get (Slugs::volume));
     set (Tags::cutoff, (double) get (Tags::cutoff));
     set (Tags::resonance, (double) get (Tags::resonance));
     set (Tags::panning, (double) get (Tags::panning));
@@ -94,8 +94,7 @@ const var& LayerItem::get (const Identifier& prop) const
     return objectData.getProperty (prop);
 }
 
-void
-LayerItem::set (const Identifier& prop, const var& val)
+void LayerItem::set (const Identifier& prop, const var& val)
 {
     objectData.setProperty (prop, val, nullptr);
 }

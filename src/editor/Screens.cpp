@@ -17,9 +17,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "BrowseScreen.h"
+#if 0
+ #include "BrowseScreen.h"
+ #include "PropertiesScreen.h"
+#endif
+
 #include "EditScreen.h"
-#include "PropertiesScreen.h"
 #include "SamplerDisplay.h"
 #include "SamplerView.h"
 #include "Screens.h"
@@ -33,8 +36,8 @@ namespace KSP1 {
           pages (TabbedButtonBar::TabsAtLeft),
           props ("screen"), id (t)
     {
-        props.setProperty (Slugs::name, name, nullptr);
-        props.setProperty (Slugs::type, (int32) type(), nullptr);
+        props.setProperty (kv::Slugs::name, name, nullptr);
+        props.setProperty (kv::Slugs::type, (int32) type(), nullptr);
 
         addAndMakeVisible (&pages);
         pages.setOutline (0);
@@ -57,6 +60,7 @@ namespace KSP1 {
     {
         if (type == Screen::editScreen)
             return new EditScreen (disp);
+       #if 0
         else if (type == Screen::patternScreen)
             return new KitScreen (disp);
         else if (type == Screen::composeScreen)
@@ -65,7 +69,9 @@ namespace KSP1 {
             return new KitScreen (disp);
         else if (type == Screen::browseScreen)
             return new BrowseScreen (disp);
-        return nullptr;
+       #endif
+        jassertfalse;
+        return new EditScreen (disp);
     }
 
     SamplerView* Screen::getSamplerView() const

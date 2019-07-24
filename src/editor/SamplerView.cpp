@@ -21,15 +21,7 @@
 #include <boost/bind.hpp>
 
 #include "Instrument.h"
-#include "SamplerInterface.h"
-
-#include "editor/AssetsListBox.h"
-#include "editor/Banks.h"
-#include "editor/LevelMeter.h"
 #include "editor/SamplerDisplay.h"
-#include "editor/EditScreen.h"
-#include "editor/ProgramsListBox.h"
-#include "editor/LayersListBox.h"
 //[/Headers]
 
 #include "SamplerView.h"
@@ -39,8 +31,6 @@ namespace KSP1 {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 
-// right now this is just a timer that keeps the level meter going
-// onDisplayUpdate will probably go away
 class SamplerView::Updater :  public Timer
 {
 public:
@@ -140,7 +130,7 @@ SamplerView::SamplerView ()
     addAndMakeVisible (meter.get());
     meter->setName ("meter");
 
-    dbScale.reset (new DecibelScaleComponent());
+    dbScale.reset (new kv::DecibelScaleComponent());
     addAndMakeVisible (dbScale.get());
     dbScale->setName ("dbScale");
 
@@ -207,11 +197,9 @@ SamplerView::SamplerView ()
     mediaTabs.reset (new TabbedComponent (TabbedButtonBar::TabsAtTop));
     addAndMakeVisible (mediaTabs.get());
     mediaTabs->setTabBarDepth (25);
-    mediaTabs->addTab (TRANS("Asset Library"), Colours::lightgrey, new AssetsListBox(), true);
+    mediaTabs->addTab (TRANS("Asset Library"), Colours::lightgrey, new Component(), true);
     mediaTabs->setCurrentTabIndex (0);
 
-    articulationControls.reset (new ArticulationControls());
-    addAndMakeVisible (articulationControls.get());
     fxSend3.reset (new Slider ("key:fx-send-1"));
     addAndMakeVisible (fxSend3.get());
     fxSend3->setTooltip (TRANS("FX Send 1"));
@@ -350,10 +338,6 @@ SamplerView::SamplerView ()
     display->connectUpdateClient (*this);
     keyboard->signalMidi().connect (boost::bind (&SamplerView::onKeyboardMidi, this, ::_1));
     keyboard->signalKeySelected().connect (boost::bind (&SamplerView::onKeySelected, this, ::_1));
-
-    if (ProgramsListBox* box = dynamic_cast<ProgramsListBox*> (mediaTabs->getTabContentComponent (1)))
-        box->signalEngaged().connect (boost::bind (&SamplerView::loadProgram, this, ::_1));
-
     layersListBox->signalSelected().connect (boost::bind (&SamplerView::layerChosen, this));
     //[/UserPreSize]
 
@@ -365,16 +349,10 @@ SamplerView::SamplerView ()
     display->setScreen (Screen::kitScreen);
     volume->setRange (-70.0f, 12.0f);
 
-    // Articulation init
-    articulationControls->setVisible (false);
 
     updater = new Updater (*this);
     updater->startTimer (66);
 
-    //FIXME: Using an asset tree is not needed or wanted
-    tree = new AssetTree ("Assets");
-    if (AssetsListBox* assets = dynamic_cast<AssetsListBox*> (mediaTabs->getTabContentComponent (0)))
-        assets->setRootItem (tree->root());
     //[/Constructor]
 }
 
@@ -401,7 +379,6 @@ SamplerView::~SamplerView()
     fxSend1 = nullptr;
     fxSend2 = nullptr;
     mediaTabs = nullptr;
-    articulationControls = nullptr;
     fxSend3 = nullptr;
     fxSend4 = nullptr;
     layerVolLabel = nullptr;
@@ -470,7 +447,6 @@ void SamplerView::resized()
     fxSend1->setBounds (getWidth() - 283, getHeight() - 154, 40, 40);
     fxSend2->setBounds (getWidth() - 244, getHeight() - 176, 40, 40);
     mediaTabs->setBounds (4, 4, 172, getHeight() - 162);
-    articulationControls->setBounds (((getWidth() / 2) + -43) + 14, (getHeight() - 198) + 34, 85, 13);
     fxSend3->setBounds (getWidth() - 204, getHeight() - 155, 40, 40);
     fxSend4->setBounds (getWidth() - 164, getHeight() - 173, 40, 40);
     layerVolLabel->setBounds (206, getHeight() - 128, 58, 15);
@@ -627,11 +603,10 @@ void SamplerView::onKeyboardMidi (const MidiMessage& midi)
 {
     if (midi.isNoteOn (false))
     {
-        display->setNote (midi.getNoteNumber());
+        display->selectNote (midi.getNoteNumber());
         updateControls (dontSendNotification);
+        DBG(getInstrument()->getValueTree().toXmlString());
     }
-
-    if (interface) interface->handleMidi (midi);
 }
 
 void SamplerView::onKeySelected (int k)
@@ -640,9 +615,6 @@ void SamplerView::onKeySelected (int k)
     const KeyItem item (display->selectedKey());
     layersListBox->setKeyItem (item);
     updateControls (dontSendNotification);
-    if (interface) {
-        interface->getKeyForNote (k);
-    }
 }
 
 void SamplerView::onDisplayUpdate()
@@ -650,32 +622,20 @@ void SamplerView::onDisplayUpdate()
 
 }
 
-void SamplerView::loadFile (const File& file) {
-    if (interface) {
-        interface->loadFile (file);
-    }
-}
-
-void SamplerView::loadProgram (const Programming::Item& item)
+void SamplerView::loadFile (const File& file)
 {
-#if 0
-    //FIXME:
-    editor.sampler()->currentSynth()->clearKeyboard();
-    display->instrument()->load (item.asFile(), display->progressBarSink());
-    editor.sampler()->currentSynth()->setInstrument (display->instrument());
-    display->setTitle (display->instrument()->getProperty (Slugs::name));
-    layersListBox->setKeyItem (display->selectedKey());
-#endif
+
 }
 
 void SamplerView::layerChosen()
 {
+#if 0
     if (EditScreen* screen = dynamic_cast<EditScreen*> (display->findChildWithID ("edit-screen")))
     {
         LayerItem layer (layersListBox->getSelectedLayer());
         screen->resized();
     }
-
+#endif
     updateControls();
 }
 
@@ -686,21 +646,20 @@ void SamplerView::updateControls (NotificationType n)
     KeyItem key (instrument->getKey (layer.getNote()));
 
     // instrument controls
-    volume->getValueObject().referTo (instrument->getPropertyAsValue (Slugs::volume));
-
-    const bool isControllingLayer = this->layerKeyButton->getToggleState();
+    volume->getValueObject().referTo (instrument->getPropertyAsValue (Tags::volume));
+    const bool isControllingLayer = layerKeyButton->getToggleState();
 
     if (isControllingLayer)
     {
-        layerVolLabel->setText ("Layer Vol.", n);
-        layerPitchLabel->setText ("Layer Pitch", n);
-        layerPanLabel->setText ("Layer Pan", n);
+        layerVolLabel->setText ("Vol.", n);
+        layerPitchLabel->setText ("Pitch", n);
+        layerPanLabel->setText ("Pan", n);
     }
     else
     {
-        layerVolLabel->setText ("Key Vol.", n);
-        layerPitchLabel->setText ("Key Pitch", n);
-        layerPanLabel->setText ("Key Pan", n);
+        layerVolLabel->setText ("Vol.", n);
+        layerPitchLabel->setText ("Pitch", n);
+        layerPanLabel->setText ("Pan", n);
     }
 
     // key controls
@@ -711,9 +670,9 @@ void SamplerView::updateControls (NotificationType n)
 
         if (! isControllingLayer)
         {
-            layerVolume->getValueObject().referTo (key.getPropertyAsValue (Slugs::volume));
+            layerVolume->getValueObject().referTo (key.getPropertyAsValue (kv::Slugs::volume));
             layerPan->getValueObject().referTo (key.getPropertyAsValue (Tags::panning));
-            layerPitch->getValueObject().referTo (key.getPropertyAsValue (Slugs::pitch));
+            layerPitch->getValueObject().referTo (key.getPropertyAsValue (kv::Slugs::pitch));
         }
         /* fxSend1->setValue (key.node().getProperty (KSP1::fxSendIdentifier(1)), n);
         fxSend2->setValue (key.node().getProperty (KSP1::fxSendIdentifier(2)), n);
@@ -727,10 +686,9 @@ void SamplerView::updateControls (NotificationType n)
 
     if (layer.isValid() && isControllingLayer)
     {
-
-        layerVolume->getValueObject().referTo (layer.getPropertyAsValue (Slugs::volume));
+        layerVolume->getValueObject().referTo (layer.getPropertyAsValue (kv::Slugs::volume));
         layerPan->getValueObject().referTo (layer.getPropertyAsValue (Tags::panning));
-        layerPitch->getValueObject().referTo (layer.getPropertyAsValue (Slugs::pitch));
+        layerPitch->getValueObject().referTo (layer.getPropertyAsValue (kv::Slugs::pitch));
         /* layerCutoff->setValue (layer.cutoff(), n);
         layerResonance->setValue (layer.resonance(), n);
         velocityRange->setMaxValue ((double) layer.getProperty (KSP1::velocityUpper) * 127.0f, n);
@@ -746,18 +704,7 @@ InstrumentPtr SamplerView::getInstrument (const int) const
 
 void SamplerView::setInstrment (InstrumentPtr i)
 {
-    if (interface)
-        interface->setInstrument (i);
     display->setInstrument (i);
-    stabilizeView();
-}
-
-void SamplerView::setInterface (SamplerInterface *iface)
-{
-    interface = iface;
-    if (interface) {
-        display->setInstrument (interface->getInstrument());
-    }
     stabilizeView();
 }
 
@@ -838,7 +785,7 @@ BEGIN_JUCER_METADATA
                     explicitFocusOrder="0" pos="28R 183R 20 177" class="LevelMeter"
                     params=""/>
   <GENERICCOMPONENT name="dbScale" id="7c019624d677326b" memberName="dbScale" virtualName=""
-                    explicitFocusOrder="0" pos="29R 4Rr 21 179" class="DecibelScaleComponent"
+                    explicitFocusOrder="0" pos="29R 4Rr 21 179" class="kv::DecibelScaleComponent"
                     params=""/>
   <SLIDER name="volume" id="47a6f6acb9d0b4b3" memberName="volume" virtualName=""
           explicitFocusOrder="0" pos="112R 177R 61 58" tooltip="Master Volume"
@@ -873,13 +820,9 @@ BEGIN_JUCER_METADATA
   <TABBEDCOMPONENT name="mediaTabs" id="8dd080e8355410ba" memberName="mediaTabs"
                    virtualName="" explicitFocusOrder="0" pos="4 4 172 162M" orientation="top"
                    tabBarDepth="25" initialTab="0">
-    <TAB name="Asset Library" colour="ffd3d3d3" useJucerComp="0" contentClassName="AssetsListBox"
+    <TAB name="Asset Library" colour="ffd3d3d3" useJucerComp="0" contentClassName="Component"
          constructorParams="" jucerComponentFile=""/>
   </TABBEDCOMPONENT>
-  <JUCERCOMP name="articulationControls" id="48885e920b3a8bc2" memberName="articulationControls"
-             virtualName="" explicitFocusOrder="0" pos="14 34 85 13" posRelativeX="5fe3d96c50772121"
-             posRelativeY="5fe3d96c50772121" sourceFile="ArticulationControls.cpp"
-             constructorParams=""/>
   <SLIDER name="key:fx-send-1" id="1fde028392ea9574" memberName="fxSend3"
           virtualName="" explicitFocusOrder="0" pos="204R 155R 40 40" tooltip="FX Send 1"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"

@@ -17,11 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_WAVEFORM_H
-#define KSP1_WAVEFORM_H
+#pragma once
 
 #include "KSP1.h"
-#include "AudioPeaks.h"
+#include "editor/AudioPeaks.h"
 
 namespace KSP1 {
 
@@ -29,7 +28,6 @@ namespace KSP1 {
                       public ChangeListener
     {
     public:
-
         Waveform ();
         virtual ~Waveform();
 
@@ -41,7 +39,6 @@ namespace KSP1 {
         void changeListenerCallback (ChangeBroadcaster* source);
 
     private:
-
         AudioPeakPtr  peak;
         Range<double> timeSpan;
 
@@ -49,5 +46,3 @@ namespace KSP1 {
         ScopedPointer<Sink> sink;
     };
 }
-
-#endif // KSP1_WAVEFORM_H

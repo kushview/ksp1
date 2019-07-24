@@ -82,6 +82,9 @@
 #define JUCE_MODULE_AVAILABLE_juce_gui_extra                1
 #define JUCE_MODULE_AVAILABLE_juce_opengl                   1
 #define JUCE_MODULE_AVAILABLE_kv_core                       1
+#define JUCE_MODULE_AVAILABLE_kv_engines                    1
+#define JUCE_MODULE_AVAILABLE_kv_gui                        1
+#define JUCE_MODULE_AVAILABLE_kv_models                     1
 
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
 
@@ -308,11 +311,25 @@
 // juce_gui_extra flags:
 
 #ifndef    JUCE_WEB_BROWSER
- #define   JUCE_WEB_BROWSER 1
+ #define   JUCE_WEB_BROWSER 0
 #endif
 
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
  //#define JUCE_ENABLE_LIVE_CONSTANT_EDITOR 0
+#endif
+
+//==============================================================================
+// kv_engines flags:
+
+#ifndef    KV_JACK_AUDIO
+ //#define KV_JACK_AUDIO 0
+#endif
+
+//==============================================================================
+// kv_gui flags:
+
+#ifndef    KV_DOCKING_WINDOWS
+ #define   KV_DOCKING_WINDOWS 0
 #endif
 
 //==============================================================================
