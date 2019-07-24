@@ -1,324 +1,124 @@
 #!/usr/bin/env python
 
 from subprocess import call, Popen, PIPE
-import os, platform, sys
+import os, sys
 
-import sys
-sys.path.insert (0, 'tools/waf')
-import juce, products, apple, audiounit
+sys.path.append (os.getcwd() + "/tools/waf")
+import juce, ksp1
 
-common_tools = 'juce'
+VERSION='0.1.0'
 
-def options(opt):
-    opt.load ('compiler_c compiler_cxx')
-    opt.load (common_tools)
-    if juce.is_mac():
-        opt.load ('apple audiounit')
+def options (opt):
+    opt.load ("compiler_c compiler_cxx juce ksp1")
 
-    opt.add_option ('--tests', default=False, action='store_true', dest='tests', \
-        help='Compile Unit Tests [ Default: False ]')
-    opt.add_option ('--enable-egl', default=False, action='store_true', dest='enable_egl', \
-        help='Use EGL windowing [ Default: False ]')
-    opt.add_option ('--without-apps', default=False, action='store_true', dest='without_apps', \
-        help='Do not compile Applications/Firmware')
-    opt.add_option ('--without-plugins', default=False, action='store_true', dest='without_plugins', \
-        help='Do not compile AU/VST/LV2 plugins')
-    opt.add_option ('--installers', default=False, action='store_true', dest='installers', \
-        help='Create installer(s) after the build is complete [ Default: False ]')
+def silence_warnings (conf):
+    '''TODO: resolve these'''
+    conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
+    conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
+    conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
+    conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
+    conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations'])
+    conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-declarations'])
 
-def compiler_pre_config (conf):
-    if not juce.is_win32():
-        '''Use clang by default on non-windows'''
-        if not 'CC' in os.environ or not 'CXX' in os.environ:
-            conf.env.CC  = 'clang'
-            conf.env.CXX = 'clang++'
+def configure_product (conf):
+    # noop
+    return
 
-def configure_compiler (conf):
-    conf.check_cxx11()
-    if juce.is_linux() and 'clang' in conf.env.CXX[0]:
-        conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
-        conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
-
-def platform_pre_config (conf):
-    conf.define ('JUCE_USE_EGL', conf.options.enable_egl)
-    conf.env.USE_EGL = conf.options.enable_egl
-    conf.env.USE_X11 = not conf.options.enable_egl
-    conf.define ('JUCE_USE_X11', conf.env.USE_X11)
-    conf.define ('JUCE_USE_XEVENTS', conf.env.USE_X11)
-    conf.write_config_header ('src/platform/config.h')
-
-    if juce.is_mac():
-        os.environ['PKG_CONFIG_PATH'] = '/opt/bketech/lib/pkgconfig'
-        conf.env.ARCH_COCOA  = ['i386', 'x86_64']
-        conf.env.append_unique ('LINKFLAGS', '-dead_strip')
-        if not conf.options.apple_version_min:
-            conf.options.apple_version_min = '10.7'
-        if not conf.options.apple_sdk:
-            conf.options.apple_sdk = '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk'
-        if not conf.options.core_audio_root:
-            conf.options.core_audio_root = '/opt/kushview/Developer/Extras/CoreAudio'
-
-    elif juce.is_linux(): pass
-    elif juce.is_win32(): pass
+def configure_product_name (conf):
+    return "KSP1"
 
 def configure (conf):
-    compiler_pre_config (conf)
-    platform_pre_config (conf)
-    conf.load ('compiler_c compiler_cxx ' + common_tools)
+    conf.check_ccache()
+    conf.load ("compiler_c compiler_cxx ar juce ksp1")
+    conf.check_cxx_version()
+    silence_warnings (conf)
+    conf.check_common()
 
-    if juce.is_mac():
-        conf.load ('apple audiounit')
+    if juce.is_mac(): conf.check_mac()
+    else: conf.check_linux()
 
-    configure_compiler (conf)
+    conf.env.DEBUG = conf.options.debug
+    if conf.env.DEBUG:
+        conf.define ('JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING', 1)
 
-    conf.env.KSP1_BUILD_APPS          = not conf.options.without_apps
-    conf.env.KSP1_BUILD_PLUGINS       = not conf.options.without_plugins and juce.is_linux()
-    conf.env.KSP1_BUILD_TESTS         = conf.options.tests
-    conf.env.KSP1_BUILD_INSTALLERS    = conf.options.installers
+    conf.env.VERSION_STRING = VERSION
 
-    conf.env.VERSION_STRING         = '0.0.1'
-    conf.define ('KSP1_VERSION_STRING', conf.env.VERSION_STRING)
-    #conf.define ('KSP1_STANDALONE', 1)
+    configure_product (conf)
 
-    conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share')
+    conf.define ('VERSION_STRING', conf.env.VERSION_STRING)
 
-    # Check for packages
-    def add_pkg_defs (pkgdefs):
-        for d in pkgdefs:
-            conf.env[d] = conf.is_defined (d)
-
-    conf.check_cfg (package='lilv-0', uselib_store='LILV', args='--cflags --libs', mandatory=True)
-    conf.check_cfg (package='suil-0', uselib_store='SUIL', args='--cflags --libs', mandatory=False)
-    conf.check_cfg (package='jack', uselib_store='JACK', args='--cflags --libs', mandatory=False)
-    add_pkg_defs (['HAVE_LILV', 'HAVE_SUIL', 'HAVE_JACK'])
-
+    conf.check(lib='curl', mandatory=False)
     if juce.is_linux():
-        for key in ['core', 'audio-basics', 'audio-devices', 'audio-formats', \
-                    'audio-processors', 'audio-utils', 'data-structures', \
-                    'gui-basics', 'gui-extra', 'audio-utils', 'opengl', \
-                    'cryptography']:
-            slug = key + '-debug' if conf.options.debug else key
-            conf.check_cfg(package='juce-' + slug + '-3',
-                           uselib_store='JUCE_' + key.replace('-', '_').upper(),
-                           args='--cflags --libs', mandatory=False)
-
-        conf.check(features='c cxx cxxprogram', lib=['dl'], cflags=['-Wall'], uselib_store='DL')
-        conf.check(features='c cxx cxxprogram', lib=['pthread'], cflags=['-Wall'], uselib_store='PTHREAD')
-        conf.check_cfg (package="alsa", uselib_store="ALSA", args='--cflags --libs', mandatory=True)
-        conf.check_cfg (package="freetype2", uselib_store="FREETYPE2", args='--cflags --libs', mandatory=True)
-        if conf.env.USE_EGL:
-            conf.check_cfg (package='x11-xcb', uselib_store='XCB', args='--cflags --libs', mandatory=False)
-            conf.check_cfg (package="glesv2", uselib_store="GLESV2", args='--cflags --libs', mandatory=True)
-            conf.check_cfg (package="egl", uselib_store="EGL", args='--cflags --libs', mandatory=True)
-        else:
-            conf.check_cfg (package="gl", uselib_store="GL", args='--cflags --libs', mandatory=True)
-            conf.check_cfg (package="x11", uselib_store="X11", args='--cflags --libs', mandatory=True)
-            conf.check_cfg (package="xext", uselib_store="XEXT", args='--cflags --libs', mandatory=True)
-        add_pkg_defs (['HAVE_ALSA', 'HAVE_X11', 'HAVE_XEXT', 'HAVE_FREETYPE2', 'HAVE_GL', \
-                       'HAVE_EGL', 'HAVE_XCB', 'HAVE_GLES2'])
-
-    pat = conf.env['cshlib_PATTERN']
-    if not pat:
-        pat = conf.env['cxxshlib_PATTERN']
-    if pat.startswith('lib'):
-        pat = pat[3:]
-    conf.env['plugin_PATTERN'] = pat
-    conf.env['plugin_EXT'] = pat[pat.rfind('.'):]
+        conf.check(lib='pthread', mandatory=True)
+        conf.check(lib='dl', mandatory=True)
+        conf.check_cfg(package='freetype2', args='--cflags --libs', \
+            mandatory=True)
+        conf.check_cfg(package='x11', args='--cflags --libs', \
+            mandatory=True)
+        conf.check_cfg(package='xext', args='--cflags --libs', \
+            mandatory=True)
+        conf.check_cfg(package='alsa', args='--cflags --libs', \
+            mandatory=True)
 
     print
-    juce.display_header ("KSP1 Build Summary")
-    juce.display_msg (conf, "Installation Prefix", conf.env.PREFIX)
-    juce.display_msg (conf, "Shared Data Path", conf.env.DATADIR)
-    juce.display_msg (conf, "Compile Standalone App", conf.env.KSP1_BUILD_APPS)
-    juce.display_msg (conf, "Compile Plugins", conf.env.KSP1_BUILD_PLUGINS)
-    juce.display_msg (conf, "Jack Audio Support", len(conf.env.LIB_JACK) > 0)
-    juce.display_msg (conf, "LV2 Plugin Support", conf.env.HAVE_LILV)
-    juce.display_msg (conf, "LV2 Plugin GUI Support", conf.env.HAVE_SUIL)
-    juce.display_msg (conf, "Firmware Version", conf.env.VERSION_STRING)
-    juce.display_msg (conf, "Build Installers", conf.env.KSP1_BUILD_INSTALLERS)
-
-    if juce.is_mac():
-        print
-        juce.display_header ("Apple Configuration Summary")
-        juce.display_msg (conf, "Apple Framework Dir", conf.env.FRAMEWORKDIR)
-        juce.display_msg (conf, "Apple Deployment Target", conf.env.APPLE_VERSION_MIN)
-        juce.display_msg (conf, "Apple SDK Path", conf.env.APPLE_SDK)
-        juce.display_msg (conf, "Apple Architecture(s)", conf.env.ARCH_COCOA)
-        juce.display_msg (conf, "Install in User Directories", conf.env.APPLE_USERDIRS)
-
+    juce.display_header ("KSP1 Configuration")
+    juce.display_msg (conf, "Installation PREFIX", conf.env.PREFIX)
+    juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
+    juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
     print
-    juce.display_header ("Global Compiler Flags")
-    juce.display_msg (conf, "Compile flags (c)", conf.env.CFLAGS)
-    juce.display_msg (conf, "Compile flags (c++)", conf.env.CXXFLAGS)
-    juce.display_msg (conf, "Linker flags", conf.env.LINKFLAGS)
+    juce.display_header ("Compiler")
+    juce.display_msg (conf, "CFLAGS", conf.env.CFLAGS)
+    juce.display_msg (conf, "CXXFLAGS", conf.env.CXXFLAGS)
+    juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
 
-def build_prepare_mac (bld):
-    return
+def common_use_flags():
+    return 'OPEN_GL ACCELERATE AUDIO_TOOLBOX AUDIO_UNIT CORE_AUDIO CORE_AUDIO_KIT COCOA CORE_MIDI IO_KIT QUARTZ_CORE'.split()
 
-def build_lv2_plugin (bld):
-    return
+def build_mac (bld):
+    libEnv = bld.env.derive()
 
-def build_sqlite3 (bld):
-    bld.stlib (
-        name = 'libsqlite3',
-        target = 'lib/sqlite3_ksp1',
-        source = ['libs/sqlite3/sqlite3.c'],
-        install_path = None,
-        cflags = ['-fPIC']
+    bld.shlib (
+        source      = bld.path.ant_glob ("src/**/*.cpp") + \
+                      bld.path.ant_glob ("jucer/Source/**/*.cpp") + \
+                      ksp1.get_juce_library_code ('jucer/JuceLibraryCode', '.mm'),
+        includes    = [ 'jucer/JuceLibraryCode', 'libs/kv/modules', \
+                        'libs/juce/modules', 'src' ],
+        target      = 'lib/ksp1',
+        name        = 'KSP1',
+        env         = libEnv,
+        use         = common_use_flags()
     )
 
-    bld.program (
-        name = 'bin/sqlite3',
-        target = 'bin/sqlite3',
-        source = bld.path.ant_glob ('libs/sqlite3/*.c'),
-        use = ['libsqlite3', 'DL', 'PTHREAD'],
-        install_path = None
+    bld.add_group()
+    appEnv = bld.env.derive()
+    app = bld.program (
+        source      = [ 'jucer/JuceLibraryCode/include_juce_audio_plugin_client_Standalone.cpp',
+                        'jucer/JuceLibraryCode/include_juce_audio_plugin_client_utils.cpp' ],
+        includes    = [ 'jucer/JuceLibraryCode', 'libs/kv/modules', \
+                        'libs/juce/modules', 'src' ],
+        target      = 'Applications/KSP1',
+        name        = 'KSP1_APP',
+        env         = appEnv,
+        use         = common_use_flags(),
+        mac_app     = True,
+        mac_plist   = 'tools/macdeploy/Info-Standalone.plist'
+        # mac_files   = [ 'tools/macdeploy/Icon.icns' ]
     )
-
-def element_ui_modules():
-    return ['libs/element/modules/element_base/element_base.cpp',
-            'libs/element/modules/element_engines/element_engines.cpp',
-            'libs/element/modules/element_gui/element_gui.cpp',
-            'libs/element/modules/element_lv2/element_lv2.cpp',
-            'libs/element/modules/element_models/element_models.cpp']
-
-def ui_use_flags():
-    return ['libsqlite3', 'PTHREAD', 'LILV', 'SUIL', 'X11', 'XEXT',
-       'ALSA', 'FREETYPE2', 'GL', 'EGL', 'GLESV2', 'XCB', \
-       'JUCE_CORE', 'JUCE_AUDIO_BASICS', 'JUCE_AUDIO_DEVICES', \
-       'JUCE_AUDIO_FORMATS', 'JUCE_GUI_BASICS', 'JUCE_DATA_STRUCTURES', \
-       'JUCE_AUDIO_PROCESSORS', 'JUCE_AUDIO_UTILS', 'JUCE_CRYPTOGRAPHY', \
-       'JUCE_OPENGL']
+    
+    app.use.append ('KSP1')
 
 def build (bld):
-    build_sqlite3 (bld)
+    build_mac (bld)
 
-    plugin_source = '''
-        src/engine/Jobs.cpp
-        src/engine/ADSR.cpp
-        src/engine/LayerData.cpp
-        src/engine/LowPassFilter.cpp
-        src/engine/SampleCache.cpp
-        src/engine/SamplerSounds.cpp
-        src/engine/SamplerSynth.cpp
-        src/engine/SamplerVoice.cpp
-        src/engine/LV2Plugin.cpp
-        src/ContentScanner.cpp
-        src/Database.cpp
-        src/DataPath.cpp
-        src/URIs.cpp
-    '''.split()
+def macdeploy (ctx):
+    call (["tools/macdeploy/appbundle.py",
+           "-verbose", "3",
+           "-dmg", "versicap-osx-%s" % VERSION,
+           "-volname", "Versicap",
+           "-fancy", "tools/macdeploy/fancy.plist",
+           "build/Applications/Versicap.app"])
 
-    '''juce_module_path = 'libs/libjuce/src/modules'
-    plugin_modules = ['juce_core', 'juce_audio_basics', 'juce_audio_formats']
-    for module in plugin_modules:
-        plugin_source.append (juce_module_path + '/' + module + '/' + module + '.cpp')
-    '''
-
-    plugin_dir = bld.env.PREFIX + '/lib/lv2/ksp1.lv2'
-
-    plugin_environ = bld.env.derive()
-    plugin_environ.cshlib_PATTERN = plugin_environ.cxxshlib_PATTERN = \
-        bld.env.plugin_PATTERN
-
-    p = juce.IntrojucerProject (bld, 'standalone/KSP1 Standalone.jucer');
-
-    if bld.env.KSP1_BUILD_PLUGINS:
-        plugin = bld.shlib (
-            source = plugin_source,
-            includes = ['src', 'libs/lvtk', 'libs/element'],
-            target = 'plugins/ksp1.lv2/plugin',
-            use = ['libsqlite3', 'PTHREAD', 'DL', 'JUCE_CORE'],
-            cxxflags = ['-DKSP1_BUILD_LV2=1'],
-            install_path = plugin_dir,
-            env = plugin_environ
-        )
-
-        bld.add_group()
-
-        ui = bld.shlib (
-            source = bld.path.ant_glob ('src/*.cpp') +
-                     bld.path.ant_glob ('src/editor/*.cpp') +
-                     element_ui_modules(),
-            includes = ['src', 'libs/lvtk'],
-            target = 'plugins/ksp1.lv2/ui',
-            use = ['libsqlite3', 'LILV', 'SUIL', 'X11', 'XEXT',
-                   'ALSA', 'FREETYPE2', 'GL', 'EGL', 'GLESV2', 'XCB'],
-            cxxflags = ['-DKSP1_STANDALONE=1', '-DJUCE_MODULE_AVAILABLE_element_engines=1'],
-            linkflags = ['-lpthread'],
-            install_path = plugin_dir,
-            env = plugin_environ
-        )
-
-        ttl = bld (
-            features = 'subst',
-            source = 'jucer/LV2/manifest.ttl',
-            target = 'plugins/ksp1.lv2/manifest.ttl',
-            install_path = plugin_dir
-        )
-
-        ttl = bld (
-            features = 'subst',
-            source = 'jucer/LV2/KSP1.ttl',
-            target = 'plugins/ksp1.lv2/KSP1.ttl',
-            install_path = plugin_dir
-        )
-
-        bld.add_group()
-
-    if bld.env.KSP1_BUILD_APPS:
-        bt = bld.program (
-            source = bld.path.ant_glob ('standalone/Source/**/*.cpp') +
-                     element_ui_modules(),
-            includes = ['libs/element', 'standalone/Source', \
-                        'libs/lvtk', 'jucer/Source', 'src'],
-            target = 'bin/ksp1',
-            use = ui_use_flags(),
-            cxxflags = ['-DKSP1_STANDALONE=1', '-DJUCE_MODULE_AVAILABLE_element_engines=1'],
-            env = bld.env.derive()
-        )
-
-    # if bld.env.KSP1_BUILD_TESTS:
-    #     tests = bld.program (
-    #         source = bld.path.ant_glob ('tests/**/*.cpp'),
-    #         includes = ['src', 'project/JuceLibraryCode'],
-    #         name = 'runTests',
-    #         target = 'runTests',
-    #         use = ['BTV', 'LILV', 'SUIL'],
-    #         linkflags = obj.linkflags,
-    #     )
-
-    #bld.add_post_fun (build_installer)
-
-def build_macdeploy (bld):
-    if bld.env.KSP1_BUILD_APPS:
-        call (['bash', 'tools/macdeploy'])
-    if bld.env.KSP1_BUILD_PLUGINS:
-        call (['bash', 'tools/macdeploy-plugins'])
-
-def build_installer (bld):
-    '''A post-build function used to create installers'''
-
-    if not bld.env.KSP1_BUILD_INSTALLERS:
-        return
-
-    cwd = os.getcwd()
-    if juce.is_mac():
-        os.chdir ('tools/installer/packagemaker')
-        call (['bash', 'build-installer'])
-        os.chdir (cwd + '/tools/installer/qt-ifw')
-        call (['bash', 'build-osx'])
-    else:
-        pass
-
-    os.chdir (cwd)
-
-from waflib import TaskGen
-@TaskGen.extension ('.mm')
-def mm_hook (self, node):
-    return self.create_compiled_task ('cxx', node)
-
-from waflib import TaskGen
-@TaskGen.extension ('.r')
-def res_hook (self, node):
-    pass
+def macrelease (ctx):
+    call (["bash", "tools/macdeploy/sync-jucer.sh"])
+    call (["bash", "tools/macdeploy/clean.sh"])
+    call (["python", "waf", "distclean", "configure", "build", "macdeploy"])
