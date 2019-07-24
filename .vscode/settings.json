@@ -1,0 +1,14 @@
+{
+    "python.pythonPath": "/usr/local/bin/python2",
+    "files.associations": {
+        "Vagrantfile": "ruby",
+        "memory": "cpp",
+        "functional": "cpp",
+        "__mutex_base": "cpp",
+        "__functional_base": "cpp",
+        "locale": "cpp",
+        "thread": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp"
+    }
+}
