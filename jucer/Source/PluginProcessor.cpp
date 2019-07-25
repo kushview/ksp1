@@ -13,60 +13,53 @@
 
 namespace KSP1 {
    
-    PluginWorld::PluginWorld() { }
-    
-    PluginWorld::~PluginWorld()
-    {
-        workThread = nullptr;
-    }
+PluginWorld::PluginWorld() { }
 
-    void PluginWorld::registerPlugin (PluginProcessor* plug)
-    {
-        if (instances.size() == 0)
-            init();
-
-        instances.addIfNotAlreadyThere (plug);
-    }
-
-    bool PluginWorld::unregisterPlugin (PluginProcessor* plug)
-    {
-        instances.removeFirstMatchingValue (plug);
-        return instances.size() == 0;
-    }
-        
-    AudioProcessor* PluginWorld::load (const String& uri)
-    {
-        return nullptr;
-    }
-    
-    kv::WorkThread& PluginWorld::getWorkThread()
-    {
-        jassert (workThread);
-        return *workThread;
-    }
-
-    void PluginWorld::init()
-    {
-        workThread = new kv::WorkThread ("KSP1_Worker", 4096, 5);
-        workThread->startThread();
-        factoryInstruments.clearQuick();
-        DataPath::factoryContentPath().getChildFile("Instruments")
-            .findChildFiles (factoryInstruments, File::findFiles, true, "*.xml");
-    }
-
-    static ScopedPointer<PluginWorld> globals;
-}
-
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+PluginWorld::~PluginWorld()
 {
-    return KSP1::PluginProcessor::create();
+    workThread = nullptr;
 }
 
-namespace KSP1 {
+void PluginWorld::registerPlugin (PluginProcessor* plug)
+{
+    if (instances.size() == 0)
+        init();
 
+    instances.addIfNotAlreadyThere (plug);
+}
+
+bool PluginWorld::unregisterPlugin (PluginProcessor* plug)
+{
+    instances.removeFirstMatchingValue (plug);
+    return instances.size() == 0;
+}
+    
+AudioProcessor* PluginWorld::load (const String& uri)
+{
+    return nullptr;
+}
+
+kv::WorkThread& PluginWorld::getWorkThread()
+{
+    jassert (workThread);
+    return *workThread;
+}
+
+void PluginWorld::init()
+{
+    workThread = new kv::WorkThread ("KSP1_Worker", 4096, 5);
+    workThread->startThread();
+    factoryInstruments.clearQuick();
+    DataPath::factoryContentPath().getChildFile("Instruments")
+        .findChildFiles (factoryInstruments, File::findFiles, true, "*.xml");
+}
+
+static ScopedPointer<PluginWorld> globals;
+
+//=============================================================================
 PluginProcessor::PluginProcessor()
     : AudioProcessor (BusesProperties()
-        .withOutput ("Main", AudioChannelSet::stereo(), true)
+        .withOutput ("Main",  AudioChannelSet::stereo(), true)
         .withOutput ("Aux 1", AudioChannelSet::stereo(), true)
         .withOutput ("Aux 2", AudioChannelSet::stereo(), true)
         .withOutput ("Aux 3", AudioChannelSet::stereo(), true)
@@ -115,13 +108,15 @@ void PluginProcessor::fillInPluginDescription (PluginDescription &desc) const
     desc.pluginFormatName   = "Internal";
 }
 
-const String PluginProcessor::getName() const {
-#ifdef JucePlugin_Name
+const String PluginProcessor::getName() const
+{
+   #ifdef JucePlugin_Name
     return JucePlugin_Name;
-#else
+   #else
     return "KSP1";
-#endif
+   #endif
 }
+
 int PluginProcessor::getNumParameters() { return 0; }
 float PluginProcessor::getParameter (int index) { return 0.0f; }
 void PluginProcessor::setParameter (int index, float newValue) { }
@@ -347,4 +342,9 @@ void PluginProcessor::timerCallback()
    #endif
 }
 
+}
+
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return KSP1::PluginProcessor::create();
 }

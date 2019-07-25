@@ -23,95 +23,94 @@
 
 namespace KSP1 {
 
-    class Waveform::Sink :  public ProgressSink
+class Waveform::Sink :  public ProgressSink
+{
+public:
+    Sink (Waveform& w) : wave(w) { }
+    void handleProgress (float p)
     {
-    public:
 
-        Sink (Waveform& w) : wave(w) { }
-        void handleProgress (float p)
-        {
-
-        }
-
-        void handleStatus (const String& msg)
-        {
-
-        }
-
-        void handleProgressStart()
-        {
-
-        }
-
-        void handleProgressFinished()
-        {
-
-        }
-
-
-    private:
-        Waveform& wave;
-    };
-
-    Waveform::Waveform()
-    {
-        sink = new Sink (*this);
     }
 
-    Waveform::~Waveform()
+    void handleStatus (const String& msg)
     {
-        peak = nullptr;
-        sink = nullptr;
+
     }
 
-    void Waveform::setAudioPeak (AudioPeakPtr nextPeak)
+    void handleProgressStart()
     {
-        if (peak == nextPeak)
-            return;
 
-        AudioPeakPtr oldPeak = peak;
-
-        if (oldPeak)
-            oldPeak->removeChangeListener (this);
-
-        if (nextPeak) {
-            nextPeak->addChangeListener (this);
-            timeSpan.setEnd (nextPeak->getTotalLength ());
-        }
-
-        peak = nextPeak;
-        oldPeak = nullptr;
     }
 
-    AudioPeakPtr Waveform::audioPeak()
+    void handleProgressFinished()
     {
-        return peak;
+
     }
 
-    void Waveform::paint (Graphics& g)
-    {
-        g.fillAll (Colours::white);
-        g.setColour (Colours::lightgreen);
 
-        if (peak && timeSpan.getLength() > 0)
-        {
-            peak->drawChannels (g, getLocalBounds().reduced (2),
-                                    timeSpan.getStart(),
-                                    timeSpan.getEnd(),
-                                    1.0f);
-        }
-        else
-        {
-            g.setFont (14.0f);
-            g.drawFittedText ("No data", getLocalBounds(), Justification::centred, 2);
-        }
+private:
+    Waveform& wave;
+};
+
+Waveform::Waveform()
+{
+    sink = new Sink (*this);
+}
+
+Waveform::~Waveform()
+{
+    peak = nullptr;
+    sink = nullptr;
+}
+
+void Waveform::setAudioPeak (AudioPeakPtr nextPeak)
+{
+    if (peak == nextPeak)
+        return;
+
+    AudioPeakPtr oldPeak = peak;
+
+    if (oldPeak)
+        oldPeak->removeChangeListener (this);
+
+    if (nextPeak) {
+        nextPeak->addChangeListener (this);
+        timeSpan.setEnd (nextPeak->getTotalLength ());
     }
 
-    void Waveform::changeListenerCallback (ChangeBroadcaster* source)
+    peak = nextPeak;
+    oldPeak = nullptr;
+}
+
+AudioPeakPtr Waveform::audioPeak()
+{
+    return peak;
+}
+
+void Waveform::paint (Graphics& g)
+{
+    g.fillAll (Colours::white);
+    g.setColour (Colours::lightgreen);
+
+    if (peak && timeSpan.getLength() > 0)
     {
-        if (peak && (void*) peak.get() == (void*) source) {
-            repaint();
-        }
+        peak->drawChannels (g, getLocalBounds().reduced (2),
+                                timeSpan.getStart(),
+                                timeSpan.getEnd(),
+                                1.0f);
     }
+    else
+    {
+        g.setFont (14.0f);
+        g.drawFittedText ("No data", getLocalBounds(), Justification::centred, 2);
+    }
+}
+
+void Waveform::changeListenerCallback (ChangeBroadcaster* source)
+{
+    if (peak && (void*) peak.get() == (void*) source) {
+        repaint();
+    }
+}
 
 }

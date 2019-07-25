@@ -34,8 +34,6 @@ namespace KSP1 {
 //==============================================================================
 /**
                                                                     //[Comments]
-    This is the main view used when the sampler is run as a tone module sampler.
-    E.g.  No composer and pattern editing.   Just a sampler that plays Instruments
                                                                     //[/Comments]
 */
 class SamplerView  : public Panel,
