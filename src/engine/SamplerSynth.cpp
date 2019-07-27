@@ -215,7 +215,7 @@ void SamplerSynth::clearAllSounds()
 {
     allNotesOff (0, false);
     for (int note = 0; note < 128; ++note)
-        if (KSP1::SamplerSound* sound = getSound (note, false))
+        if (auto* sound = findSound (note, false))
             sound->clearSources();
 }
 
@@ -261,7 +261,7 @@ bool SamplerSynth::insertLayerData (uint32 soundId, LayerData *data)
     return false;
 }
 
-SamplerSound* SamplerSynth::getSound (int note, bool createIt)
+SamplerSound* SamplerSynth::findSound (int note, bool createIt)
 {        
     return nullptr;
 }

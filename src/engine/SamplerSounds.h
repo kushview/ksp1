@@ -198,8 +198,10 @@ public:
     void setProperty (const URIs& uris, const PatchSet& set);
    #endif
 
+    const int getObjectId() const { return id; }
+
 private:
-    const int32 id;
+    const int id;
     KeyInfo key;
 
     AtomicFrame     start, duration;

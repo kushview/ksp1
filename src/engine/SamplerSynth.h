@@ -134,7 +134,7 @@ namespace KSP1 {
             @param note The note to search for
             @param createIt create the sound if it doesn't exists
          */
-        SamplerSound* getSound (int note, bool createIt = true);
+        SamplerSound* findSound (int note, bool createIt);
 
         friend class DataLoader;
 

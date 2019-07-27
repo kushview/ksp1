@@ -93,6 +93,17 @@ namespace KSP1 {
         return *this;
     }
     
+    static bool containsSound (const ValueTree& tree, int note, int span)
+    {
+        for (int i = 0; i < tree.getNumChildren(); ++i)
+        {
+            const auto child = tree.getChild (i);
+            if ((int) child[Tags::note] == note && span == (int) child [Tags::length])
+                return true;
+        }
+        return false;
+    }
+
     KeyItem Instrument::addKey (int32 noteNumber, int32 keySpan)
     {
         if (! isPositiveAndBelow (noteNumber, 128))
@@ -100,25 +111,17 @@ namespace KSP1 {
         
         bool wasJustCreated = false;
         
-        ValueTree key = node().getChildWithProperty (kv::Slugs::note, noteNumber);
-        if (! key.isValid())
-        {
-            key = ValueTree ("key");
-            key.setProperty (kv::Slugs::note, noteNumber, nullptr);
-            if (keySpan > 0)
-                key.setProperty (kv::Slugs::length, keySpan, nullptr);
-            wasJustCreated = true;
-        }
+        ValueTree key = ValueTree (Tags::key);
+        key.setProperty (kv::Slugs::note, noteNumber, nullptr);
+        if (keySpan > 0)
+            key.setProperty (kv::Slugs::length, keySpan, nullptr);
 
         KeyItem item (key);
-        if (wasJustCreated) {
-            item.setMissingProperties();
-        }
+        item.setMissingProperties();
         
-        if (key.isValid()) {
+        if (key.isValid())
+        {
             objectData.addChild (key, noteNumber, nullptr);
-            KeySorter sorter;
-            objectData.sort (sorter, nullptr, true);
         }
 
         return item;

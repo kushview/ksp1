@@ -20,14 +20,16 @@ public:
     SoundsTimeline()
         : TimelineComponent()
     {
-        setTrackWidth (64);
+        setTrackWidth (100);
+        setIndicator (nullptr);
         const_cast<kv::TimeScale&> (timeScale()).setPixelsPerBeat (32);
         const_cast<kv::TimeScale&> (timeScale()).updateScale();
     }
 
     ~SoundsTimeline() { }
 
-    void mouseDown (const MouseEvent& ev) override {
+    void mouseDown (const MouseEvent& ev) override
+    {
         TimelineComponent::mouseDown (ev);
     }
 
@@ -41,28 +43,30 @@ public:
         return (instrument) ? instrument->getNumChildren() : 0;
     }
 
-    void setInstrument (InstrumentPtr ptr)
+    void refresh()
     {
-        instrument = ptr;
-        if (! instrument) {
-            removeClips();
-            return;
-        }
-
         removeClips();
 
-        ValueTree node = instrument->node();
+        if (! instrument)
+            return;
+        ValueTree node = instrument->getValueTree();
         for (int i = 0; i < node.getNumChildren(); ++i)
         {
-            if (! node.getChild(i).hasType(Tags::key))
+            if (! node.getChild(i).hasType (Tags::key))
                 continue;
 
-            KeyItem item (node.getChild(i));
-            addTimelineClip (new KeyItemClip (*this, item));
+            KeyItem item (node.getChild (i));
+            addTimelineClip (new KeyItemClip (*this, item), i);
         }
 
         setAllTrackHeights (18);
         repaint();
+    }
+
+    void setInstrument (InstrumentPtr ptr)
+    {
+        instrument = ptr;
+        refresh();
     }
 
     void paintTrackHeader (Graphics& g, int track, const Rectangle<int>& area) override
@@ -165,7 +169,6 @@ private:
         KeyItem key;
 
     protected:
-
         virtual void reset()
         {
 
@@ -351,7 +354,6 @@ private:
 
 };
 
-
 class EditScreen::Updater : public Timer
 {
 public:
@@ -385,7 +387,6 @@ public:
     }
 
 private:
-
     EditScreen& screen;
     int frequency;
 
@@ -492,8 +493,9 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
         }
         else
         {
-            auto i = display().getInstrument();
-            keySelectedEvent (i->addKey (display().selectedNote()));
+            auto instrument = display().getInstrument();
+            instrument->addKey (display().selectedNote());
+            sounds->refresh();
         }
     }
     else if (buttonThatWasClicked == buttonRemoveLayer)

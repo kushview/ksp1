@@ -7,7 +7,10 @@
 
 #include "KSP1.h"
 #include "engine/SamplerSynth.h"
+#include "engine/SamplerSounds.h"
+
 #include "DataPath.h"
+#include "Instrument.h"
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
 
@@ -67,11 +70,16 @@ PluginProcessor::PluginProcessor()
 {
     currentProgram = 0;
     globals->registerPlugin (this);
+
     synth.reset (SamplerSynth::create());
+    instrument = new Instrument ("Instrument");
+    data = instrument->getValueTree();
+    data.addListener (this);
 }
 
 PluginProcessor::~PluginProcessor()
 {
+    data.removeListener (this);
     if (editors.size() > 0)
     {
         jassertfalse;
@@ -171,67 +179,6 @@ void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
 {
     audio.clear();
     midi.clear();
-   #if 0
-    // save for reference
-    if (ring->canRead (sizeof (uint32)))
-    {
-        uint32 totalSize = 0;
-        ring->peak (&totalSize, sizeof (uint32));
-        bool readEvents = ring->canRead (totalSize);
-        kv::PortEvent ev;
-        
-        while (readEvents)
-        {
-            zerostruct (ev);
-            ring->read (&totalSize, sizeof (uint32));
-            ring->read (&ev, sizeof (PortEvent));
-            jassert(totalSize == sizeof(uint32) + ev.size + sizeof(PortEvent));
-            ring->read (block, ev.size);
-            
-            if (ev.index == Port::AtomInput)
-            {
-                const lvtk::Atom atom (block.getData());
-                atomIn->addEvent (ev.time.frames,
-                                  atom.size(), atom.type(),
-                                  (uint8*) atom.body());
-            }
-            
-            if (ring->canRead (sizeof (uint32)))
-            {
-                ring->peak (&totalSize, sizeof (uint32));
-                readEvents = ring->canRead (totalSize);
-            }
-            else
-            {
-                readEvents = false;
-            }
-        }
-    }
-    
-    if (midi.getNumEvents() > 0)
-    {
-        MidiBuffer::Iterator iter (midi);
-        const uint8* data = nullptr; int bytes = 0, frame = 0;
-        while (iter.getNextEvent (data, bytes, frame))
-            atomIn->addEvent (frame, static_cast<uint32> (bytes),
-                              uris->midi_MidiEvent, data);
-        midi.clear();
-    }
-    
-    atomOut->reset (true);
-    module->connectPort (Port::AtomInput,  atomIn->getPortData());
-    module->connectPort (Port::AtomOutput, atomOut->getPortData());
-    module->connectPort (Port::MainLeft,   audio.getWritePointer (0, 0));
-    module->connectPort (Port::MainRight,  audio.getWritePointer (1, 0));
-    module->run (audio.getNumSamples());
-    
-    LV2_ATOM_SEQUENCE_FOREACH ((LV2_Atom_Sequence*) atomOut->getPortData(), ev)
-    {
-        uint32 totalSize = lv2_atom_total_size (&ev->body);
-        if (uiRing->canWrite (totalSize))
-            uiRing->write (&ev->body, totalSize);
-    }
-   #endif
 }
 
 bool PluginProcessor::hasEditor() const { return true; }
@@ -258,29 +205,12 @@ void PluginProcessor::unregisterEditor (PluginEditor* ed)
 
 void PluginProcessor::getStateInformation (MemoryBlock& destData)
 {
-    SamplerSynth* sampler = nullptr;
-    if (! sampler)
-        return;
     
-    var data;
-    sampler->getNestedVariant (data);
-    const String json (JSON::toString (data, true));
-    destData.append (json.toRawUTF8(), strlen(json.toRawUTF8()));
 }
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    SamplerSynth* sampler = nullptr;
-    if (! sampler)
-        return;
-    
-    const String json (CharPointer_UTF8 ((const char*) data),
-                       (size_t) sizeInBytes);
-    
-    if (! sampler->loadJSON (json))
-    {
-        DBG("Failed loading JSON data");
-    }
+
 }
 
 void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 portProtocol, const void* buffer)
@@ -341,6 +271,44 @@ void PluginProcessor::timerCallback()
     }
    #endif
 }
+
+void PluginProcessor::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
+{
+    if (tree.hasType (Tags::key))
+    {
+        DBG("key: " << property.toString());
+    }
+}
+
+void PluginProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+{
+    if (parent == data && child.hasType (Tags::key))
+    {
+        KeyItem soundItem (child);
+        auto* const sound = new SamplerSound (soundItem.getNote());
+        sound->setLength ((int) soundItem.getProperty (Tags::length));
+        synth->insertSound (sound);
+        soundItem.setProperty (Tags::id, sound->getObjectId())
+                 .setProperty ("object", sound);
+    }
+}
+
+void PluginProcessor::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int childIndex)
+{
+    if (parent == data && child.hasType (Tags::key))
+    {
+        if (SamplerSoundPtr ptr = dynamic_cast<SamplerSound*> (child.getProperty ("object").getObject()))
+        {
+            for (int i = 0; i < synth->getNumSounds(); ++i)
+                if (ptr.get() == synth->getSound(i).get())
+                    { synth->removeSound (i); break; }
+            jassert (synth->getNumSounds() == instrument->getNumChildren());
+        }
+    }
+}
+
+void PluginProcessor::valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) { ignoreUnused (parent, oldIndex, newIndex); }
+void PluginProcessor::valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) {}
 
 }
 

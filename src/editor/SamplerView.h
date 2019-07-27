@@ -23,7 +23,6 @@
 #include "editor/LevelMeter.h"
 #include "editor/LayersListBox.h"
 #include "editor/Keyboard.h"
-#include "editor/Panels.h"
 //[/Headers]
 
 #include "SamplerDisplay.h"
@@ -36,7 +35,7 @@ namespace KSP1 {
                                                                     //[Comments]
                                                                     //[/Comments]
 */
-class SamplerView  : public Panel,
+class SamplerView  : public Component,
                      public DragAndDropContainer,
                      public Button::Listener,
                      public Slider::Listener,
@@ -52,8 +51,6 @@ public:
     void setVolume (float db, bool notify = false);
 
     inline SamplerDisplay* getDisplay() const { return display.get(); }
-
-    inline int32 type() const override { return Panel::samplerPanel; }
 
     LevelMeter* levelMeter() const;
 

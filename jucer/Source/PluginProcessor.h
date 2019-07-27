@@ -8,6 +8,7 @@
 #pragma once
 
 #include "KSP1.h"
+#include "Instrument.h"
 
 namespace KSP1 {
 
@@ -25,6 +26,8 @@ public:
     AudioProcessor* load (const String& uri);
     kv::WorkThread& getWorkThread();
     
+    
+
 private:
     friend class PluginProcessor;
     Array<PluginProcessor*> instances;
@@ -35,11 +38,13 @@ private:
 };
 
 class PluginProcessor  : public AudioProcessor,
+                         private ValueTree::Listener,
                          private Timer
 {
 public:
     ~PluginProcessor();
     static PluginProcessor* create();
+    InstrumentPtr getInstrument() const { return instrument; }
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -76,7 +81,9 @@ protected:
 
 private:
     std::unique_ptr<SamplerSynth> synth;
-    
+    InstrumentPtr instrument;
+    ValueTree data;
+
     bool useExternalData;
     ScopedPointer<kv::RingBuffer> ring, uiRing;
     HeapBlock<uint8> block;
@@ -87,6 +94,12 @@ private:
     friend class Timer;
     void timerCallback() override;
     
+    void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override;
+    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override;
+    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int childIndex) override;
+    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override;
+    void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor);
 };
 

@@ -29,9 +29,10 @@ class SampleCache;
 class SamplerSound;
 class SamplerSynth;
 class SamplerVoice;
+
 struct URIs;
 
-class LayerData
+class LayerData : public ReferenceCountedObject
 {
 public:
     LayerData (SampleCache&, int layerId);
@@ -131,5 +132,7 @@ private:
     void startNote (int voice, const KeyInfo& key);
     const float* getSampleData (int32 chan, int32 frame) const;
 };
+
+using LayerPtr = ReferenceCountedObjectPtr<LayerData>;
 
 }

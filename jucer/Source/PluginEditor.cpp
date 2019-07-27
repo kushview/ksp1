@@ -21,11 +21,7 @@ PluginEditor::PluginEditor (PluginProcessor* plug, PluginWorld& pw)
     view.reset (new SamplerView ());
     addAndMakeVisible (view.get());
     setSize (view->getWidth(), view->getHeight());
-    
-    InstrumentPtr instrument = new Instrument ("Instrument");
-    auto zone = instrument->addKey (0, 128);
-    zone.addLayer (File());
-    view->setInstrment (instrument);
+    view->setInstrment (plug->getInstrument());
 }
 
 PluginEditor::~PluginEditor()
