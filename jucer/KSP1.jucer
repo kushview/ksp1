@@ -82,7 +82,6 @@
               file="../src/editor/MidiKeyboardComponent.cpp"/>
         <FILE id="bsS78P" name="MidiKeyboardComponent.h" compile="0" resource="0"
               file="../src/editor/MidiKeyboardComponent.h"/>
-        <FILE id="gxUzOz" name="Panels.h" compile="0" resource="0" file="../src/editor/Panels.h"/>
         <FILE id="Ag6sNA" name="SamplerDisplay.cpp" compile="1" resource="0"
               file="../src/editor/SamplerDisplay.cpp"/>
         <FILE id="L0KSjZ" name="SamplerDisplay.h" compile="0" resource="0"
