@@ -225,6 +225,17 @@ void PluginProcessor::setStateInformation (const void* stateData, int sizeInByte
 {
     data = ValueTree::readFromGZIPData (stateData, (size_t) sizeInBytes);
     instrument = new Instrument (data);
+    
+    if (auto* xml = data.createXml())
+    {
+        std::unique_ptr<SamplerSynth> newSynth (SamplerSynth::create());
+        newSynth->loadValueTreeXml (*xml);
+        deleteAndZero (xml);
+
+        ScopedLock sl (getCallbackLock());
+        synth.swap (newSynth);
+    }
+
     sendChangeMessage();
 }
 
