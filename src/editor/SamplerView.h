@@ -55,7 +55,7 @@ public:
     LevelMeter* levelMeter() const;
 
     InstrumentPtr getInstrument (const int track = 0) const;
-    void setInstrment (InstrumentPtr i);
+    void setInstrument (InstrumentPtr i);
 
     // signal/callback handlers
     void loadFile (const File&);

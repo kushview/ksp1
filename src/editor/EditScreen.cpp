@@ -38,6 +38,11 @@ public:
 
     }
 
+    void timelineTrackHeadersClicked (const MouseEvent&, int track) override
+    { 
+        DBG("track: " << track);
+    }
+
     int getNumTracks() const override
     {
         return (instrument) ? instrument->getNumChildren() : 0;
@@ -47,8 +52,12 @@ public:
     {
         removeClips();
 
+        if (auto* view = findParentComponentOfClass<SamplerView>())
+            instrument = view->getInstrument();
+
         if (! instrument)
             return;
+        
         ValueTree node = instrument->getValueTree();
         for (int i = 0; i < node.getNumChildren(); ++i)
         {
@@ -60,13 +69,8 @@ public:
         }
 
         setAllTrackHeights (18);
+        resized();
         repaint();
-    }
-
-    void setInstrument (InstrumentPtr ptr)
-    {
-        instrument = ptr;
-        refresh();
     }
 
     void paintTrackHeader (Graphics& g, int track, const Rectangle<int>& area) override
@@ -419,8 +423,7 @@ EditScreen::EditScreen (SamplerDisplay& owner)
     setSize (600, 400);
 
     lastNote = display().selectedKey().getNote();
-    addPage ("Sounds", sounds = new SoundsTimeline());
-    sounds->setInstrument (owner.getInstrument());
+    addPage ("Sounds", sounds   = new SoundsTimeline());
     addPage ("Layers", timeline = new LayersTimeline());
 
     buttonAddSample->setAlwaysOnTop (true);
@@ -451,6 +454,11 @@ void EditScreen::resized()
     buttonAddSample->setBounds (getWidth() - 56, getHeight() - 18, 24, 16);
     buttonRemoveLayer->setBounds (getWidth() - 28, getHeight() - 18, 24, 16);
     Screen::resized();
+}
+
+void EditScreen::parentHierarchyChanged()
+{
+    sounds->refresh();
 }
 
 void EditScreen::buttonClicked (Button* buttonThatWasClicked)
@@ -512,11 +520,6 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode]
 void EditScreen::keySelectedEvent (const KeyItem& item)
 {
-    if (item.isValid())
-    {
-        if (timeline) timeline->setKey (item);
-        if (sounds) sounds->setInstrument (display().getInstrument());
-    }
 }
 
 void EditScreen::timerCallback()
@@ -527,15 +530,13 @@ void EditScreen::updateComponents()
 {
 }
 
-void
-EditScreen::onDisplayUpdate()
+void EditScreen::onDisplayUpdate()
 {
     // detect a note change from the display
     if (lastNote != display().selectedKey().getNote())
     {
         lastNote = display().selectedKey().getNote();
         timeline->setKey (display().selectedKey());
-        sounds->setInstrument (display().getInstrument());
     }
 }
 

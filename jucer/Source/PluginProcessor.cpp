@@ -203,14 +203,29 @@ void PluginProcessor::unregisterEditor (PluginEditor* ed)
         stopTimer();
 }
 
-void PluginProcessor::getStateInformation (MemoryBlock& destData)
+void removePropertyRecursive (ValueTree data, const Identifier& property)
 {
-    
+    data.removeProperty (property, nullptr);
+    for (int i = 0; i < data.getNumChildren(); ++i)
+        removePropertyRecursive (data.getChild (i), property);
 }
 
-void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
+void PluginProcessor::getStateInformation (MemoryBlock& destData)
 {
+    auto saveData = data.createCopy();
+    removePropertyRecursive (saveData, "object");
+    MemoryOutputStream mo (destData, false);
+    {
+        GZIPCompressorOutputStream gzip (mo);
+        saveData.writeToStream (gzip);
+    }
+}
 
+void PluginProcessor::setStateInformation (const void* stateData, int sizeInBytes)
+{
+    data = ValueTree::readFromGZIPData (stateData, (size_t) sizeInBytes);
+    instrument = new Instrument (data);
+    sendChangeMessage();
 }
 
 void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 portProtocol, const void* buffer)

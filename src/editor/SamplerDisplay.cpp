@@ -334,7 +334,6 @@ InstrumentPtr SamplerDisplay::getInstrument() const
     return models->instrument();
 }
 
-
 ProgressSink& SamplerDisplay::progressBarSink()
 {
     jassert (progressBar.get());
@@ -369,9 +368,11 @@ LayerItem SamplerDisplay::selectedLayer()
 
 void SamplerDisplay::selectNote (int32 note, bool notify)
 {
+   #if 0
     KeyItem item = getInstrument()->getKey (note);
     if (currentScreen && notify)
         currentScreen->keySelectedEvent (item);
+   #endif
 
     setNote (note);
 }

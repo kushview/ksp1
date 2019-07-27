@@ -21,18 +21,31 @@ PluginEditor::PluginEditor (PluginProcessor* plug, PluginWorld& pw)
     view.reset (new SamplerView ());
     addAndMakeVisible (view.get());
     setSize (view->getWidth(), view->getHeight());
-    view->setInstrment (plug->getInstrument());
+    view->setInstrument (plug->getInstrument());
+    plug->addChangeListener (this);
 }
 
 PluginEditor::~PluginEditor()
 {
-    if (PluginProcessor* base = dynamic_cast<PluginProcessor*> (getAudioProcessor()))
+    processor.editorBeingDeleted (this);
+
+    if (auto* const base = dynamic_cast<PluginProcessor*> (&processor))
     {
+        base->removeChangeListener (this);
         base->unregisterEditor (this);
-        base->editorBeingDeleted (this);
+    }
+    else
+    {
+        jassertfalse; // should not ever happen
     }
     
     setLookAndFeel (nullptr);
+}
+
+void PluginEditor::changeListenerCallback (ChangeBroadcaster*)
+{
+    if (PluginProcessor* plugin = dynamic_cast<PluginProcessor*> (&processor))
+        view->setInstrument (plugin->getInstrument());
 }
 
 void PluginEditor::paint (Graphics& g)

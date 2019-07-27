@@ -47,6 +47,7 @@ public:
     void buttonClicked (Button* buttonThatWasClicked);
     Screen::ID type() const { return Screen::editScreen; }
 
+    void parentHierarchyChanged() override;
 private:
     OwnedArray<AudioThumbnail>   peaks;
     int lastNote;

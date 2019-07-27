@@ -425,7 +425,8 @@ namespace KSP1 {
 
         void print()
         {
-            DBG (objectData.toXmlString());
+            auto copy = objectData.createCopy();
+            DBG (copy.toXmlString());
         }
 
         void sortKeys();

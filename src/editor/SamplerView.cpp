@@ -334,7 +334,6 @@ SamplerView::SamplerView ()
 
 
     //[UserPreSize]
-
     display->connectUpdateClient (*this);
     keyboard->signalMidi().connect (boost::bind (&SamplerView::onKeyboardMidi, this, ::_1));
     keyboard->signalKeySelected().connect (boost::bind (&SamplerView::onKeySelected, this, ::_1));
@@ -345,11 +344,8 @@ SamplerView::SamplerView ()
 
 
     //[Constructor] You can add your own custom stuff here..
-
-    display->setScreen (Screen::kitScreen);
+    display->setScreen (Screen::editScreen);
     volume->setRange (-70.0f, 12.0f);
-
-
     updater = new Updater (*this);
     updater->startTimer (66);
 
@@ -605,7 +601,6 @@ void SamplerView::onKeyboardMidi (const MidiMessage& midi)
     {
         display->selectNote (midi.getNoteNumber());
         updateControls (dontSendNotification);
-        DBG(getInstrument()->getValueTree().toXmlString());
     }
 }
 
@@ -614,7 +609,6 @@ void SamplerView::onKeySelected (int k)
     display->selectNote (k, true);
     const KeyItem item (display->selectedKey());
     layersListBox->setKeyItem (item);
-    DBG(item.getValueTree().toXmlString());
     updateControls (dontSendNotification);
 }
 
@@ -703,7 +697,7 @@ InstrumentPtr SamplerView::getInstrument (const int) const
     return display->getInstrument();
 }
 
-void SamplerView::setInstrment (InstrumentPtr i)
+void SamplerView::setInstrument (InstrumentPtr i)
 {
     display->setInstrument (i);
     stabilizeView();
@@ -714,12 +708,12 @@ void SamplerView::stabilizeView()
     updateControls (dontSendNotification);
 }
 
- void SamplerView::setMainRMS (const float rmsL, const float rmsR)
- {
-     meter->setValue (0, rmsL);
-     meter->setValue (1, rmsR);
-     meter->refresh();
- }
+void SamplerView::setMainRMS (const float rmsL, const float rmsR)
+{
+    meter->setValue (0, rmsL);
+    meter->setValue (1, rmsR);
+    meter->refresh();
+}
 
 //[/MiscUserCode]
 

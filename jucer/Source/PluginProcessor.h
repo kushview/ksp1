@@ -38,6 +38,7 @@ private:
 };
 
 class PluginProcessor  : public AudioProcessor,
+                         public ChangeBroadcaster,
                          private ValueTree::Listener,
                          private Timer
 {

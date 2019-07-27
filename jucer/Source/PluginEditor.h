@@ -9,7 +9,8 @@ class PluginProcessor;
 class PluginWorld;
 class SamplerView;
 
-class PluginEditor  : public AudioProcessorEditor
+class PluginEditor  : public AudioProcessorEditor,
+                      public ChangeListener
 {
 public:
     PluginEditor (PluginProcessor* plug, PluginWorld& pw);
@@ -17,6 +18,8 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    
+    void changeListenerCallback (ChangeBroadcaster*) override;
     
 private:
     PluginWorld& world;
