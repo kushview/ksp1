@@ -131,13 +131,14 @@ private:
 
         virtual void setClipRange (const ClipRange<double>& loc)
         {
-            key.node().setProperty (Slugs::note, roundDoubleToInt (loc.getStart()), 0);
-            int32 len = roundDoubleToInt (loc.getLength() - 1.0);
-            if (len < 0) {
-                len = 0;
-            }
+            int note = jmax (0, roundToInt (loc.getStart()));
+            int len =  jmax (0, roundToInt (loc.getLength() - 1.0));
 
-            key.node().setProperty (Slugs::length, len, 0);
+            if (isPositiveAndBelow (note, 127))
+            {
+                key.setProperty (Slugs::note, note);
+                key.setProperty (Slugs::length, len);
+            }
         }
 
         virtual TimeUnit getTimeUnit() const { return TimeUnit::Beats; }
@@ -424,6 +425,8 @@ EditScreen::EditScreen (SamplerDisplay& owner)
     setSize (600, 400);
 
     lastNote = display().selectedKey().getNote();
+
+    setTabOrientation (TabbedButtonBar::TabsAtTop);
     addPage ("Sounds", sounds   = new SoundsTimeline());
     addPage ("Layers", timeline = new LayersTimeline());
 
