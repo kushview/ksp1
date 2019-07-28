@@ -50,6 +50,12 @@ SamplerView::SamplerView ()
     //[/Constructor_pre]
 
     setName ("samplerView");
+    articulationGroup.reset (new GroupComponent ("articulationGroup",
+                                                 String()));
+    addAndMakeVisible (articulationGroup.get());
+    articulationGroup->setColour (GroupComponent::outlineColourId, Colour (0x00c81b1b));
+    articulationGroup->setColour (GroupComponent::textColourId, Colour (0xffcdcdcd));
+
     layerKeyButton.reset (new TextButton ("layerKeyButton"));
     addAndMakeVisible (layerKeyButton.get());
     layerKeyButton->setButtonText (TRANS("K"));
@@ -57,12 +63,6 @@ SamplerView::SamplerView ()
     layerKeyButton->addListener (this);
     layerKeyButton->setColour (TextButton::buttonColourId, Colour (0xffe4e84f));
     layerKeyButton->setColour (TextButton::buttonOnColourId, Colour (0xfffcab36));
-
-    articulationGroup.reset (new GroupComponent ("articulationGroup",
-                                                 String()));
-    addAndMakeVisible (articulationGroup.get());
-    articulationGroup->setColour (GroupComponent::outlineColourId, Colour (0x00777777));
-    articulationGroup->setColour (GroupComponent::textColourId, Colour (0xffcdcdcd));
 
     volLabel.reset (new Label ("volume-label",
                                TRANS("Master Vol.\n")));
@@ -98,20 +98,6 @@ SamplerView::SamplerView ()
     voiceGroup->setColour (Slider::rotarySliderFillColourId, Colour (0xffaeaeae));
     voiceGroup->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff565656));
     voiceGroup->addListener (this);
-
-    layersLabel.reset (new Label ("LayersLabel",
-                                  TRANS("LAYERS")));
-    addAndMakeVisible (layersLabel.get());
-    layersLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Bold"));
-    layersLabel->setJustificationType (Justification::centred);
-    layersLabel->setEditable (false, false, false);
-    layersLabel->setColour (Label::textColourId, Colour (0xffcdcdcd));
-    layersLabel->setColour (TextEditor::textColourId, Colours::black);
-    layersLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    layersListBox.reset (new LayersListBox());
-    addAndMakeVisible (layersListBox.get());
-    layersListBox->setName ("layers-list-box");
 
     triggerMode.reset (new ComboBox ("triggerMode"));
     addAndMakeVisible (triggerMode.get());
@@ -193,12 +179,6 @@ SamplerView::SamplerView ()
     fxSend2->setColour (Slider::rotarySliderFillColourId, Colour (0x73000000));
     fxSend2->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
     fxSend2->addListener (this);
-
-    mediaTabs.reset (new TabbedComponent (TabbedButtonBar::TabsAtTop));
-    addAndMakeVisible (mediaTabs.get());
-    mediaTabs->setTabBarDepth (25);
-    mediaTabs->addTab (TRANS("Asset Library"), Colours::lightgrey, new Component(), true);
-    mediaTabs->setCurrentTabIndex (0);
 
     fxSend3.reset (new Slider ("key:fx-send-1"));
     addAndMakeVisible (fxSend3.get());
@@ -337,7 +317,6 @@ SamplerView::SamplerView ()
     display->connectUpdateClient (*this);
     keyboard->signalMidi().connect (boost::bind (&SamplerView::onKeyboardMidi, this, ::_1));
     keyboard->signalKeySelected().connect (boost::bind (&SamplerView::onKeySelected, this, ::_1));
-    layersListBox->signalSelected().connect (boost::bind (&SamplerView::layerChosen, this));
     //[/UserPreSize]
 
     setSize (960, 540);
@@ -359,13 +338,11 @@ SamplerView::~SamplerView()
     updater = nullptr;
     //[/Destructor_pre]
 
-    layerKeyButton = nullptr;
     articulationGroup = nullptr;
+    layerKeyButton = nullptr;
     volLabel = nullptr;
     layerVolume = nullptr;
     voiceGroup = nullptr;
-    layersLabel = nullptr;
-    layersListBox = nullptr;
     triggerMode = nullptr;
     meter = nullptr;
     dbScale = nullptr;
@@ -374,7 +351,6 @@ SamplerView::~SamplerView()
     layerPitch = nullptr;
     fxSend1 = nullptr;
     fxSend2 = nullptr;
-    mediaTabs = nullptr;
     fxSend3 = nullptr;
     fxSend4 = nullptr;
     layerVolLabel = nullptr;
@@ -427,34 +403,31 @@ void SamplerView::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    layerKeyButton->setBounds (188, getHeight() - 179, 18, 18);
-    articulationGroup->setBounds ((getWidth() / 2) + -43, getHeight() - 198, 201, 78);
+    articulationGroup->setBounds (39, getHeight() - 170, 320, 41);
+    layerKeyButton->setBounds (4, getHeight() - 179, 18, 18);
     volLabel->setBounds (getWidth() - 113, getHeight() - 129, 71, 16);
-    layerVolume->setBounds (207, getHeight() - 178, 56, 56);
-    voiceGroup->setBounds (((getWidth() / 2) + -43) + 103, (getHeight() - 198) + 78 - 24, 85, 13);
-    layersLabel->setBounds (4, getHeight() - 152, 172, 24);
-    layersListBox->setBounds (4, getHeight() - 132, 172, 128);
-    triggerMode->setBounds (((getWidth() / 2) + -43) + 103, (getHeight() - 198) + 78 - 43, 85, 13);
+    layerVolume->setBounds (304, getHeight() - 177, 56, 56);
+    voiceGroup->setBounds (39 + 92, (getHeight() - 170) + 41 - 24, 85, 13);
+    triggerMode->setBounds (39 + 182, (getHeight() - 170) + 41 - 23, 85, 13);
     meter->setBounds (getWidth() - 28, getHeight() - 183, 20, 177);
     dbScale->setBounds (getWidth() - 29, getHeight() - 4 - 179, 21, 179);
     volume->setBounds (getWidth() - 112, getHeight() - 177, 61, 58);
-    layerPan->setBounds (273, getHeight() - 162, 56, 56);
-    layerPitch->setBounds (336, getHeight() - 178, 56, 56);
+    layerPan->setBounds (370, getHeight() - 161, 56, 56);
+    layerPitch->setBounds (433, getHeight() - 177, 56, 56);
     fxSend1->setBounds (getWidth() - 283, getHeight() - 154, 40, 40);
     fxSend2->setBounds (getWidth() - 244, getHeight() - 176, 40, 40);
-    mediaTabs->setBounds (4, 4, 172, getHeight() - 162);
     fxSend3->setBounds (getWidth() - 204, getHeight() - 155, 40, 40);
     fxSend4->setBounds (getWidth() - 164, getHeight() - 173, 40, 40);
-    layerVolLabel->setBounds (206, getHeight() - 128, 58, 15);
-    layerPanLabel->setBounds (274, getHeight() - 177, 58, 15);
-    layerPitchLabel->setBounds (336, getHeight() - 126, 58, 15);
+    layerVolLabel->setBounds (303, getHeight() - 127, 58, 15);
+    layerPanLabel->setBounds (371, getHeight() - 176, 58, 15);
+    layerPitchLabel->setBounds (433, getHeight() - 125, 58, 15);
     fx1Label->setBounds (getWidth() - 278, getHeight() - 170, 31, 18);
     fx1Label2->setBounds (getWidth() - 238, getHeight() - 144, 31, 18);
     fx1Label3->setBounds (getWidth() - 200, getHeight() - 170, 31, 18);
     fx1Label4->setBounds (getWidth() - 159, getHeight() - 141, 31, 18);
-    keyboard->setBounds (187, getHeight() - 4 - 101, getWidth() - 223, 101);
-    display->setBounds (186, 27, getWidth() - 188, getHeight() - 212);
-    keyLength->setBounds (((getWidth() / 2) + -43) + 201 / 2 + -84, (getHeight() - 198) + 78 - 25, 80, 13);
+    keyboard->setBounds (4, getHeight() - 4 - 101, getWidth() - 41, 101);
+    display->setBounds (3, 27, getWidth() - 8, getHeight() - 212);
+    keyLength->setBounds (39 + 320 / 2 + -152, (getHeight() - 170) + 41 - 24, 80, 13);
     propsButton->setBounds (getWidth() - 55, 4, 49, 18);
     editButton->setBounds (getWidth() - 107, 4, 49, 18);
     //[UserResized] Add your own custom resize handling here..
@@ -606,10 +579,8 @@ void SamplerView::onKeyboardMidi (const MidiMessage& midi)
 
 void SamplerView::onKeySelected (int k)
 {
-    display->selectNote (k, true);
-    const KeyItem item (display->selectedKey());
-    layersListBox->setKeyItem (item);
-    updateControls (dontSendNotification);
+    display->setNote (k);
+    stabilizeView();
 }
 
 void SamplerView::onDisplayUpdate()
@@ -637,8 +608,8 @@ void SamplerView::layerChosen()
 void SamplerView::updateControls (NotificationType n)
 {
     InstrumentPtr instrument (display->getInstrument());
-    LayerItem layer (layersListBox->getSelectedLayer());
     KeyItem key (instrument->getActiveSound());
+    LayerItem layer (key.getLayer (0));
 
     // instrument controls
     volume->getValueObject().referTo (instrument->getPropertyAsValue (Tags::volume));
@@ -749,13 +720,13 @@ BEGIN_JUCER_METADATA
     <RECT pos="0 0 100% 100%" fill="linear: 285 2, 283 651, 0=ff747474, 1=ff353535"
           hasStroke="0"/>
   </BACKGROUND>
+  <GROUPCOMPONENT name="articulationGroup" id="5fe3d96c50772121" memberName="articulationGroup"
+                  virtualName="" explicitFocusOrder="0" pos="39 170R 320 41" outlinecol="c81b1b"
+                  textcol="ffcdcdcd" title=""/>
   <TEXTBUTTON name="layerKeyButton" id="db4a5e029bc91d2" memberName="layerKeyButton"
-              virtualName="" explicitFocusOrder="0" pos="188 179R 18 18" bgColOff="ffe4e84f"
+              virtualName="" explicitFocusOrder="0" pos="4 179R 18 18" bgColOff="ffe4e84f"
               bgColOn="fffcab36" buttonText="K" connectedEdges="15" needsCallback="1"
               radioGroupId="0"/>
-  <GROUPCOMPONENT name="articulationGroup" id="5fe3d96c50772121" memberName="articulationGroup"
-                  virtualName="" explicitFocusOrder="0" pos="-43C 198R 201 78"
-                  outlinecol="777777" textcol="ffcdcdcd" title=""/>
   <LABEL name="volume-label" id="73228f61d5b45b64" memberName="volLabel"
          virtualName="" explicitFocusOrder="0" pos="113R 129R 71 16" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Master Vol.&#10;"
@@ -763,29 +734,20 @@ BEGIN_JUCER_METADATA
          fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
          italic="1" justification="33" typefaceStyle="Italic"/>
   <SLIDER name="layerVolume" id="bf65c3b220f44da5" memberName="layerVolume"
-          virtualName="" explicitFocusOrder="0" pos="207 178R 56 56" tooltip="Key Volume"
+          virtualName="" explicitFocusOrder="0" pos="304 177R 56 56" tooltip="Key Volume"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
           min="-3e1" max="1.2e1" int="1e-3" style="RotaryVerticalDrag"
           textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
           textBoxHeight="20" skewFactor="1" needsCallback="1"/>
   <SLIDER name="voiceGroup" id="947ac3f3088f71a6" memberName="voiceGroup"
-          virtualName="" explicitFocusOrder="0" pos="103 24R 85 13" posRelativeX="5fe3d96c50772121"
+          virtualName="" explicitFocusOrder="0" pos="92 24R 85 13" posRelativeX="5fe3d96c50772121"
           posRelativeY="5fe3d96c50772121" tooltip="Voice Group" bkgcol="0"
           trackcol="7fffffff" rotarysliderfill="ffaeaeae" rotaryslideroutline="ff565656"
           min="-1" max="7" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
-  <LABEL name="LayersLabel" id="b92c4c02f15c9879" memberName="layersLabel"
-         virtualName="" explicitFocusOrder="0" pos="4 152R 172 24" textCol="ffcdcdcd"
-         edTextCol="ff000000" edBkgCol="0" labelText="LAYERS" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="1.5e1" kerning="0" bold="1" italic="0" justification="36"
-         typefaceStyle="Bold"/>
-  <GENERICCOMPONENT name="layers-list-box" id="8a15718f78e152e0" memberName="layersListBox"
-                    virtualName="" explicitFocusOrder="0" pos="4 132R 172 128" class="LayersListBox"
-                    params=""/>
   <COMBOBOX name="triggerMode" id="9de3dfb17cdff6fe" memberName="triggerMode"
-            virtualName="" explicitFocusOrder="0" pos="103 43R 85 13" posRelativeX="5fe3d96c50772121"
+            virtualName="" explicitFocusOrder="0" pos="182 23R 85 13" posRelativeX="5fe3d96c50772121"
             posRelativeY="5fe3d96c50772121" tooltip="Trigger Mode" editable="0"
             layout="33" items="Retrigger&#10;One Shot&#10;Gate&#10;One Shot Gate"
             textWhenNonSelected="Trigger Mode" textWhenNoItems="Trigger Mode"/>
@@ -802,13 +764,13 @@ BEGIN_JUCER_METADATA
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <SLIDER name="layer-pan" id="1de5ef00d853a1b0" memberName="layerPan"
-          virtualName="" explicitFocusOrder="0" pos="273 162R 56 56" tooltip="Panning"
+          virtualName="" explicitFocusOrder="0" pos="370 161R 56 56" tooltip="Panning"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
           min="0" max="1" int="1e-3" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <SLIDER name="layer:pitch" id="86fb2e7a1567e16" memberName="layerPitch"
-          virtualName="" explicitFocusOrder="0" pos="336 178R 56 56" tooltip="Pitch"
+          virtualName="" explicitFocusOrder="0" pos="433 177R 56 56" tooltip="Pitch"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
           min="-2.4e1" max="2.4e1" int="0" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
@@ -825,12 +787,6 @@ BEGIN_JUCER_METADATA
           rotaryslideroutline="ff2a2a2a" min="0" max="1" int="0" style="RotaryVerticalDrag"
           textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
           textBoxHeight="20" skewFactor="1" needsCallback="1"/>
-  <TABBEDCOMPONENT name="mediaTabs" id="8dd080e8355410ba" memberName="mediaTabs"
-                   virtualName="" explicitFocusOrder="0" pos="4 4 172 162M" orientation="top"
-                   tabBarDepth="25" initialTab="0">
-    <TAB name="Asset Library" colour="ffd3d3d3" useJucerComp="0" contentClassName="Component"
-         constructorParams="" jucerComponentFile=""/>
-  </TABBEDCOMPONENT>
   <SLIDER name="key:fx-send-1" id="1fde028392ea9574" memberName="fxSend3"
           virtualName="" explicitFocusOrder="0" pos="204R 155R 40 40" tooltip="FX Send 1"
           bkgcol="0" trackcol="7fffffff" rotarysliderfill="73000000" rotaryslideroutline="ff2a2a2a"
@@ -844,19 +800,19 @@ BEGIN_JUCER_METADATA
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <LABEL name="layerVolLabel" id="4c9d302bf2827bcb" memberName="layerVolLabel"
-         virtualName="" explicitFocusOrder="0" pos="206 128R 58 15" textCol="ffdadada"
+         virtualName="" explicitFocusOrder="0" pos="303 127R 58 15" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Layer Vol."
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
          italic="1" justification="36" typefaceStyle="Italic"/>
   <LABEL name="layerPanLabel" id="aad53eaeda5c6183" memberName="layerPanLabel"
-         virtualName="" explicitFocusOrder="0" pos="274 177R 58 15" textCol="ffdadada"
+         virtualName="" explicitFocusOrder="0" pos="371 176R 58 15" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Layer Pan"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
          italic="1" justification="36" typefaceStyle="Italic"/>
   <LABEL name="layerPitchLabel" id="9bd479de36829fb4" memberName="layerPitchLabel"
-         virtualName="" explicitFocusOrder="0" pos="336 126R 58 15" textCol="ffdadada"
+         virtualName="" explicitFocusOrder="0" pos="433 125R 58 15" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Layer Pitch"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
@@ -886,13 +842,13 @@ BEGIN_JUCER_METADATA
          fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
          italic="1" justification="33" typefaceStyle="Italic"/>
   <GENERICCOMPONENT name="keyboard" id="99aac150ed63807" memberName="keyboard" virtualName=""
-                    explicitFocusOrder="0" pos="187 4Rr 223M 101" class="KeyboardWidget"
+                    explicitFocusOrder="0" pos="4 4Rr 41M 101" class="KeyboardWidget"
                     params="keyboardState"/>
   <JUCERCOMP name="display" id="56c24b8a829e534f" memberName="display" virtualName=""
-             explicitFocusOrder="0" pos="186 27 188M 212M" sourceFile="SamplerDisplay.cpp"
+             explicitFocusOrder="0" pos="3 27 8M 212M" sourceFile="SamplerDisplay.cpp"
              constructorParams=""/>
   <SLIDER name="keyLength" id="a09d8e14cc07f187" memberName="keyLength"
-          virtualName="" explicitFocusOrder="0" pos="-84C 25R 80 13" posRelativeX="5fe3d96c50772121"
+          virtualName="" explicitFocusOrder="0" pos="-152C 24R 80 13" posRelativeX="5fe3d96c50772121"
           posRelativeY="5fe3d96c50772121" tooltip="Set the keyspan of the selected note(s)"
           min="0" max="1.27e2" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"

@@ -93,13 +93,11 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<TextButton> layerKeyButton;
     std::unique_ptr<GroupComponent> articulationGroup;
+    std::unique_ptr<TextButton> layerKeyButton;
     std::unique_ptr<Label> volLabel;
     std::unique_ptr<Slider> layerVolume;
     std::unique_ptr<Slider> voiceGroup;
-    std::unique_ptr<Label> layersLabel;
-    std::unique_ptr<LayersListBox> layersListBox;
     std::unique_ptr<ComboBox> triggerMode;
     std::unique_ptr<LevelMeter> meter;
     std::unique_ptr<kv::DecibelScaleComponent> dbScale;
@@ -108,7 +106,6 @@ private:
     std::unique_ptr<Slider> layerPitch;
     std::unique_ptr<Slider> fxSend1;
     std::unique_ptr<Slider> fxSend2;
-    std::unique_ptr<TabbedComponent> mediaTabs;
     std::unique_ptr<Slider> fxSend3;
     std::unique_ptr<Slider> fxSend4;
     std::unique_ptr<Label> layerVolLabel;
