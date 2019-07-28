@@ -112,12 +112,10 @@ namespace KSP1 {
     File DataPath::resolvePath (const String& path)
     {
         jassert (path.isNotEmpty());
-        jassert (! File::isAbsolutePath (path));
-        if (path.substring (0, 1) != "/")
-            return factoryContentPath().getChildFile (path);
+        if (File::isAbsolutePath (path))
+            return File (path);
 
-        File file (path);
-        return file;
+        return factoryContentPath().getChildFile (path);
     }
 
     const File& DataPath::simBeatThangPath()

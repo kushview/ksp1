@@ -345,6 +345,8 @@ bool SamplerSynth::installLoadedData (DataLoader &loader)
         for (LayerData* layer : *sound) {
             layerMap.set (layer->id, layer);
         }
+
+        sound->setDefaultLength();
     }
 
     const bool loaded = (layerMap.size() == loader.layers.size() &&

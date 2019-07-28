@@ -133,7 +133,7 @@ void LayerData::restoreFromXml (const XmlElement& e)
         const File newSampleFile (DataPath::resolvePath (filePath));
         if (! loadAudioFile (newSampleFile))
         {
-            //
+            jassertfalse;
         }
     }
 }

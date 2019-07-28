@@ -113,8 +113,7 @@ namespace KSP1 {
         return LayerItem (ValueTree::invalid);
     }
 
-    void
-    KeyItem::removeLayer (int index)
+    void KeyItem::removeLayer (int index)
     {
         LayerItem layer (getLayer (index));
         if (layer.isValid())

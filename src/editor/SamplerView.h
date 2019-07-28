@@ -37,6 +37,7 @@ namespace KSP1 {
 */
 class SamplerView  : public Component,
                      public DragAndDropContainer,
+                     private Value::Listener,
                      public Button::Listener,
                      public Slider::Listener,
                      public ComboBox::Listener
@@ -78,16 +79,15 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    Value activeSound;
     MidiKeyboardState keyboardState;
 
     class Updater; friend class Updater;
     ScopedPointer<Updater> updater;
 
-    /** @internal Called when a layer is chosen in the listbox */
     void layerChosen();
-    /** @internal Update all of the controls in this view */
     void updateControls (NotificationType n = dontSendNotification);
-
+    void valueChanged (Value&) override;
     //[/UserVariables]
 
     //==============================================================================

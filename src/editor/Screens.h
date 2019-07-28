@@ -79,10 +79,29 @@ namespace KSP1 {
 
     protected:
         Screen (SamplerDisplay& disp, const String& name, Screen::ID t);
+        std::function<void()> onPageChanged;
 
     private:
         SamplerDisplay& owner;
-        TabbedComponent pages;
+        class Pages : public TabbedComponent
+        {
+        public:
+            Pages (Screen& s) : TabbedComponent (TabbedButtonBar::TabsAtLeft),
+                screen (s) { }
+            
+            void currentTabChanged (int newIndex, const String& newName) override
+            {
+                ignoreUnused (newIndex, newName);
+                if (screen.onPageChanged)
+                    screen.onPageChanged();
+            }
+
+            std::function<void()> onTabChanged;
+        private:
+            Screen& screen;
+        };
+
+        Pages pages;
         ValueTree props;
         Screen::ID id;
 

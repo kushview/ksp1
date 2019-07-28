@@ -638,7 +638,7 @@ void SamplerView::updateControls (NotificationType n)
 {
     InstrumentPtr instrument (display->getInstrument());
     LayerItem layer (layersListBox->getSelectedLayer());
-    KeyItem key (instrument->getKey (layer.getNote()));
+    KeyItem key (instrument->getActiveSound());
 
     // instrument controls
     volume->getValueObject().referTo (instrument->getPropertyAsValue (Tags::volume));
@@ -697,9 +697,22 @@ InstrumentPtr SamplerView::getInstrument (const int) const
     return display->getInstrument();
 }
 
+void SamplerView::valueChanged (Value& value)
+{
+    if (value.refersToSameSourceAs (activeSound))
+        stabilizeView();
+}
+
 void SamplerView::setInstrument (InstrumentPtr i)
 {
+    activeSound.removeListener (this);
     display->setInstrument (i);
+    if (auto instrument = getInstrument())
+    {
+        activeSound.referTo (instrument->getPropertyAsValue ("activeSound"));
+        activeSound.addListener (this);
+    }
+
     stabilizeView();
 }
 
@@ -728,7 +741,7 @@ void SamplerView::setMainRMS (const float rmsL, const float rmsR)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SamplerView" template="../../jucer/Templates/GuiTemplate.cpp"
-                 componentName="samplerView" parentClasses="public Panel, public DragAndDropContainer"
+                 componentName="samplerView" parentClasses="public Component, public DragAndDropContainer, private Value::Listener"
                  constructorParams="" variableInitialisers="" snapPixels="8" snapActive="0"
                  snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="960"
                  initialHeight="540">

@@ -33,7 +33,7 @@ namespace KSP1 {
 
     Screen::Screen (SamplerDisplay& disp, const String& name, Screen::ID t)
         : owner (disp),
-          pages (TabbedButtonBar::TabsAtLeft),
+          pages (*this),
           props ("screen"), id (t)
     {
         props.setProperty (kv::Slugs::name, name, nullptr);

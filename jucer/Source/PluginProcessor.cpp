@@ -6,9 +6,7 @@
 */
 
 #include "KSP1.h"
-#include "engine/SamplerSynth.h"
-#include "engine/SamplerSounds.h"
-
+#include "engine/Sampler.h"
 #include "DataPath.h"
 #include "Instrument.h"
 #include "PluginEditor.h"
@@ -163,6 +161,7 @@ void PluginProcessor::changeProgramName (int /*index*/, const String& /*newName*
 void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
 {
     setPlayConfigDetails (0, 2, sampleRate, blockSize);
+    synth->setCurrentPlaybackSampleRate (sampleRate);
     ring = new kv::RingBuffer (4096 * 3);
     uiRing = new kv::RingBuffer (4096 * 3);
     block.allocate (1024, true);
@@ -178,6 +177,8 @@ void PluginProcessor::releaseResources()
 void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
 {
     audio.clear();
+    ScopedLock sl (getCallbackLock());
+    synth->renderNextBlock (audio, midi, 0, audio.getNumSamples());
     midi.clear();
 }
 
@@ -316,6 +317,23 @@ void PluginProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
         synth->insertSound (sound);
         soundItem.setProperty (Tags::id, sound->getObjectId())
                  .setProperty ("object", sound);
+    }
+
+    if (parent.hasType (Tags::key) && child.hasType (Tags::layer))
+    {
+        const KeyItem soundItem (parent);
+        const LayerItem layerItem (child);
+        if (auto* object = dynamic_cast<SamplerSound*> (soundItem.getProperty("object").getObject()))
+        {
+            DBG(layerItem.getProperty(Tags::file).toString());
+            auto& cache = synth->getSampleCache();
+            File file (layerItem.getProperty (Tags::file).toString());
+            if (auto* layer = cache.getLayerData (true))
+            {
+                if (layer->loadAudioFile (file))
+                    object->insertLayerData (layer);
+            }
+        }
     }
 }
 

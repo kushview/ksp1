@@ -39,19 +39,20 @@ public:
     EditScreen (SamplerDisplay& owner);
     ~EditScreen();
 
-    void keySelectedEvent (const KeyItem&);
-    void onDisplayUpdate();
+    void keySelectedEvent (const KeyItem&) override;
+    void onDisplayUpdate() override;
 
-    void paint (Graphics& g);
-    void resized();
-    void buttonClicked (Button* buttonThatWasClicked);
+    void paint (Graphics& g) override;
+    void resized() override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
     Screen::ID type() const { return Screen::editScreen; }
 
     void parentHierarchyChanged() override;
+
 private:
     OwnedArray<AudioThumbnail>   peaks;
     int lastNote;
-    void timerCallback();
+    void timerCallback() override;
     void updateComponents();
 
     class Updater;

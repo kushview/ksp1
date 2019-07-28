@@ -94,21 +94,27 @@ void SamplerSound::setDefaultLength()
 {
     start.set (0);
     
+    int64 begin = 0;
     int64 end = 0;
 
     for (int i = 0; i < activeLayers.size(); ++i)
     {
         auto* const data = activeLayers.getUnchecked (i);
 
+        if (data->getLength() <= 0)
+        {
+            jassertfalse;
+        }
+
         if (i == 0)
         {
-            start.set (data->getStart());
+            begin = data->getStart();
             end = data->getStart() + data->getLength();
         }
         else
         {
-            if (data->getStart() < start.get())
-                start.set (data->getStart());
+            if (data->getStart() < begin)
+                begin = data->getStart();
 
             if ((data->getStart() + data->getLength()) > end)
                 end = data->getStart() + data->getLength();
@@ -118,10 +124,11 @@ void SamplerSound::setDefaultLength()
     if (activeLayers.size() > 0)
     {
         // avoid asserting when there are no layers
-        jassert (end > start.get());
+        jassert (end > begin);
     }
 
-    duration.set (end - start.get());
+    start.set (begin);
+    duration.set (end - begin);
 }
 
 bool SamplerSound::appliesToNote (const int note)

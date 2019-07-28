@@ -22,7 +22,7 @@ public:
     {
         setTrackWidth (100);
         setIndicator (nullptr);
-        const_cast<kv::TimeScale&> (timeScale()).setPixelsPerBeat (32);
+        const_cast<kv::TimeScale&> (timeScale()).setPixelsPerBeat (24);
         const_cast<kv::TimeScale&> (timeScale()).updateScale();
     }
 
@@ -35,17 +35,25 @@ public:
 
     void timelineBodyClicked (const MouseEvent& ev, int track) override
     {
-
+        if (instrument && isPositiveAndBelow (track, instrument->getNumSounds()))
+            instrument->setActiveSoundIndex (track);
     }
 
     void timelineTrackHeadersClicked (const MouseEvent&, int track) override
     { 
-        DBG("track: " << track);
+        if (instrument && isPositiveAndBelow (track, instrument->getNumSounds()))
+            instrument->setActiveSoundIndex (track);
+    }
+
+    void clipClicked (kv::TimelineClip* clip, const MouseEvent&) override
+    {
+        if (instrument && isPositiveAndBelow (clip->trackIndex(), instrument->getNumSounds()))
+            instrument->setActiveSoundIndex (clip->trackIndex());
     }
 
     int getNumTracks() const override
     {
-        return (instrument) ? instrument->getNumChildren() : 0;
+        return (instrument) ? instrument->getNumSounds() : 0;
     }
 
     void refresh()
@@ -92,14 +100,8 @@ public:
             txt << "Sound " << track;
         }
 
-        g.drawText (txt, area, Justification::left);
-
-    }
-
-    void clipClicked (TimelineClip *clip, const MouseEvent& /*ev*/) override
-    {
-        clip->setSelected (! clip->isSelected());
-        clip->repaint();
+        g.setFont (9.f);
+        g.drawText (txt, area.withX(10).withWidth(area.getWidth() - 10), Justification::centredLeft);
     }
 
 private:
@@ -147,7 +149,7 @@ private:
 
         void paint (Graphics& g)
         {
-            const int letterSpace = 30;
+            const int letterSpace = 24;
             String n1 (MidiMessage::getMidiNoteName (key.getNote(), true, true, 3));
             String n2 (MidiMessage::getMidiNoteName (key.getNote() + (int) key.getProperty(Slugs::length), true, true, 3));
 
@@ -162,6 +164,7 @@ private:
             g.drawRect(0, 0, getWidth(), getHeight(), 1);
 
             g.setColour (Colours::black);
+            g.setFont (10.f);
             g.drawText (n1, 0, 0, letterSpace, getHeight(), Justification::centred);
             if ((int) key.getProperty (Slugs::length) > 0)
             {
@@ -191,15 +194,14 @@ private:
 };
 
 
-class LayersTimeline : public TimelineComponent {
+class LayersTimeline : public kv::TimelineComponent {
 public:
 
     LayersTimeline()
         : kv::TimelineComponent(),
           key (nullptr)
     {
-        //setTrackHeightsOffset (120, false);
-        setTrackWidth (128);
+        setTrackWidth (100);
         const_cast<kv::TimeScale&> (timeScale()).setPixelsPerBeat (640);
         const_cast<kv::TimeScale&> (timeScale()).updateScale();
     }
@@ -231,7 +233,6 @@ public:
         i.sortKeys();
 
         removeClips();
-        DBG (this->getPixelOffset ());
 
         if (key && key->isValid()) {
             for (int i = key->countLayers(); --i >= 0;)
@@ -428,6 +429,21 @@ EditScreen::EditScreen (SamplerDisplay& owner)
 
     buttonAddSample->setAlwaysOnTop (true);
     buttonRemoveLayer->setAlwaysOnTop (true);
+
+    onPageChanged = [this]
+    {
+        switch (getCurrentPage())
+        {
+            case 0:
+                sounds->refresh();
+                break;
+            case 1:
+            {
+                if (auto i = display().getInstrument())
+                    timeline->setKey (i->getActiveSound());
+            } break;
+        }
+    };
 }
 
 EditScreen::~EditScreen()
@@ -459,11 +475,13 @@ void EditScreen::resized()
 void EditScreen::parentHierarchyChanged()
 {
     sounds->refresh();
+    if (auto i = display().getInstrument())
+        timeline->setKey (i->getActiveSound());
 }
 
 void EditScreen::buttonClicked (Button* buttonThatWasClicked)
 {
-    KeyItem key (display().selectedKey());
+    KeyItem key (display().getInstrument()->getActiveSound());
 
     if (buttonThatWasClicked == buttonAddSample)
     {
@@ -483,13 +501,10 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
                     }
                     else
                     {
-                        if (! key.isValid()) {
-                            key = display().getInstrument()->getOrCreateKey (display().selectedNote());
-                        }
-
                         if (key.isValid())
                         {
                             key.addLayer (f);
+                            timeline->setKey (key);
                         }
                         else
                         {

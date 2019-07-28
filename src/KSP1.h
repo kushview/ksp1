@@ -56,6 +56,7 @@ namespace Tags {
 using namespace kv::Slugs;
 static const Identifier articulation    = "articulation";
 static const Identifier interval        = "interval";
+static const Identifier instrument      = "instrument";
 static const Identifier key             = "key";
 static const Identifier layer           = "layer";
 static const Identifier legato          = "legato";
