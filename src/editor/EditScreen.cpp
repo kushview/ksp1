@@ -487,7 +487,9 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
     {
         if (getCurrentPage() == 1)
         {
-            FileChooser chooser ("Open media", File (String ("./content")), "*.btdk;*.xml;*.wav;*.aiff;*.flac", false);
+            auto dir = File::getSpecialLocation(File::userHomeDirectory).getChildFile("Downloads");
+            FileChooser chooser ("Open media", dir, "*.btdk;*.xml;*.wav;*.aiff;*.flac", false);
+
             if (chooser.browseForMultipleFilesToOpen())
             {
                 for (const File& f : chooser.getResults())
@@ -523,7 +525,21 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == buttonRemoveLayer)
     {
+        switch (getCurrentPage())
+        {
+            case 0:
+            {
+                auto instrument = display().getInstrument();
+                auto sound = instrument->getActiveSound();
+                instrument->removeSound (sound);
+                sounds->refresh();
+            } break;
+            
+            case 1:
+            {
 
+            } break;
+        }
     }
 
     //[UserbuttonClicked_Post]

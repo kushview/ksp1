@@ -60,6 +60,7 @@ static const Identifier instrument      = "instrument";
 static const Identifier key             = "key";
 static const Identifier layer           = "layer";
 static const Identifier legato          = "legato";
+static const Identifier object          = "object";
 static const Identifier panning         = "panning";
 static const Identifier session         = "session";
 static const Identifier strokeType      = "strokeType";

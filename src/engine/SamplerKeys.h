@@ -27,7 +27,8 @@ namespace KSP1 {
 class TriggerMode
 {
 public:
-    enum ID {
+    enum ID
+    {
         Retrigger    = 0,  ///< previous sounds are cutoff. Default.
         OneShot      = 1,  ///< previous sounds continue
         Gate         = 2,  ///< sample plays only until note off and loops

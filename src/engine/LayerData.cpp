@@ -22,6 +22,7 @@
 #include "engine/SampleCache.h"
 #include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
+#include "Instrument.h"
 #include "DataPath.h"
 
 namespace KSP1 {
@@ -151,6 +152,12 @@ void LayerData::setEndTime (double timeOut)
 void LayerData::setVolume (const double vol)
 {
     gain.set (Decibels::decibelsToGain (vol));
+}
+
+void LayerData::bindTo (const LayerItem& _item)
+{
+    LayerItem item = _item;
+    item.getPropertyAsValue (Tags::length);
 }
 
 DynamicObject::Ptr LayerData::createDynamicObject() const

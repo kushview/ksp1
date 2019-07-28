@@ -126,6 +126,12 @@ KeyItem Instrument::getActiveSound() const
     return sound;
 }
 
+void Instrument::removeSound (const KeyItem& item)
+{
+    if (objectData.indexOf (item.getValueTree()));
+        objectData.removeChild (item.getValueTree(), nullptr);
+}
+
 KeyItem Instrument::addKey (int32 noteNumber, int32 keySpan)
 {
     if (! isPositiveAndBelow (noteNumber, 128))

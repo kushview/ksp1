@@ -52,7 +52,7 @@ public:
     void setLayer (const LayerItem& item);
     void setSelected (bool yn);
     int layerIndex() const { return (layer.isValid()) ? layer.index() : -1; }
-    void mouseWheelMove (const MouseEvent &e, const MouseWheelDetails &d);
+    void mouseWheelMove (const MouseEvent &e, const MouseWheelDetails &d) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;

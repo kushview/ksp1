@@ -42,6 +42,12 @@ PluginEditor::~PluginEditor()
     setLookAndFeel (nullptr);
 }
 
+MidiKeyboardState& PluginEditor::getMidiKeyboardState()
+{
+    jassert (view);
+    return view->getMidiKeyboardState();
+}
+
 void PluginEditor::changeListenerCallback (ChangeBroadcaster*)
 {
     if (PluginProcessor* plugin = dynamic_cast<PluginProcessor*> (&processor))

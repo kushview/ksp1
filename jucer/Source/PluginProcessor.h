@@ -46,6 +46,7 @@ public:
     ~PluginProcessor();
     static PluginProcessor* create();
     InstrumentPtr getInstrument() const { return instrument; }
+    MidiMessageCollector& getMidiMessageCollector() { return midiCollector; }
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -75,6 +76,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     void fillInPluginDescription (PluginDescription &description) const;
+    
     void unregisterEditor (PluginEditor*);
 
 protected:
@@ -92,6 +94,8 @@ private:
     Array<PluginEditor*> editors;
     int currentProgram;
     
+    MidiMessageCollector midiCollector;
+
     friend class Timer;
     void timerCallback() override;
     

@@ -74,11 +74,11 @@ private:
 
     // HashMap<int32, Shared<MidiMessageSequence> > midiSequences;
 
-    AudioFormatManager&             formats;
-    AudioThumbnailCache&            thumbs;
-    OwnedArray<TimeSliceThread>     threads;
-    OwnedArray<LayerData>           layers;
-    OwnedArray<AudioFormatReader>   readers;
+    AudioFormatManager&                 formats;
+    AudioThumbnailCache&                thumbs;
+    OwnedArray<TimeSliceThread>         threads;
+    ReferenceCountedArray<LayerData>    layers;
+    OwnedArray<AudioFormatReader>       readers;
     int threadPriority { 3 };
 };
 

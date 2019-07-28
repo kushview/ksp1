@@ -91,6 +91,8 @@ namespace KSP1 {
         /** Load the sampler from XML create with ValueTree::toXmlString() */
         bool loadValueTreeXml (const XmlElement& xml);
 
+        bool load (const ValueTree& data);
+        
         /** Returns the SampleCache used by this SamplerSynth */
         SampleCache& getSampleCache() const { return cache; }
 

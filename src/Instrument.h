@@ -26,6 +26,9 @@
 
 namespace KSP1 {
 
+class SamplerSound;
+class SamplerSynth;
+
 static inline Identifier fxSendIdentifier (int sendNumber)
 {
     static const Identifier fxSendSlug      = "fxSend";
@@ -33,8 +36,6 @@ static inline Identifier fxSendIdentifier (int sendNumber)
     s << String("-") << String (sendNumber);
     return Identifier (s);
 }
-
-class SamplerSynth;
 
 class LayerItem :  public kv::ObjectModel
 {
@@ -162,6 +163,8 @@ public:
     KeyItem (const int note, const bool setMissing = true);
     KeyItem (const ValueTree& k);
 
+    SamplerSound* getObject() const;
+
     bool isValid()      const { return objectData.isValid(); }
     bool isNotValid()   const { return ! objectData.isValid(); }
 
@@ -216,8 +219,10 @@ public:
 
     int getNumSounds() const { return getNumChildren(); }
     KeyItem getSound (int index) const;
+
     void setActiveSoundIndex (int index);
     KeyItem getActiveSound() const;
+    void removeSound (const KeyItem& item);
     
     KeyItem addKey (int32 noteNumber, int32 keySpan = 0);
     KeyItem getKey (int32 noteNumber, bool setMissing = false) const;

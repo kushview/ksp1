@@ -20,10 +20,12 @@
 #include "engine/LayerData.h"
 #include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
+#include "Instrument.h"
 
 namespace KSP1 {
 
 static int32 lastSoundIdSeed = 0;
+
 SamplerSound::SamplerSound (int noteNumber, int soundID)
     : id ((soundID != 0) ? soundID : generateObjectID (++lastSoundIdSeed))
 {
@@ -46,6 +48,18 @@ SamplerSound::SamplerSound (int noteNumber, int soundID)
     midiChans.setRange (0, 17, true);
     midiNotes.setRange (0, 128, false);
     midiNotes.setBit (key.note);
+
+    noteValue.addListener (this);
+    lengthValue.addListener (this);
+    volumeValue.addListener (this);
+    pitchValue.addListener (this);
+    panningValue.addListener (this);
+}
+
+SamplerSound::~SamplerSound()
+{
+    noteValue.removeListener (this);
+    lengthValue.removeListener (this);
 }
 
 DynamicObject::Ptr SamplerSound::createDynamicObject() const
@@ -70,6 +84,42 @@ DynamicObject::Ptr SamplerSound::createDynamicObject() const
         object->setProperty ("layers", layers);
    #endif
     return object;
+}
+
+void SamplerSound::bindTo (const KeyItem& _item)
+{
+    KeyItem item = _item;
+    noteValue.referTo (item.getPropertyAsValue (Tags::note));
+    lengthValue.referTo (item.getPropertyAsValue (Tags::length));
+    volumeValue.referTo (item.getPropertyAsValue (Tags::volume));
+    panningValue.referTo (item.getPropertyAsValue (Tags::panning));
+    pitchValue.referTo (item.getPropertyAsValue (Tags::pitch));
+}
+
+void SamplerSound::valueChanged (Value& value)
+{
+    if (noteValue.refersToSameSourceAs (value))
+    {
+        setRootNote ((int) value.getValue());
+    }
+    else if (lengthValue.refersToSameSourceAs (value))
+    {
+        auto newlen = (int) value.getValue();
+        Lock sl (*this);
+        key.length = newlen;
+    }
+    else if (volumeValue.refersToSameSourceAs (value))
+    {
+        setVolume (value.getValue());
+    }
+    else if (panningValue.refersToSameSourceAs (value))
+    {
+        setPan (value.getValue());
+    }
+    else if (pitchValue.refersToSameSourceAs (value))
+    {
+        setPitch (value.getValue());
+    }
 }
 
 bool SamplerSound::insertLayerData (LayerData* data)

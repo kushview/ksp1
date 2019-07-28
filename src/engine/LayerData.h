@@ -23,14 +23,12 @@
 
 namespace KSP1 {
 
+class LayerItem;
 class LowPassFilter;
-class PatchSet;
 class SampleCache;
 class SamplerSound;
 class SamplerSynth;
 class SamplerVoice;
-
-struct URIs;
 
 class LayerData : public ReferenceCountedObject
 {
@@ -71,6 +69,8 @@ public:
 
     /** Reset properties to default values */
     void reset();
+
+    void bindTo (const LayerItem&);
 
     /** Restore properties from a JSON formatted var */
     void restoreFromJSON (const var& json);

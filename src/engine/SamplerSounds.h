@@ -25,6 +25,7 @@ namespace KSP1 {
 
 class SamplerSynth;
 class LayerData;
+class KeyItem;
 
 /** A base for all sounds in the sampler */
 class SoundBase :  public SynthesiserSound
@@ -36,13 +37,24 @@ public:
 
 
 /** The default sampler sound, maintains a group of layer data */
-class SamplerSound : public SoundBase
+class SamplerSound : public SoundBase,
+                     private Value::Listener
 {
 public:
     typedef Array<LayerData*> LayerSources;
 
+    class Lock
+    {
+    public:
+        Lock (SamplerSound& snd) : sound (snd) { sound.dataLock.lock(); }
+        ~Lock() { sound.dataLock.unlock(); }
+    
+    private:
+        SamplerSound& sound;
+    };
+
     SamplerSound (int noteNumber, int soundID = 0);
-    virtual ~SamplerSound() { }
+    ~SamplerSound();
 
     bool appliesToNote (const int note) override;
     bool appliesToChannel (const int chan) override;
@@ -145,6 +157,18 @@ public:
         key.randomPitch = f;
     }
 
+    inline void setPitch (float pitch)
+    {
+        Lock lock (*this);
+        key.pitch = pitch;
+    }
+
+    inline void setPan (float pan)
+    {
+        Lock lock (*this);
+        // noop
+    }
+
     /** Set the master volume (in decibels) for this sound */
     inline void setVolume (const double vol)
     {
@@ -170,17 +194,7 @@ public:
     /** Clear all sources (layers) for this sound */
     void clearSources();
 
-    class Lock {
-    public:
-        Lock (SamplerSound& snd) : sound (snd) { sound.dataLock.lock(); }
-        ~Lock() { sound.dataLock.unlock(); }
-    private:
-        SamplerSound& sound;
-    };
-
-    float getPitchOffsetForNote (const int note) {
-        return (float) note - key.note;
-    }
+    float getPitchOffsetForNote (const int note) const { return (float) note - key.note; }
 
     /** Add a new source to be processed */
     bool insertLayerData (LayerData* getLayer);
@@ -200,6 +214,8 @@ public:
 
     const int getObjectId() const { return id; }
 
+    void bindTo (const KeyItem&);
+
 private:
     const int id;
     KeyInfo key;
@@ -211,8 +227,13 @@ private:
     BigInteger midiChans;
     BigInteger midiNotes;
 
-    /** @internal Returns the longest frame count among all layers */
+    Value noteValue, lengthValue, volumeValue,
+          panningValue, pitchValue;
+
+    /** Returns the longest frame count among all layers */
     int64 longestLayerFrames() const;
+    
+    void valueChanged (Value&) override;
 
     friend class Lock;
     friend class SamplerSynth;

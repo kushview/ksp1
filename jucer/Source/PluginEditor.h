@@ -16,6 +16,8 @@ public:
     PluginEditor (PluginProcessor* plug, PluginWorld& pw);
     ~PluginEditor();
 
+    MidiKeyboardState& getMidiKeyboardState();
+
     void paint (Graphics& g) override;
     void resized() override;
     

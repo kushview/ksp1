@@ -23,6 +23,7 @@
 #include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
 #include "engine/SamplerVoice.h"
+#include "Instrument.h"
 
 namespace Slugs = kv::Slugs;
 
@@ -280,6 +281,13 @@ void SamplerSynth::setMidiChannel (int chan)
     while (iter.next())
         if (iter.getValue())
             iter.getValue()->setMidiChannel (chan);
+}
+
+bool SamplerSynth::load (const ValueTree& data)
+{
+    if (! data.hasType (Tags::instrument))
+        return false;
+    return false;
 }
 
 bool SamplerSynth::loadFile (const File &file)

@@ -18,6 +18,7 @@
 */
 
 #include "KSP1.h"
+#include "engine/SamplerSounds.h"
 #include "Instrument.h"
 
 using namespace kv;
@@ -47,6 +48,11 @@ namespace KSP1 {
     {
         setMissingProperties();
         nlayers = countLayers();
+    }
+
+    SamplerSound* KeyItem::getObject() const
+    {
+        return dynamic_cast<SamplerSound*> (getProperty("object").getObject());
     }
 
     LayerItem KeyItem::addLayer (const File& file)

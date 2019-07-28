@@ -58,6 +58,8 @@ public:
     InstrumentPtr getInstrument (const int track = 0) const;
     void setInstrument (InstrumentPtr i);
 
+    MidiKeyboardState& getMidiKeyboardState() { return keyboardState; }
+
     // signal/callback handlers
     void loadFile (const File&);
     void onDisplayUpdate();

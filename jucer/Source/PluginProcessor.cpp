@@ -165,6 +165,7 @@ void PluginProcessor::prepareToPlay (double sampleRate, int blockSize)
     ring = new kv::RingBuffer (4096 * 3);
     uiRing = new kv::RingBuffer (4096 * 3);
     block.allocate (1024, true);
+    midiCollector.reset (sampleRate);
 }
 
 void PluginProcessor::releaseResources()
@@ -177,6 +178,7 @@ void PluginProcessor::releaseResources()
 void PluginProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
 {
     audio.clear();
+    midiCollector.removeNextBlockOfMessages (midi, audio.getNumSamples());
     ScopedLock sl (getCallbackLock());
     synth->renderNextBlock (audio, midi, 0, audio.getNumSamples());
     midi.clear();
@@ -188,10 +190,7 @@ AudioProcessorEditor* PluginProcessor::createEditor()
 {
     PluginEditor* ed = new PluginEditor (this, *globals);
     editors.add (ed);
-    
-    if (! isTimerRunning())
-        startTimer (52);
-    
+    ed->getMidiKeyboardState().addListener (&midiCollector);
     return ed;
 }
 
@@ -199,7 +198,8 @@ void PluginProcessor::unregisterEditor (PluginEditor* ed)
 {
     jassert (editors.contains (ed));
     editors.removeFirstMatchingValue (ed);
-    
+    ed->getMidiKeyboardState().removeListener (&midiCollector);
+
     if (editors.size() <= 0 && isTimerRunning())
         stopTimer();
 }
@@ -230,14 +230,25 @@ void PluginProcessor::setStateInformation (const void* stateData, int sizeInByte
     if (auto* xml = data.createXml())
     {
         std::unique_ptr<SamplerSynth> newSynth (SamplerSynth::create());
-        newSynth->loadValueTreeXml (*xml);
         deleteAndZero (xml);
 
         ScopedLock sl (getCallbackLock());
         synth.swap (newSynth);
     }
 
-    sendChangeMessage();
+    for (int i = 0; i < instrument->getNumSounds(); ++i)
+    {
+        auto sound = instrument->getSound (i).getValueTree();
+        valueTreeChildAdded (data, sound);
+
+        for (int i = 0; i < sound.getNumChildren(); ++i)
+        {
+            auto layer = sound.getChild (i);
+            valueTreeChildAdded (sound, layer);
+        }
+    }
+
+    sendSynchronousChangeMessage();
 }
 
 void PluginProcessor::writeToPort (uint32 portIndex, uint32 bufferSize, uint32 portProtocol, const void* buffer)
@@ -312,27 +323,44 @@ void PluginProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
     if (parent == data && child.hasType (Tags::key))
     {
         KeyItem soundItem (child);
-        auto* const sound = new SamplerSound (soundItem.getNote());
-        sound->setLength ((int) soundItem.getProperty (Tags::length));
-        synth->insertSound (sound);
-        soundItem.setProperty (Tags::id, sound->getObjectId())
-                 .setProperty ("object", sound);
+        SamplerSoundPtr sound = new SamplerSound (soundItem.getNote());
+        if (synth->insertSound (sound))
+        {
+            sound->bindTo (soundItem);
+            soundItem.setProperty (Tags::id, sound->getObjectId())
+                     .setProperty ("object", sound.get());
+        }
+        else
+        {
+
+        }
     }
 
     if (parent.hasType (Tags::key) && child.hasType (Tags::layer))
     {
         const KeyItem soundItem (parent);
         const LayerItem layerItem (child);
-        if (auto* object = dynamic_cast<SamplerSound*> (soundItem.getProperty("object").getObject()))
+        
+        bool loaded = false;
+
+        if (auto* const object = soundItem.getObject())
         {
-            DBG(layerItem.getProperty(Tags::file).toString());
             auto& cache = synth->getSampleCache();
             File file (layerItem.getProperty (Tags::file).toString());
             if (auto* layer = cache.getLayerData (true))
             {
                 if (layer->loadAudioFile (file))
-                    object->insertLayerData (layer);
+                    loaded = object->insertLayerData (layer);
             }
+        }
+
+        if (loaded)
+        {
+            
+        }
+        else
+        {
+            DBG("[ksp1] could not load: " << layerItem.getProperty(Tags::file).toString());
         }
     }
 }
@@ -341,7 +369,9 @@ void PluginProcessor::valueTreeChildRemoved (ValueTree& parent, ValueTree& child
 {
     if (parent == data && child.hasType (Tags::key))
     {
-        if (SamplerSoundPtr ptr = dynamic_cast<SamplerSound*> (child.getProperty ("object").getObject()))
+        KeyItem soundItem (child);
+        
+        if (SamplerSoundPtr ptr = soundItem.getObject())
         {
             for (int i = 0; i < synth->getNumSounds(); ++i)
                 if (ptr.get() == synth->getSound(i).get())
