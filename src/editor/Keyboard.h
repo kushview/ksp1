@@ -52,7 +52,7 @@ namespace KSP1 {
         {
             setKeyPressBaseOctave (0);
             setWantsKeyboardFocus (true);
-            setKeyWidth (24);
+            setKeyWidth (18);
             selectedTimer.startTimer (300);
         }
 
@@ -70,8 +70,7 @@ namespace KSP1 {
             selectedTimer.stopTimer();
         }
 
-        inline int
-        getSelectedKey() const
+        inline int getSelectedKey() const
         {
             return lastPressedNote;
         }
@@ -92,7 +91,6 @@ namespace KSP1 {
         bool shouldDrawDragImageWhenOver() override;
 
     protected:
-
         inline void mouseUp (const MouseEvent& ev) override
         {
             MidiKeyboardComponent::mouseUp (ev);

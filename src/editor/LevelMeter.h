@@ -29,9 +29,11 @@ public:
 
     LevelMeter()
         : DigitalMeter (2)
-    {
+    { }
 
-    }
+    LevelMeter (int ports, bool horiz)
+        : DigitalMeter (jmax (1, ports), horiz)
+    { }
 
     virtual ~LevelMeter() { }
 

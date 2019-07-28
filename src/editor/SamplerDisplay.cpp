@@ -157,34 +157,8 @@ SamplerDisplay::SamplerDisplay ()
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    comboBox.reset (new ComboBox ("new combo box"));
-    addAndMakeVisible (comboBox.get());
-    comboBox->setEditableText (false);
-    comboBox->setJustificationType (Justification::centredLeft);
-    comboBox->setTextWhenNothingSelected (TRANS("Chan"));
-    comboBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboBox->addItem (TRANS("1"), 1);
-    comboBox->addItem (TRANS("2"), 2);
-    comboBox->addItem (TRANS("3"), 3);
-    comboBox->addItem (TRANS("4"), 4);
-    comboBox->addItem (TRANS("5"), 5);
-    comboBox->addItem (TRANS("6"), 6);
-    comboBox->addItem (TRANS("7"), 7);
-    comboBox->addItem (TRANS("8"), 8);
-    comboBox->addItem (TRANS("9"), 9);
-    comboBox->addItem (TRANS("10"), 10);
-    comboBox->addItem (TRANS("11"), 11);
-    comboBox->addItem (TRANS("12"), 12);
-    comboBox->addItem (TRANS("13"), 13);
-    comboBox->addItem (TRANS("14"), 14);
-    comboBox->addItem (TRANS("15"), 15);
-    comboBox->addItem (TRANS("16"), 16);
-    comboBox->addListener (this);
-
-    comboBox->setBounds (6, 4, 48, 16);
-
     title.reset (new Label ("title",
-                            TRANS("New Instrument")));
+                            TRANS("Default Instrument")));
     addAndMakeVisible (title.get());
     title->setTooltip (TRANS("Current Instrument"));
     title->setFont (Font (18.00f, Font::plain).withTypefaceStyle ("Regular"));
@@ -195,7 +169,7 @@ SamplerDisplay::SamplerDisplay ()
     title->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     title->addListener (this);
 
-    title->setBounds (57, -1, 223, 24);
+    title->setBounds (1, -1, 279, 24);
 
     noteLabel.reset (new Label ("note-label",
                                 TRANS("C0-1")));
@@ -244,7 +218,6 @@ SamplerDisplay::~SamplerDisplay()
     stopTimer();
     //[/Destructor_pre]
 
-    comboBox = nullptr;
     title = nullptr;
     noteLabel = nullptr;
     screen = nullptr;
@@ -281,21 +254,6 @@ void SamplerDisplay::resized()
     if (currentScreen)
         currentScreen->setBounds (screen->getBoundsInParent());
     //[/UserResized]
-}
-
-void SamplerDisplay::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
-{
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
-    if (comboBoxThatHasChanged == comboBox.get())
-    {
-        //[UserComboBoxCode_comboBox] -- add your combo box handling code here..
-        //[/UserComboBoxCode_comboBox]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
 
 void SamplerDisplay::labelTextChanged (Label* labelThatHasChanged)
@@ -439,13 +397,9 @@ BEGIN_JUCER_METADATA
     <METHOD name="mouseDown (const MouseEvent&amp; e)"/>
   </METHODS>
   <BACKGROUND backgroundColour="a00e0e0e"/>
-  <COMBOBOX name="new combo box" id="50052ef19912822d" memberName="comboBox"
-            virtualName="" explicitFocusOrder="0" pos="6 4 48 16" editable="0"
-            layout="33" items="1&#10;2&#10;3&#10;4&#10;5&#10;6&#10;7&#10;8&#10;9&#10;10&#10;11&#10;12&#10;13&#10;14&#10;15&#10;16"
-            textWhenNonSelected="Chan" textWhenNoItems="(no choices)"/>
   <LABEL name="title" id="b70ebe624c02371d" memberName="title" virtualName=""
-         explicitFocusOrder="0" pos="57 -1 223 24" tooltip="Current Instrument"
-         textCol="ff7fff00" edTextCol="ffe4e4e4" edBkgCol="0" labelText="New Instrument"
+         explicitFocusOrder="0" pos="1 -1 279 24" tooltip="Current Instrument"
+         textCol="ff7fff00" edTextCol="ffe4e4e4" edBkgCol="0" labelText="Default Instrument"
          editableSingleClick="0" editableDoubleClick="1" focusDiscardsChanges="0"
          fontname="Default font" fontsize="1.8e1" kerning="0" bold="0"
          italic="0" justification="33"/>

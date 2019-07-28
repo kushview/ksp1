@@ -47,7 +47,6 @@ namespace KSP1 {
 */
 class SamplerDisplay  : public Component,
                         public Timer,
-                        public ComboBox::Listener,
                         public Label::Listener
 {
 public:
@@ -86,7 +85,6 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void labelTextChanged (Label* labelThatHasChanged) override;
     void mouseDown (const MouseEvent& e) override;
     void mouseDoubleClick (const MouseEvent& e) override;
@@ -116,7 +114,6 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<ComboBox> comboBox;
     std::unique_ptr<Label> title;
     std::unique_ptr<Label> noteLabel;
     std::unique_ptr<Component> screen;

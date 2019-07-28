@@ -38,9 +38,8 @@ namespace KSP1 {
 class SamplerView  : public Component,
                      public DragAndDropContainer,
                      private Value::Listener,
-                     public Button::Listener,
                      public Slider::Listener,
-                     public ComboBox::Listener
+                     public Button::Listener
 {
 public:
     //==============================================================================
@@ -65,7 +64,6 @@ public:
     void onDisplayUpdate();
     void onKeyboardMidi (const MidiMessage& midi);
     void onKeySelected (int k);
-    void buttonStateChanged (Button*) override;
     void stabilizeView();
     void setMainRMS (const float rmsL, const float rmsR);
 
@@ -73,9 +71,8 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
@@ -93,32 +90,13 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> articulationGroup;
-    std::unique_ptr<TextButton> layerKeyButton;
-    std::unique_ptr<Label> volLabel;
-    std::unique_ptr<Slider> layerVolume;
-    std::unique_ptr<Slider> voiceGroup;
-    std::unique_ptr<ComboBox> triggerMode;
-    std::unique_ptr<LevelMeter> meter;
-    std::unique_ptr<kv::DecibelScaleComponent> dbScale;
-    std::unique_ptr<Slider> volume;
-    std::unique_ptr<Slider> layerPan;
-    std::unique_ptr<Slider> layerPitch;
-    std::unique_ptr<Slider> fxSend1;
-    std::unique_ptr<Slider> fxSend2;
-    std::unique_ptr<Slider> fxSend3;
-    std::unique_ptr<Slider> fxSend4;
-    std::unique_ptr<Label> layerVolLabel;
-    std::unique_ptr<Label> layerPanLabel;
-    std::unique_ptr<Label> layerPitchLabel;
-    std::unique_ptr<Label> fx1Label;
-    std::unique_ptr<Label> fx1Label2;
-    std::unique_ptr<Label> fx1Label3;
-    std::unique_ptr<Label> fx1Label4;
-    std::unique_ptr<KeyboardWidget> keyboard;
     std::unique_ptr<SamplerDisplay> display;
-    std::unique_ptr<Slider> keyLength;
-    std::unique_ptr<TextButton> propsButton;
+    std::unique_ptr<Label> volLabel;
+    std::unique_ptr<LevelMeter> meter;
+    std::unique_ptr<Slider> volume;
+    std::unique_ptr<KeyboardWidget> keyboard;
+    std::unique_ptr<Label> outputLabel;
+    std::unique_ptr<Label> ksp1Label;
     std::unique_ptr<TextButton> editButton;
 
 
