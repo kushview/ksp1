@@ -47,6 +47,7 @@ namespace KSP1 {
         Screen::ID type() const { return id; }
         static Screen* create (SamplerDisplay& disp, Screen::ID type);
 
+        inline void setTabOrientation (TabbedButtonBar::Orientation o) { pages.setOrientation (o); }
         inline int getNumPages()        const { return pages.getNumTabs(); }
         inline int getCurrentPage()     const { return pages.getCurrentTabIndex(); }
         inline void addPage (const String& name, Component* page)
@@ -97,6 +98,7 @@ namespace KSP1 {
             }
 
             std::function<void()> onTabChanged;
+        
         private:
             Screen& screen;
         };
