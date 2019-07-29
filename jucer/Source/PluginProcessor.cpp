@@ -312,10 +312,6 @@ void PluginProcessor::timerCallback()
 
 void PluginProcessor::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    if (tree.hasType (Tags::key))
-    {
-        DBG("key: " << property.toString());
-    }
 }
 
 void PluginProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
@@ -370,7 +366,8 @@ void PluginProcessor::valueTreeChildRemoved (ValueTree& parent, ValueTree& child
     if (parent == data && child.hasType (Tags::key))
     {
         KeyItem soundItem (child);
-        
+        removePropertyRecursive (child, Tags::object);
+
         if (SamplerSoundPtr ptr = soundItem.getObject())
         {
             for (int i = 0; i < synth->getNumSounds(); ++i)
