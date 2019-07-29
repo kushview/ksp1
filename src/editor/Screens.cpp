@@ -37,12 +37,12 @@ namespace KSP1 {
           props ("screen"), id (t)
     {
         props.setProperty (kv::Slugs::name, name, nullptr);
-        props.setProperty (kv::Slugs::type, (int32) type(), nullptr);
+        props.setProperty (kv::Slugs::type, (int) getScreenID(), nullptr);
 
         addAndMakeVisible (&pages);
         pages.setOutline (0);
-        pages.setIndent (6);
-        pages.setTabBarDepth (18);
+        pages.setIndent (0);
+        pages.setTabBarDepth (0);
         pages.setAlwaysOnTop (true);
 
         pages.setOrientation (TabbedButtonBar::TabsAtBottom);
@@ -52,7 +52,6 @@ namespace KSP1 {
 
     Screen::~Screen()
     {
-        removeChildComponent (&pages);
         displayConnection.disconnect();
     }
 
@@ -60,17 +59,7 @@ namespace KSP1 {
     {
         if (type == Screen::editScreen)
             return new EditScreen (disp);
-       #if 0
-        else if (type == Screen::patternScreen)
-            return new KitScreen (disp);
-        else if (type == Screen::composeScreen)
-            return new EditScreen (disp);
-        else if (type == Screen::kitScreen)
-            return new KitScreen (disp);
-        else if (type == Screen::browseScreen)
-            return new BrowseScreen (disp);
-       #endif
-        jassertfalse;
+
         return new EditScreen (disp);
     }
 

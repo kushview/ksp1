@@ -32,24 +32,19 @@ namespace KSP1 {
     public:
         enum ID
         {
-            browseFilesystem = 0,
-            browseScreen,
-            composeScreen,
             editScreen,
-            patternScreen,
-            midiFilterScreen,
-            kitScreen,
             numScreens
         };
 
         virtual ~Screen();
 
-        Screen::ID type() const { return id; }
+        Screen::ID getScreenID() const { return id; }
         static Screen* create (SamplerDisplay& disp, Screen::ID type);
 
         inline void setTabOrientation (TabbedButtonBar::Orientation o) { pages.setOrientation (o); }
         inline int getNumPages()        const { return pages.getNumTabs(); }
         inline int getCurrentPage()     const { return pages.getCurrentTabIndex(); }
+        inline void setCurrentPage (int page) { pages.setCurrentTabIndex (page); }
         inline void addPage (const String& name, Component* page)
         {
             pages.addTab (name, Colours::transparentBlack, page, true);
@@ -80,6 +75,7 @@ namespace KSP1 {
 
     protected:
         Screen (SamplerDisplay& disp, const String& name, Screen::ID t);
+        TabbedComponent& getTabs() { return pages; }
         std::function<void()> onPageChanged;
 
     private:

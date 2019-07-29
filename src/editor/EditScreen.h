@@ -21,8 +21,6 @@
 
 #pragma once
 
-//[Headers]
-#include "editor/LayersListBox.h"
 #include "editor/Screens.h"
 #include "editor/Waveform.h"
 
@@ -39,13 +37,14 @@ public:
     EditScreen (SamplerDisplay& owner);
     ~EditScreen();
 
+    void setPropertiesVisible (bool);
+
     void keySelectedEvent (const KeyItem&) override;
     void onDisplayUpdate() override;
 
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
-    Screen::ID type() const { return Screen::editScreen; }
 
     void parentHierarchyChanged() override;
 
@@ -55,13 +54,10 @@ private:
     void timerCallback() override;
     void updateComponents();
 
-    class Updater;
-    friend class Updater;
-    ScopedPointer<Updater> updater;
-    ScopedPointer<LayersTimeline> timeline;
-    ScopedPointer<SoundsTimeline> sounds;
-    ScopedPointer<TextButton> buttonAddSample;
-    ScopedPointer<TextButton> buttonRemoveLayer;
+    std::unique_ptr<LayersTimeline> timeline;
+    std::unique_ptr<SoundsTimeline> sounds;
+    TextButton addButton, removeButton;
+    PropertyPanel properties;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditScreen)
 };
