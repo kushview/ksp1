@@ -122,6 +122,15 @@ SamplerView::SamplerView ()
     layersButton->addListener (this);
     layersButton->setColour (TextButton::buttonOnColourId, Colour (0xff1867ae));
 
+    editButton.reset (new TextButton ("EditButton"));
+    addAndMakeVisible (editButton.get());
+    editButton->setButtonText (TRANS("Edit"));
+    editButton->setRadioGroupId (1);
+    editButton->addListener (this);
+    editButton->setColour (TextButton::buttonOnColourId, Colour (0xff1867ae));
+
+    editButton->setBounds (4, 125, 36, 16);
+
 
     //[UserPreSize]
     display->connectUpdateClient (*this);
@@ -158,6 +167,7 @@ SamplerView::~SamplerView()
     ksp1Label = nullptr;
     soundsButton = nullptr;
     layersButton = nullptr;
+    editButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -170,7 +180,7 @@ void SamplerView::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff221a1a));
+    g.fillAll (Colour (0xff373737));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -181,14 +191,14 @@ void SamplerView::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    display->setBounds (4, 133, getWidth() - 8, getHeight() - 137);
+    display->setBounds (4, 150, getWidth() - 8, getHeight() - 154);
     volLabel->setBounds (getWidth() - 293, 0, 52, 36);
     meter->setBounds (getWidth() - 142, 11, 136, 17);
     volume->setBounds (getWidth() - 238, 4, 28, 30);
-    keyboard->setBounds (2, 106 - 68, getWidth() - 8, 68);
+    keyboard->setBounds (2, 116 - 73, getWidth() - 8, 73);
     outputLabel->setBounds (getWidth() - 196, 0, 48, 36);
-    soundsButton->setBounds ((getWidth() / 2) - 36, 111, 36, 16);
-    layersButton->setBounds ((getWidth() / 2) + 1, 111, 36, 16);
+    soundsButton->setBounds ((getWidth() / 2) - 36, 125, 36, 16);
+    layersButton->setBounds ((getWidth() / 2) + 1, 125, 36, 16);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -217,18 +227,36 @@ void SamplerView::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_soundsButton] -- add your button handler code here..
         soundsButton->setToggleState (! soundsButton->getToggleState(), dontSendNotification);
-        display->setScreen (Screen::editScreen, 0);
+        if (soundsButton->getToggleState())
+            display->setScreen (Screen::editScreen, 0);
         //[/UserButtonCode_soundsButton]
     }
     else if (buttonThatWasClicked == layersButton.get())
     {
         //[UserButtonCode_layersButton] -- add your button handler code here..
         layersButton->setToggleState (! layersButton->getToggleState(), dontSendNotification);
-        display->setScreen (Screen::editScreen, 1);
+        if (layersButton->getToggleState())
+            display->setScreen (Screen::editScreen, 1);
         //[/UserButtonCode_layersButton]
+    }
+    else if (buttonThatWasClicked == editButton.get())
+    {
+        //[UserButtonCode_editButton] -- add your button handler code here..
+        //[/UserButtonCode_editButton]
     }
 
     //[UserbuttonClicked_Post]
+    editButton->setToggleState (layersButton->getToggleState() || soundsButton->getToggleState(),
+                                dontSendNotification);
+    
+    if (editButton->getToggleState())
+    {
+        
+    }
+    else
+    {
+        
+    }
     //[/UserbuttonClicked_Post]
 }
 
@@ -358,9 +386,9 @@ BEGIN_JUCER_METADATA
                  constructorParams="" variableInitialisers="" snapPixels="8" snapActive="0"
                  snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="720"
                  initialHeight="420">
-  <BACKGROUND backgroundColour="ff221a1a"/>
+  <BACKGROUND backgroundColour="ff373737"/>
   <JUCERCOMP name="display" id="56c24b8a829e534f" memberName="display" virtualName=""
-             explicitFocusOrder="0" pos="4 133 8M 137M" sourceFile="SamplerDisplay.cpp"
+             explicitFocusOrder="0" pos="4 150 8M 154M" sourceFile="SamplerDisplay.cpp"
              constructorParams=""/>
   <LABEL name="volume-label" id="73228f61d5b45b64" memberName="volLabel"
          virtualName="" explicitFocusOrder="0" pos="293R 0 52 36" textCol="ffdadada"
@@ -379,7 +407,7 @@ BEGIN_JUCER_METADATA
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <GENERICCOMPONENT name="keyboard" id="99aac150ed63807" memberName="keyboard" virtualName=""
-                    explicitFocusOrder="0" pos="2 106r 8M 68" class="KeyboardWidget"
+                    explicitFocusOrder="0" pos="2 116r 8M 73" class="KeyboardWidget"
                     params="keyboardState"/>
   <LABEL name="OutputLabel" id="277ce632dc5f2ace" memberName="outputLabel"
          virtualName="" explicitFocusOrder="0" pos="196R 0 48 36" textCol="ffdadada"
@@ -392,11 +420,14 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="2e1"
          kerning="4.19e-1" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="SoundsButton" id="50b83eadd71f2375" memberName="soundsButton"
-              virtualName="" explicitFocusOrder="0" pos="0Cr 111 36 16" bgColOn="ff1867ae"
+              virtualName="" explicitFocusOrder="0" pos="0Cr 125 36 16" bgColOn="ff1867ae"
               buttonText="Sounds" connectedEdges="2" needsCallback="1" radioGroupId="1"/>
   <TEXTBUTTON name="LayersButton" id="9e9a13f32a730b59" memberName="layersButton"
-              virtualName="" explicitFocusOrder="0" pos="1C 111 36 16" bgColOn="ff1867ae"
+              virtualName="" explicitFocusOrder="0" pos="1C 125 36 16" bgColOn="ff1867ae"
               buttonText="Layers" connectedEdges="1" needsCallback="1" radioGroupId="1"/>
+  <TEXTBUTTON name="EditButton" id="8610fb54d6f3dcde" memberName="editButton"
+              virtualName="" explicitFocusOrder="0" pos="4 125 36 16" bgColOn="ff1867ae"
+              buttonText="Edit" connectedEdges="0" needsCallback="1" radioGroupId="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

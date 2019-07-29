@@ -171,7 +171,7 @@ SamplerDisplay::SamplerDisplay ()
 
     title->setBounds (1, -1, 279, 24);
 
-    noteLabel.reset (new Label ("note-label",
+    noteLabel.reset (new Label ("NoteLabel",
                                 TRANS("C0-1")));
     addAndMakeVisible (noteLabel.get());
     noteLabel->setTooltip (TRANS("Current Note"));
@@ -356,7 +356,7 @@ void SamplerDisplay::setScreen (Screen::ID s, int page)
     if (currentScreen)
         removeChildComponent (currentScreen);
     this->currentScreen = screens->getScreen (*this, (int) s);
-    
+
     if (currentScreen)
     {
         addAndMakeVisible (currentScreen);
@@ -406,7 +406,7 @@ BEGIN_JUCER_METADATA
          editableSingleClick="0" editableDoubleClick="1" focusDiscardsChanges="0"
          fontname="Default font" fontsize="1.8e1" kerning="0" bold="0"
          italic="0" justification="33"/>
-  <LABEL name="note-label" id="b73160220da4fa51" memberName="noteLabel"
+  <LABEL name="NoteLabel" id="b73160220da4fa51" memberName="noteLabel"
          virtualName="" explicitFocusOrder="0" pos="6Rr 0 59 24" tooltip="Current Note"
          textCol="ffb0c19f" edTextCol="ffe8e8e8" edBkgCol="0" hiliteCol="40545454"
          labelText="C0-1" editableSingleClick="0" editableDoubleClick="0"
