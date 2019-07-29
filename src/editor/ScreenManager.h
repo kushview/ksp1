@@ -38,7 +38,6 @@ public:
 private:
     OwnedArray<Screen> screens;
     Screen* createScreen (const int type);
-
 };
 
 }

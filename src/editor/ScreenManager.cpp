@@ -30,15 +30,15 @@ namespace KSP1 {
         screens.clearQuick (true);
     }
 
-    Screen* ScreenManager::getScreen (SamplerDisplay& d, const int screenType)
+    Screen* ScreenManager::getScreen (SamplerDisplay& d, const int screenId)
     {
         for (Screen* screen : screens)
-            if (screenType == (int) screen->type())
+            if (screenId == (int) screen->getScreenID())
                 return screen;
 
-        if (screenType < Screen::numScreens)
-            if (auto* const screen = Screen::create (d, (Screen::ID) screenType))
-            return screens.add (screen);
+        if (screenId < Screen::numScreens)
+            if (auto* const screen = Screen::create (d, (Screen::ID) screenId))
+                return screens.add (screen);
         
         jassertfalse;
         return nullptr;

@@ -351,15 +351,18 @@ void SamplerDisplay::setNote (int32 n)
     currentNote = n;
 }
 
-void SamplerDisplay::setScreen (Screen::ID s)
+void SamplerDisplay::setScreen (Screen::ID s, int page)
 {
     if (currentScreen)
         removeChildComponent (currentScreen);
     this->currentScreen = screens->getScreen (*this, (int) s);
+    
     if (currentScreen)
     {
         addAndMakeVisible (currentScreen);
+        currentScreen->setCurrentPage (page);
     }
+
     resized();
 }
 

@@ -194,8 +194,9 @@ private:
     };
 };
 
-
-class LayersTimeline : public kv::TimelineComponent {
+//=============================================================================
+class LayersTimeline : public kv::TimelineComponent
+{
 public:
 
     LayersTimeline()
@@ -360,78 +361,44 @@ private:
 
 };
 
-class EditScreen::Updater : public Timer
-{
-public:
-    Updater (EditScreen& es)
-        : screen (es)
-    {
-        setFrequecy (500);
-        //startTimer (frequency);
-    }
-
-    ~Updater()
-    {
-        stopTimer();
-    }
-
-    void setFrequecy (int f)
-    {
-        const bool wasRunning = isTimerRunning();
-
-        if (wasRunning)
-            stopTimer();
-
-        frequency = f;
-
-        if (wasRunning)
-            startTimer (frequency);
-    }
-
-    void timerCallback () {
-        screen.updateComponents();
-    }
-
-private:
-    EditScreen& screen;
-    int frequency;
-
-};
-
-
+//=============================================================================
 EditScreen::EditScreen (SamplerDisplay& owner)
     : Screen (owner, "Edit Screen", Screen::editScreen)
 {
-    addAndMakeVisible (buttonAddSample = new TextButton ("add-sample-button"));
-    buttonAddSample->setTooltip (TRANS("Add a Sample"));
-    buttonAddSample->setButtonText (TRANS("+"));
-    buttonAddSample->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
-    buttonAddSample->addListener (this);
-    buttonAddSample->setColour (TextButton::buttonColourId, Colour (0xc7282828));
-    buttonAddSample->setColour (TextButton::buttonOnColourId, Colour (0xe5cbcbcb));
-    buttonAddSample->setColour (TextButton::textColourOnId, Colour (0xff858585));
-    buttonAddSample->setColour (TextButton::textColourOffId, Colour (0xffe2e2e2));
+    addAndMakeVisible (addButton);
+    addButton.setTooltip (TRANS("Add a Sample"));
+    addButton.setButtonText (TRANS("+"));
+    addButton.setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
+    addButton.addListener (this);
+    addButton.setColour (TextButton::buttonColourId, Colour (0xc7282828));
+    addButton.setColour (TextButton::buttonOnColourId, Colour (0xe5cbcbcb));
+    addButton.setColour (TextButton::textColourOnId, Colour (0xff858585));
+    addButton.setColour (TextButton::textColourOffId, Colour (0xffe2e2e2));
 
-    addAndMakeVisible (buttonRemoveLayer = new TextButton ("button-remove-layer"));
-    buttonRemoveLayer->setTooltip (TRANS("Remove Sample"));
-    buttonRemoveLayer->setButtonText (TRANS("-"));
-    buttonRemoveLayer->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
-    buttonRemoveLayer->addListener (this);
-    buttonRemoveLayer->setColour (TextButton::buttonColourId, Colour (0xc72d2d2d));
-    buttonRemoveLayer->setColour (TextButton::buttonOnColourId, Colour (0xe5ededed));
-    buttonRemoveLayer->setColour (TextButton::textColourOnId, Colour (0xff858585));
-    buttonRemoveLayer->setColour (TextButton::textColourOffId, Colour (0xffe2e2e2));
+    addAndMakeVisible (removeButton);
+    removeButton.setTooltip (TRANS("Remove Sample"));
+    removeButton.setButtonText (TRANS("-"));
+    removeButton.setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
+    removeButton.addListener (this);
+    removeButton.setColour (TextButton::buttonColourId, Colour (0xc72d2d2d));
+    removeButton.setColour (TextButton::buttonOnColourId, Colour (0xe5ededed));
+    removeButton.setColour (TextButton::textColourOnId, Colour (0xff858585));
+    removeButton.setColour (TextButton::textColourOffId, Colour (0xffe2e2e2));
+
+    addChildComponent (properties);
 
     setSize (600, 400);
 
     lastNote = display().selectedKey().getNote();
 
-    setTabOrientation (TabbedButtonBar::TabsAtTop);
-    addPage ("Sounds", sounds   = new SoundsTimeline());
-    addPage ("Layers", timeline = new LayersTimeline());
+    setTabOrientation (TabbedButtonBar::TabsAtBottom);
+    sounds.reset (new SoundsTimeline());
+    addPage ("Sounds", sounds.get());
+    timeline.reset (new LayersTimeline());
+    addPage ("Layers", timeline.get());
 
-    buttonAddSample->setAlwaysOnTop (true);
-    buttonRemoveLayer->setAlwaysOnTop (true);
+    addButton.setAlwaysOnTop (true);
+    removeButton.setAlwaysOnTop (true);
 
     onPageChanged = [this]
     {
@@ -451,11 +418,17 @@ EditScreen::EditScreen (SamplerDisplay& owner)
 
 EditScreen::~EditScreen()
 {
-    timeline.release();
-    sounds.release();
-    updater = nullptr;
-    buttonAddSample = nullptr;
-    buttonRemoveLayer = nullptr;
+    timeline.reset();
+    sounds.reset();
+}
+
+void EditScreen::setPropertiesVisible (bool visible)
+{
+    if (properties.isVisible() == visible)
+        return;
+    
+    properties.setVisible (visible);
+    resized();
 }
 
 void EditScreen::paint (Graphics& g)
@@ -470,9 +443,19 @@ void EditScreen::paint (Graphics& g)
 
 void EditScreen::resized()
 {
-    buttonAddSample->setBounds (getWidth() - 56, getHeight() - 18, 24, 16);
-    buttonRemoveLayer->setBounds (getWidth() - 28, getHeight() - 18, 24, 16);
     Screen::resized();
+    auto tabBounds (getTabs().getBoundsInParent());
+
+    if (properties.isVisible())
+    {
+        properties.setBounds (tabBounds.removeFromRight (140));
+    }
+
+    getTabs().setBounds (tabBounds);
+
+    addButton.setBounds (getWidth() - 56, getHeight() - 18, 24, 16);
+    removeButton.setBounds (getWidth() - 28, getHeight() - 18, 24, 16);
+    
 }
 
 void EditScreen::parentHierarchyChanged()
@@ -486,7 +469,7 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
 {
     KeyItem key (display().getInstrument()->getActiveSound());
 
-    if (buttonThatWasClicked == buttonAddSample)
+    if (buttonThatWasClicked == &addButton)
     {
         if (getCurrentPage() == 1)
         {
@@ -526,7 +509,7 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
             sounds->refresh();
         }
     }
-    else if (buttonThatWasClicked == buttonRemoveLayer)
+    else if (buttonThatWasClicked == &removeButton)
     {
         switch (getCurrentPage())
         {

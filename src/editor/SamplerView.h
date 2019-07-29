@@ -97,7 +97,8 @@ private:
     std::unique_ptr<KeyboardWidget> keyboard;
     std::unique_ptr<Label> outputLabel;
     std::unique_ptr<Label> ksp1Label;
-    std::unique_ptr<TextButton> editButton;
+    std::unique_ptr<TextButton> soundsButton;
+    std::unique_ptr<TextButton> layersButton;
 
 
     //==============================================================================

@@ -67,7 +67,7 @@ public:
     void setNote (int32 n);
     void setTitle (const String& titleText);
 
-    void setScreen (Screen::ID);
+    void setScreen (Screen::ID, int page = 0);
 
     //SamplerInterface* getInterface() const;
     /** Get/set the current instrument in current pattern */

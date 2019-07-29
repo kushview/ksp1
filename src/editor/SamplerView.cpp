@@ -19,9 +19,9 @@
 
 //[Headers] You can add your own extra header files here...
 #include <boost/bind.hpp>
-
 #include "Instrument.h"
 #include "editor/SamplerDisplay.h"
+#include "editor/Screens.h"
 //[/Headers]
 
 #include "SamplerView.h"
@@ -74,9 +74,11 @@ SamplerView::SamplerView ()
     volume->setSliderStyle (Slider::RotaryVerticalDrag);
     volume->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
     volume->setColour (Slider::backgroundColourId, Colour (0x00000000));
+    volume->setColour (Slider::thumbColourId, Colours::white);
     volume->setColour (Slider::trackColourId, Colour (0x7fffffff));
-    volume->setColour (Slider::rotarySliderFillColourId, Colour (0xff5591ad));
+    volume->setColour (Slider::rotarySliderFillColourId, Colours::white);
     volume->setColour (Slider::rotarySliderOutlineColourId, Colour (0xff2a2a2a));
+    volume->setColour (Slider::textBoxHighlightColourId, Colour (0x66df1010));
     volume->addListener (this);
 
     keyboard.reset (new KeyboardWidget (keyboardState));
@@ -96,19 +98,29 @@ SamplerView::SamplerView ()
     ksp1Label.reset (new Label ("KSP1Label",
                                 TRANS("KSP-1\n")));
     addAndMakeVisible (ksp1Label.get());
-    ksp1Label->setFont (Font (20.00f, Font::plain).withTypefaceStyle ("Bold").withExtraKerningFactor (0.419f));
+    ksp1Label->setFont (Font (20.00f, Font::plain).withTypefaceStyle ("Regular").withExtraKerningFactor (0.419f));
     ksp1Label->setJustificationType (Justification::centredLeft);
     ksp1Label->setEditable (false, false, false);
     ksp1Label->setColour (TextEditor::textColourId, Colours::black);
     ksp1Label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    ksp1Label->setBounds (3, 0, 196, 29);
+    ksp1Label->setBounds (3, 0, 196, 36);
 
-    editButton.reset (new TextButton ("EditButton"));
-    addAndMakeVisible (editButton.get());
-    editButton->setButtonText (TRANS("E"));
-    editButton->addListener (this);
-    editButton->setColour (TextButton::buttonOnColourId, Colour (0xff1867ae));
+    soundsButton.reset (new TextButton ("SoundsButton"));
+    addAndMakeVisible (soundsButton.get());
+    soundsButton->setButtonText (TRANS("Sounds"));
+    soundsButton->setConnectedEdges (Button::ConnectedOnRight);
+    soundsButton->setRadioGroupId (1);
+    soundsButton->addListener (this);
+    soundsButton->setColour (TextButton::buttonOnColourId, Colour (0xff1867ae));
+
+    layersButton.reset (new TextButton ("LayersButton"));
+    addAndMakeVisible (layersButton.get());
+    layersButton->setButtonText (TRANS("Layers"));
+    layersButton->setConnectedEdges (Button::ConnectedOnLeft);
+    layersButton->setRadioGroupId (1);
+    layersButton->addListener (this);
+    layersButton->setColour (TextButton::buttonOnColourId, Colour (0xff1867ae));
 
 
     //[UserPreSize]
@@ -144,7 +156,8 @@ SamplerView::~SamplerView()
     keyboard = nullptr;
     outputLabel = nullptr;
     ksp1Label = nullptr;
-    editButton = nullptr;
+    soundsButton = nullptr;
+    layersButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -157,22 +170,7 @@ void SamplerView::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff8c3131));
-
-    {
-        int x = 0, y = 0, width = proportionOfWidth (1.0000f), height = proportionOfHeight (1.0000f);
-        Colour fillColour1 = Colour (0xff747474), fillColour2 = Colour (0xff353535);
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setGradientFill (ColourGradient (fillColour1,
-                                       285.0f - 0.0f + x,
-                                       2.0f - 0.0f + y,
-                                       fillColour2,
-                                       283.0f - 0.0f + x,
-                                       651.0f - 0.0f + y,
-                                       false));
-        g.fillRect (x, y, width, height);
-    }
+    g.fillAll (Colour (0xff221a1a));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -183,13 +181,14 @@ void SamplerView::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    display->setBounds (4, 102, getWidth() - 8, getHeight() - 106);
-    volLabel->setBounds (getWidth() - 319, 2, 52, 28);
-    meter->setBounds (getWidth() - 168, 7, 136, 17);
-    volume->setBounds (getWidth() - 264, 2, 28, 28);
-    keyboard->setBounds (2, 97 - 68, getWidth() - 8, 68);
-    outputLabel->setBounds (getWidth() - 222, 1, 48, 28);
-    editButton->setBounds (getWidth() - 6 - 18, 7, 18, 18);
+    display->setBounds (4, 133, getWidth() - 8, getHeight() - 137);
+    volLabel->setBounds (getWidth() - 293, 0, 52, 36);
+    meter->setBounds (getWidth() - 142, 11, 136, 17);
+    volume->setBounds (getWidth() - 238, 4, 28, 30);
+    keyboard->setBounds (2, 106 - 68, getWidth() - 8, 68);
+    outputLabel->setBounds (getWidth() - 196, 0, 48, 36);
+    soundsButton->setBounds ((getWidth() / 2) - 36, 111, 36, 16);
+    layersButton->setBounds ((getWidth() / 2) + 1, 111, 36, 16);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -214,11 +213,19 @@ void SamplerView::buttonClicked (Button* buttonThatWasClicked)
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == editButton.get())
+    if (buttonThatWasClicked == soundsButton.get())
     {
-        //[UserButtonCode_editButton] -- add your button handler code here..
-        editButton->setToggleState (! editButton->getToggleState(), dontSendNotification);
-        //[/UserButtonCode_editButton]
+        //[UserButtonCode_soundsButton] -- add your button handler code here..
+        soundsButton->setToggleState (! soundsButton->getToggleState(), dontSendNotification);
+        display->setScreen (Screen::editScreen, 0);
+        //[/UserButtonCode_soundsButton]
+    }
+    else if (buttonThatWasClicked == layersButton.get())
+    {
+        //[UserButtonCode_layersButton] -- add your button handler code here..
+        layersButton->setToggleState (! layersButton->getToggleState(), dontSendNotification);
+        display->setScreen (Screen::editScreen, 1);
+        //[/UserButtonCode_layersButton]
     }
 
     //[UserbuttonClicked_Post]
@@ -349,46 +356,47 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="SamplerView" template="../../jucer/Templates/GuiTemplate.cpp"
                  componentName="samplerView" parentClasses="public Component, public DragAndDropContainer, private Value::Listener"
                  constructorParams="" variableInitialisers="" snapPixels="8" snapActive="0"
-                 snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="720"
+                 snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="720"
                  initialHeight="420">
-  <BACKGROUND backgroundColour="ff8c3131">
-    <RECT pos="0 0 100% 100%" fill="linear: 285 2, 283 651, 0=ff747474, 1=ff353535"
-          hasStroke="0"/>
-  </BACKGROUND>
+  <BACKGROUND backgroundColour="ff221a1a"/>
   <JUCERCOMP name="display" id="56c24b8a829e534f" memberName="display" virtualName=""
-             explicitFocusOrder="0" pos="4 102 8M 106M" sourceFile="SamplerDisplay.cpp"
+             explicitFocusOrder="0" pos="4 133 8M 137M" sourceFile="SamplerDisplay.cpp"
              constructorParams=""/>
   <LABEL name="volume-label" id="73228f61d5b45b64" memberName="volLabel"
-         virtualName="" explicitFocusOrder="0" pos="319R 2 52 28" textCol="ffdadada"
+         virtualName="" explicitFocusOrder="0" pos="293R 0 52 36" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" hiliteCol="261151ee" labelText="Volume&#10;"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="1.16e1" kerning="0" bold="0"
          italic="0" justification="34"/>
   <GENERICCOMPONENT name="meter" id="bfda63f9ccd27d97" memberName="meter" virtualName=""
-                    explicitFocusOrder="0" pos="168R 7 136 17" class="LevelMeter"
+                    explicitFocusOrder="0" pos="142R 11 136 17" class="LevelMeter"
                     params="2, true"/>
   <SLIDER name="volume" id="47a6f6acb9d0b4b3" memberName="volume" virtualName=""
-          explicitFocusOrder="0" pos="264R 2 28 28" tooltip="Master Volume"
-          bkgcol="0" trackcol="7fffffff" rotarysliderfill="ff5591ad" rotaryslideroutline="ff2a2a2a"
-          min="-7e1" max="6" int="1e-3" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
+          explicitFocusOrder="0" pos="238R 4 28 30" tooltip="Master Volume"
+          bkgcol="0" thumbcol="ffffffff" trackcol="7fffffff" rotarysliderfill="ffffffff"
+          rotaryslideroutline="ff2a2a2a" textboxhighlight="66df1010" min="-7e1"
+          max="6" int="1e-3" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <GENERICCOMPONENT name="keyboard" id="99aac150ed63807" memberName="keyboard" virtualName=""
-                    explicitFocusOrder="0" pos="2 97r 8M 68" class="KeyboardWidget"
+                    explicitFocusOrder="0" pos="2 106r 8M 68" class="KeyboardWidget"
                     params="keyboardState"/>
   <LABEL name="OutputLabel" id="277ce632dc5f2ace" memberName="outputLabel"
-         virtualName="" explicitFocusOrder="0" pos="222R 1 48 28" textCol="ffdadada"
+         virtualName="" explicitFocusOrder="0" pos="196R 0 48 36" textCol="ffdadada"
          edTextCol="ff000000" edBkgCol="0" labelText="Output" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="1.16e1" kerning="0" bold="0" italic="0" justification="34"/>
   <LABEL name="KSP1Label" id="ef55d3420a00b74f" memberName="ksp1Label"
-         virtualName="" explicitFocusOrder="0" pos="3 0 196 29" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="3 0 196 36" edTextCol="ff000000"
          edBkgCol="0" labelText="KSP-1&#10;" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="2e1"
-         kerning="4.19e-1" bold="1" italic="0" justification="33" typefaceStyle="Bold"/>
-  <TEXTBUTTON name="EditButton" id="50b83eadd71f2375" memberName="editButton"
-              virtualName="" explicitFocusOrder="0" pos="6Rr 7 18 18" bgColOn="ff1867ae"
-              buttonText="E" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+         kerning="4.19e-1" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="SoundsButton" id="50b83eadd71f2375" memberName="soundsButton"
+              virtualName="" explicitFocusOrder="0" pos="0Cr 111 36 16" bgColOn="ff1867ae"
+              buttonText="Sounds" connectedEdges="2" needsCallback="1" radioGroupId="1"/>
+  <TEXTBUTTON name="LayersButton" id="9e9a13f32a730b59" memberName="layersButton"
+              virtualName="" explicitFocusOrder="0" pos="1C 111 36 16" bgColOn="ff1867ae"
+              buttonText="Layers" connectedEdges="1" needsCallback="1" radioGroupId="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
