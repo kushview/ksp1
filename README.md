@@ -1,4 +1,4 @@
-KSP-1 Sampler
--------------
+KSP1 Sampler
+------------
 
 This is a digital sampling plugin.
