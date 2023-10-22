@@ -1,0 +1,31 @@
+#  Copyright (C) 2013  Michael Fisher <mfisher31@gmail.com>
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License as
+#  published by the Free Software Foundation; either version 2 of
+#  the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix ui:    <http://lv2plug.in/ns/extensions/ui#> .
+
+<http://kushview.net/ns/ksp1>
+        a lv2:Plugin ;
+        lv2:binary <plugin.so> ;
+        rdfs:seeAlso <KSP1.ttl> .
+
+<http://kushview.net/ns/ksp1/ui/x11>
+        a ui:X11UI ;
+        ui:binary <ui.so> ;
+        rdfs:seeAlso <KSP1.ttl> .
