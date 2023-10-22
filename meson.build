@@ -43,3 +43,5 @@ lvtk_opengl_dep = dependency ('lvtk-opengl-3',
 
 juce_proj = subproject ('juce')
 juce_dep = juce_proj.get_variable ('juce_dep')
+
+subdir ('src')
