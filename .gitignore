@@ -30,3 +30,4 @@ libs/vstsdk2.4
 content/
 testpack/
 data/factory/
+.meson-subproject-wrap-hash.txt
