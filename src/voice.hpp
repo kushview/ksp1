@@ -19,15 +19,18 @@
 
 #pragma once
 
-#include "KSP1.h"
-#include "engine/ADSR.h"
+#include <cstdint>
 
-namespace KSP1 {
+#include "adsr.hpp"
+#include "juceconfig.hpp"
+#include <juce_audio_basics/juce_audio_basics.h>
 
+namespace ksp1 {
+
+class SamplerSound;
 class SamplerSynth;
 
-class SamplerVoice : public SynthesiserVoice
-{
+class SamplerVoice : public juce::SynthesiserVoice {
 public:
     enum State {
         StopRequested,
@@ -37,14 +40,17 @@ public:
         Releasing
     };
 
-    SamplerVoice (SamplerSynth& parent, int32 voiceId);
+    SamplerVoice (SamplerSynth& parent, int voiceId);
     ~SamplerVoice();
 
-    bool canPlaySound (SynthesiserSound* sound);
-    void startNote (const int midiNote, const float /* velocity */, SynthesiserSound* s,  const int /* pitch position */);
+    bool canPlaySound (juce::SynthesiserSound* sound);
+    void startNote (const int midiNote,
+                    const float velocity,
+                    juce::SynthesiserSound* sound,
+                    const int pitchPosition);
     void pitchWheelMoved (const int newValue);
-    void controllerMoved (const int controllerNumber,  const int newValue);
-    void renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples);
+    void controllerMoved (const int controllerNumber, const int newValue);
+    void renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples);
     void stopNote (float velocity, bool allowTailOff);
 
 protected:
@@ -55,25 +61,25 @@ private:
     float velocityGain;   // velocityNormal converted to gain
     float wheelPitch;     // Mixin pitch value from pitch messages
 
-    int     note;
-    int64  frame;
+    int note;
+    int64_t frame;
 
     State state;
     SamplerSound* sound;
     SamplerSynth& owner;
 
     int id;
-    float  lastGains [16];
-    double layerPosition [32];
+    float lastGains[16];
+    double layerPosition[32];
 
     double pitchRatio;
 
-    AudioSampleBuffer tempBuffer;
+    juce::AudioSampleBuffer tempBuffer;
     friend class SamplerSynth;
 
     ADSR adsr;
 
-    void _renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples);
+    void _renderNextBlock (juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples);
 };
 
-}
+} // namespace ksp1

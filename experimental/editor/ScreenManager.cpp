@@ -17,30 +17,28 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "editor/Screens.h"
 #include "editor/ScreenManager.h"
+#include "editor/Screens.h"
 
 namespace KSP1 {
 
-    ScreenManager::ScreenManager() { }
-    ScreenManager::~ScreenManager() { }
+ScreenManager::ScreenManager() {}
+ScreenManager::~ScreenManager() {}
 
-    void ScreenManager::clear()
-    {
-        screens.clearQuick (true);
-    }
-
-    Screen* ScreenManager::getScreen (SamplerDisplay& d, const int screenId)
-    {
-        for (Screen* screen : screens)
-            if (screenId == (int) screen->getScreenID())
-                return screen;
-
-        if (screenId < Screen::numScreens)
-            if (auto* const screen = Screen::create (d, (Screen::ID) screenId))
-                return screens.add (screen);
-        
-        jassertfalse;
-        return nullptr;
-    }
+void ScreenManager::clear() {
+    screens.clearQuick (true);
 }
+
+Screen* ScreenManager::getScreen (SamplerDisplay& d, const int screenId) {
+    for (Screen* screen : screens)
+        if (screenId == (int) screen->getScreenID())
+            return screen;
+
+    if (screenId < Screen::numScreens)
+        if (auto* const screen = Screen::create (d, (Screen::ID) screenId))
+            return screens.add (screen);
+
+    jassertfalse;
+    return nullptr;
+}
+} // namespace KSP1

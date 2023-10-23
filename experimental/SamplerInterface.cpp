@@ -21,107 +21,81 @@
 
 namespace KSP1 {
 
+void SamplerInterface::getKeyForNote (const int note) {}
 
-void SamplerInterface::getKeyForNote (const int note) { }
-
-void SamplerInterface::setInstrument (InstrumentPtr i)
-{
+void SamplerInterface::setInstrument (InstrumentPtr i) {
     instrument = i;
-    state = (i != nullptr) ? i->node() : ValueTree::invalid;
+    state      = (i != nullptr) ? i->node() : ValueTree::invalid;
 }
 
-void SamplerInterface::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
-{
-    if (tree == state)
-    {
+void SamplerInterface::valueTreePropertyChanged (ValueTree& tree, const Identifier& property) {
+    if (tree == state) {
         Instrument inst (tree);
         this->mutate (inst, property);
-    }
-    else if (tree.hasType (Tags::key))
-    {
+    } else if (tree.hasType (Tags::key)) {
         KeyItem key (tree);
         this->mutate (key, property);
-    }
-    else if (tree.hasType (Tags::layer))
-    {
+    } else if (tree.hasType (Tags::layer)) {
         LayerItem layer (tree);
         this->mutate (layer, property);
     }
 }
 
-void SamplerInterface::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
-{
-    if (child.hasType (Tags::key))
-    {
+void SamplerInterface::valueTreeChildAdded (ValueTree& parent, ValueTree& child) {
+    if (child.hasType (Tags::key)) {
         jassert (parent == state);
         const KeyItem key (child);
         this->addKey (key);
-    }
-    else if (child.hasType (Tags::layer))
-    {
+    } else if (child.hasType (Tags::layer)) {
         const LayerItem layer (child);
         this->addLayer (layer);
     }
 }
 
-void SamplerInterface::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int /*indexFromWhichChildWasRemoved*/)
-{
-    if (child.hasType (Tags::key))
-    {
+void SamplerInterface::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int /*indexFromWhichChildWasRemoved*/) {
+    if (child.hasType (Tags::key)) {
         const KeyItem key (child);
         this->removeKey (key);
-    }
-    else if (child.hasType (Tags::layer))
-    {
+    } else if (child.hasType (Tags::layer)) {
         LayerItem layer (child);
         this->removeLayer (layer);
     }
 }
 
-void SamplerInterface::valueTreeChildOrderChanged (ValueTree& /*tree*/, int /*oldIndex*/, int /*newIndex*/)
-{
-
+void SamplerInterface::valueTreeChildOrderChanged (ValueTree& /*tree*/, int /*oldIndex*/, int /*newIndex*/) {
 }
 
-void SamplerInterface::valueTreeParentChanged (ValueTree& /*tree*/)
-{
-
+void SamplerInterface::valueTreeParentChanged (ValueTree& /*tree*/) {
 }
 
-void SamplerInterface::valueTreeRedirected (ValueTree& tree)
-{
+void SamplerInterface::valueTreeRedirected (ValueTree& tree) {
     if (tree != state)
         return;
 
     reloadState();
 }
 
-void SamplerInterface::reloadState()
-{
+void SamplerInterface::reloadState() {
     clearKeyboard();
     Instrument i (state);
 
-    for (int note = 0; note < 128; ++note)
-    {
+    for (int note = 0; note < 128; ++note) {
         KeyItem key (i.getKey (note, false));
         ValueTree kv = key.node();
         //const SamplerSound* const sound = getSound (key.note());
         //(void) sound;
 
-        for (int i = kv.getNumProperties(); --i >= 0;)
-        {
+        for (int i = kv.getNumProperties(); --i >= 0;) {
             const Identifier prop = kv.getPropertyName (i);
             mutate (key, prop);
         }
 
-        for (int l = 0; l < key.countLayers(); ++l)
-        {
+        for (int l = 0; l < key.countLayers(); ++l) {
             LayerItem layer (key.getLayer (l));
             addLayer (layer);
 
             ValueTree ld = layer.node();
-            for (int32 i = ld.getNumProperties(); --i >= 0;)
-            {
+            for (int32 i = ld.getNumProperties(); --i >= 0;) {
                 const Identifier prop = ld.getPropertyName (i);
                 mutate (layer, prop);
             }
@@ -129,4 +103,4 @@ void SamplerInterface::reloadState()
     }
 }
 
-}
+} // namespace KSP1

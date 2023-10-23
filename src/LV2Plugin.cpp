@@ -17,79 +17,73 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "LV2Plugin.h"
+#include "ContentScanner.h"
+#include "DataPath.h"
+#include "Database.h"
+#include "Ports.h"
+#include "URIs.h"
 #include "engine/Jobs.h"
 #include "engine/LayerData.h"
 #include "engine/SampleCache.h"
 #include "engine/SamplerSounds.h"
 #include "engine/SamplerSynth.h"
-#include "ContentScanner.h"
-#include "Database.h"
-#include "DataPath.h"
-#include "Ports.h"
-#include "URIs.h"
-#include "LV2Plugin.h"
 
 using namespace lvtk;
 
 namespace KSP1 {
 
-
-
 class LoadInstrumentJob : public Job {
 public:
-
 };
-
 
 static Array<LV2Plugin*> sPlugins;
 
 LV2Plugin::LV2Plugin (double _sampleRate)
     : LV2PluginType (2),
-      sampleRate (_sampleRate), lastGain (1.0f),
-      wasRestored (0)
-{
-    sampler = SamplerSynth::create();
+      sampleRate (_sampleRate),
+      lastGain (1.0f),
+      wasRestored (0) {
+    sampler  = SamplerSynth::create();
     retainer = SamplerSynth::create();
 
     var json;
     sampler->getNestedVariant (json);
 
     URIs::MapFunc mf = std::bind (&LV2Plugin::map, this, std::placeholders::_1);
-    uris  = new URIs (mf);
-    forge = new Forge (*uris, get_urid_map(), get_urid_unmap());
-    jobs  = new JobManager (*this);
+    uris             = new URIs (mf);
+    forge            = new Forge (*uris, get_urid_map(), get_urid_unmap());
+    jobs             = new JobManager (*this);
 
     sPlugins.add (this);
 }
 
-LV2Plugin::~LV2Plugin()
-{
+LV2Plugin::~LV2Plugin() {
     sPlugins.removeFirstMatchingValue (this);
-    jobs = nullptr;
+    jobs    = nullptr;
     sampler = nullptr;
-    forge = nullptr;
-    uris = nullptr;
+    forge   = nullptr;
+    uris    = nullptr;
 }
 
-void LV2Plugin::activate()
-{
+void LV2Plugin::activate() {
     if (DataPath::defaultDatabaseFile().existsAsFile())
         DataPath::defaultDatabaseFile().deleteFile();
-    
+
     Database db (DataPath::defaultDatabaseFile());
     { DatabaseSchema schema (db); }
-    { ContentScanner scanner (db);
-      scanner.scanLocation (DataPath::factoryContentPath()); }
-    
+    {
+        ContentScanner scanner (db);
+        scanner.scanLocation (DataPath::factoryContentPath());
+    }
+
     lastGain = 1.0f;
     sampler->setCurrentPlaybackSampleRate (sampleRate);
     midiIn.ensureSize (2048);
 }
 
-void LV2Plugin::connect_port (uint32_t port, void *ptr)
-{
-    switch (port)
-    {
+void LV2Plugin::connect_port (uint32_t port, void* ptr) {
+    switch (port) {
         case Port::MainLeft:
             audioOuts[0] = static_cast<float*> (ptr);
             break;
@@ -104,26 +98,22 @@ void LV2Plugin::connect_port (uint32_t port, void *ptr)
     }
 }
 
-void LV2Plugin::deactivate()
-{
-
+void LV2Plugin::deactivate() {
 }
 
-void LV2Plugin::run (uint32_t nframes)
-{
+void LV2Plugin::run (uint32_t nframes) {
     const int32 numSamples = static_cast<int> (nframes);
     const lvtk::AtomSequence seq (p<LV2_Atom_Sequence*> (Port::AtomInput));
-    forge->set_buffer ((uint8_t*)notifyPort, notifyPort->atom.size);
+    forge->set_buffer ((uint8_t*) notifyPort, notifyPort->atom.size);
     forge->sequence_head (notifyFrame, 0);
 
-    if (wasRestored.get() != 0)
-    {
-        if (wasRestored.set (0))
-        {
+    if (wasRestored.get() != 0) {
+        if (wasRestored.set (0)) {
             forge->frame_time (0);
             ForgeFrame frame;
             forge->write_object (frame, 1, uris->ksp1_SamplerSynth);
-            forge->write_key (uris->slugs_index); forge->write_int (1);
+            forge->write_key (uris->slugs_index);
+            forge->write_int (1);
             forge->pop_frame (frame);
         }
     }
@@ -132,48 +122,33 @@ void LV2Plugin::run (uint32_t nframes)
     audio.clear();
 
     procFrame = 0;
-    for (const lvtk::AtomEvent& ev : seq)
-    {
+    for (const lvtk::AtomEvent& ev : seq) {
         if (procFrame < ev.time.frames)
             sampler->renderNextBlock (audio, midiIn, procFrame, ev.time.frames - procFrame);
 
-        if (ev.body.type == uris->midi_MidiEvent)
-        {
-            midiIn.addEvent (LV2_ATOM_BODY (&ev.body), ev.body.size,
-                (ev.time.frames < numSamples) ? ev.time.frames : numSamples - 1);
-        }
-        else if (ev.body.type == uris->atom_Object)
-        {
+        if (ev.body.type == uris->midi_MidiEvent) {
+            midiIn.addEvent (LV2_ATOM_BODY (&ev.body), ev.body.size, (ev.time.frames < numSamples) ? ev.time.frames : numSamples - 1);
+        } else if (ev.body.type == uris->atom_Object) {
             const lvtk::AtomObject obj (&ev.body);
 
-            if (obj.otype() == uris->patch_Set)
-            {
+            if (obj.otype() == uris->patch_Set) {
                 const PatchSet set (*uris, obj);
                 handle_patch_set (set);
-            }
-            else if (obj.otype() == uris->patch_Get)
-            {
+            } else if (obj.otype() == uris->patch_Get) {
                 const PatchGet get (*uris, obj);
                 handle_patch_get (get);
-            }
-            else if (obj.otype() == uris->patch_Patch)
-            {
+            } else if (obj.otype() == uris->patch_Patch) {
                 const Patch patch (*uris, obj);
                 handle_patch (patch);
-            }
-            else if (obj.otype() == uris->patch_Delete)
-            {
+            } else if (obj.otype() == uris->patch_Delete) {
                 const PatchDelete del (*uris, obj);
-                if (del.subject.has_object_type (uris->ksp1_Layer))
-                {
+                if (del.subject.has_object_type (uris->ksp1_Layer)) {
                     lvtk::AtomObject layer (del.subject.as_object());
                     if (LayerData* data = sampler->getLayerData (*uris, layer))
                         sampler->recycleLayerData (data);
                 }
             }
-        }
-        else
-        {
+        } else {
             DBG (unmap (ev.body.type));
         }
 
@@ -188,29 +163,25 @@ void LV2Plugin::run (uint32_t nframes)
     midiIn.clear();
 }
 
-void LV2Plugin::trigger_restored()
-{
-    while (! wasRestored.set (1)) { }
+void LV2Plugin::trigger_restored() {
+    while (! wasRestored.set (1)) {
+    }
 }
 
-WorkerStatus LV2Plugin::end_run()
-{
+WorkerStatus LV2Plugin::end_run() {
     forge->pop (notifyFrame);
     return WORKER_SUCCESS;
 }
 
 SamplerSynth* LV2Plugin::get_sampler_synth() const { return sampler.get(); }
-void LV2Plugin::handle_patch_get (const PatchGet &obj)
-{
+void LV2Plugin::handle_patch_get (const PatchGet& obj) {
     if (! obj.subject) {
         DBG ("patch get with null subject");
         return;
     }
 
-    if (obj.subject.has_object_type (uris->ksp1_Key))
-    {
-        if (SamplerSound* sound = sampler->getSound (*uris, obj.subject.as_object()))
-        {
+    if (obj.subject.has_object_type (uris->ksp1_Key)) {
+        if (SamplerSound* sound = sampler->getSound (*uris, obj.subject.as_object())) {
             forge->frame_time (0);
             sound->writeAtomObject (*forge);
             for (LayerData* layer : *sound) {
@@ -218,110 +189,78 @@ void LV2Plugin::handle_patch_get (const PatchGet &obj)
                 layer->writeAtomObject (*forge);
             }
         }
-    }
-    else if (obj.subject.type() == uris->atom_URID) {
-
+    } else if (obj.subject.type() == uris->atom_URID) {
     }
 }
 
 void LV2Plugin::handle_patch_set_root_level (const PatchSet& set) {
-   /* DBG ("set_root_level");
+    /* DBG ("set_root_level");
     DBG ("  " << unmap (set.property.as_urid())); */
 }
 
-void LV2Plugin::handle_patch_set (const PatchSet& set)
-{
+void LV2Plugin::handle_patch_set (const PatchSet& set) {
     if (! set.subject)
         return handle_patch_set_root_level (set);
 
-    if (set.subject.has_object_type (uris->ksp1_Layer))
-    {
-        if (LayerData* data = sampler->getLayerData (*uris, set.subject.as_object()))
-        {
+    if (set.subject.has_object_type (uris->ksp1_Layer)) {
+        if (LayerData* data = sampler->getLayerData (*uris, set.subject.as_object())) {
             data->setProperty (*uris, set);
-            if (set.property.as_urid() == uris->slugs_length ||
-                set.property.as_urid() == uris->slugs_offset ||
-                set.property.as_urid() == uris->slugs_start)
-            {
+            if (set.property.as_urid() == uris->slugs_length || set.property.as_urid() == uris->slugs_offset || set.property.as_urid() == uris->slugs_start) {
                 if (SamplerSound* snd = data->getSound())
                     snd->setDefaultLength();
             }
-        }
-        else
-        {
+        } else {
             //DBG ("can't set layer property: " << unmap (set.property.as_urid()));
         }
-    }
-    else if (set.subject.has_object_type (uris->ksp1_Key))
-    {
-        if (set.property.as_urid() == uris->slugs_note)
-        {
+    } else if (set.subject.has_object_type (uris->ksp1_Key)) {
+        if (set.property.as_urid() == uris->slugs_note) {
             jassert (set.subject.as_object().id() != 0);
-            if (SamplerSound* sound = sampler->moveSound (set.subject.as_object().id(), set.value.as_int()))
-            { (void)sound; }
-        }
-        else
-        {
+            if (SamplerSound* sound = sampler->moveSound (set.subject.as_object().id(), set.value.as_int())) {
+                (void) sound;
+            }
+        } else {
             if (SamplerSound* snd = sampler->getSound (*uris, set.subject.as_object()))
                 snd->setProperty (*uris, set);
         }
-    }
-    else if (set.subject.has_type_and_equals (forge->URID, uris->ksp1_Instrument))
-    {
-        if (set.property.as_urid() == uris->slugs_file &&
-            set.value.type() == uris->atom_Path)
-        {
+    } else if (set.subject.has_type_and_equals (forge->URID, uris->ksp1_Instrument)) {
+        if (set.property.as_urid() == uris->slugs_file && set.value.type() == uris->atom_Path) {
             const Atom atom (set.object.cobj());
             schedule_work (atom.total_size(), atom.cobj());
-        }
-        else
-        {
+        } else {
             sampler->setProperty (*uris, set);
         }
     }
 }
 
-void LV2Plugin::handle_patch (const Patch& patch)
-{
-    if (patch.subject.has_object_type (uris->ksp1_Key))
-    {
-        if (patch.add)
-        {
-            for (const auto& p : patch.add.as_object())
-            {
-                if (p.key == uris->slugs_layer)
-                {
+void LV2Plugin::handle_patch (const Patch& patch) {
+    if (patch.subject.has_object_type (uris->ksp1_Key)) {
+        if (patch.add) {
+            for (const auto& p : patch.add.as_object()) {
+                if (p.key == uris->slugs_layer) {
                     schedule_work (lv2_atom_total_size (&p.value), &p.value);
                 }
             }
         }
 
         if (patch.remove) {
-
         }
     }
 
-    if (patch.subject.has_type_and_equals (uris->atom_URID, uris->ksp1_Instrument))
-    {
-        if (patch.add)
-        {
-            for (const auto& p : patch.add.as_object())
-            {
-                if (p.key == uris->slugs_key)
-                {
+    if (patch.subject.has_type_and_equals (uris->atom_URID, uris->ksp1_Instrument)) {
+        if (patch.add) {
+            for (const auto& p : patch.add.as_object()) {
+                if (p.key == uris->slugs_key) {
                     schedule_work (lv2_atom_total_size (&p.value), &p.value);
                 }
             }
         }
 
         if (patch.remove) {
-
         }
     }
 }
 
-WorkerStatus LV2Plugin::work (WorkerRespond &respond, uint32_t size, const void* data)
-{
+WorkerStatus LV2Plugin::work (WorkerRespond& respond, uint32_t size, const void* data) {
     const lvtk::Atom atom (data);
     if (atom.total_size() != size) {
         DBG ("work: atom size mismatch: " << unmap (atom.type()));
@@ -331,8 +270,7 @@ WorkerStatus LV2Plugin::work (WorkerRespond &respond, uint32_t size, const void*
     return jobs->work (respond, *uris, atom);
 }
 
-WorkerStatus LV2Plugin::work_response (uint32_t size, const void* body)
-{
+WorkerStatus LV2Plugin::work_response (uint32_t size, const void* body) {
     const lvtk::Atom atom (body);
     if (atom.total_size() != size) {
         DBG ("work_response: atom size mismatch: " << unmap (atom.type()));
@@ -351,13 +289,10 @@ WorkerStatus LV2Plugin::work_response (uint32_t size, const void* body)
         lv2_atom_forge_primitive (forge, atom);
     }
 
-    if (atom.has_object_type (uris->jobs_ObjectRef))
-    {
+    if (atom.has_object_type (uris->jobs_ObjectRef)) {
         ObjectRef ref (*uris, atom.as_object());
-        if (ref.has_class_type (uris->ksp1_SamplerSynth))
-        {
-            if (SamplerSynth* next = ref.get<SamplerSynth>())
-            {
+        if (ref.has_class_type (uris->ksp1_SamplerSynth)) {
+            if (SamplerSynth* next = ref.get<SamplerSynth>()) {
                 if (SamplerSynth* old = sampler.release())
                     jobs->dispose (old);
 
@@ -366,36 +301,25 @@ WorkerStatus LV2Plugin::work_response (uint32_t size, const void* body)
                 forge->frame_time (0);
                 ForgeFrame frame;
                 forge->write_object (frame, 1, uris->ksp1_SamplerSynth);
-                forge->write_key (uris->slugs_index); forge->write_int (1);
+                forge->write_key (uris->slugs_index);
+                forge->write_int (1);
                 forge->pop_frame (frame);
             }
-        }
-        else if (ref.has_class_type (uris->ksp1_Key))
-        {
-            if (SamplerSound* sound = ref.get<SamplerSound>())
-            {
-                if (sampler->insertSound (sound))
-                {
-                    forge->frame_time(0);
+        } else if (ref.has_class_type (uris->ksp1_Key)) {
+            if (SamplerSound* sound = ref.get<SamplerSound>()) {
+                if (sampler->insertSound (sound)) {
+                    forge->frame_time (0);
                     sound->writeAtomObject (*forge);
-                }
-                else
-                {
+                } else {
                     DBG ("Failed inserted new sound on note: " << sound->getRootNote());
                 }
             }
-        }
-        else if (ref.has_class_type (uris->ksp1_Layer))
-        {
-            if (LayerData* data = ref.get<LayerData>())
-            {
-                if (sampler->insertLayerData (data->getParent(), data))
-                {
+        } else if (ref.has_class_type (uris->ksp1_Layer)) {
+            if (LayerData* data = ref.get<LayerData>()) {
+                if (sampler->insertLayerData (data->getParent(), data)) {
                     forge->frame_time (0);
                     data->writeAtomObject (*forge);
-                }
-                else
-                {
+                } else {
                     DBG ("Failed inserting new layer");
                     data->reset();
                 }
@@ -406,13 +330,11 @@ WorkerStatus LV2Plugin::work_response (uint32_t size, const void* body)
     return WORKER_SUCCESS;
 }
 
-StateStatus LV2Plugin::save (StateStore &store, uint32_t /*flags*/, const FeatureVec &features)
-{
+StateStatus LV2Plugin::save (StateStore& store, uint32_t /*flags*/, const FeatureVec& features) {
     LV2_State_Make_Path* make_path = nullptr;
-    LV2_State_Map_Path* map_path = nullptr;
+    LV2_State_Map_Path* map_path   = nullptr;
 
-    for (const LV2_Feature* f : features)
-    {
+    for (const LV2_Feature* f : features) {
         if (0 == strcmp (LV2_STATE__makePath, f->URI)) {
             make_path = reinterpret_cast<LV2_State_Make_Path*> (f->data);
         }
@@ -423,14 +345,10 @@ StateStatus LV2Plugin::save (StateStore &store, uint32_t /*flags*/, const Featur
     }
 
     var json;
-    if (sampler->getNestedVariant (json))
-    {
-        if (map_path && make_path)
-        {
-            if (char* absolute = make_path->path (make_path->handle, "data.json"))
-            {
-                if (char* abstract = map_path->abstract_path (map_path->handle, absolute))
-                {
+    if (sampler->getNestedVariant (json)) {
+        if (map_path && make_path) {
+            if (char* absolute = make_path->path (make_path->handle, "data.json")) {
+                if (char* abstract = map_path->abstract_path (map_path->handle, absolute)) {
                     const File file (String::fromUTF8 (absolute));
                     FileOutputStream fos (file);
                     JSON::writeToStream (fos, json);
@@ -441,9 +359,7 @@ StateStatus LV2Plugin::save (StateStore &store, uint32_t /*flags*/, const Featur
 
                 std::free (absolute);
             }
-        }
-        else
-        {
+        } else {
             const String data = JSON::toString (json, true);
             store (uris->ksp1_SamplerSynth, data.toRawUTF8(), data.length() + 1, forge->String, STATE_IS_POD);
         }
@@ -452,13 +368,11 @@ StateStatus LV2Plugin::save (StateStore &store, uint32_t /*flags*/, const Featur
     return STATE_SUCCESS;
 }
 
-StateStatus LV2Plugin::restore (StateRetrieve &retrieve, uint32_t flags, const FeatureVec &features)
-{
+StateStatus LV2Plugin::restore (StateRetrieve& retrieve, uint32_t flags, const FeatureVec& features) {
     LV2_State_Make_Path* make_path = nullptr;
-    LV2_State_Map_Path* map_path = nullptr;
+    LV2_State_Map_Path* map_path   = nullptr;
 
-    for (const LV2_Feature* f : features)
-    {
+    for (const LV2_Feature* f : features) {
         if (0 == strcmp (LV2_STATE__makePath, f->URI)) {
             make_path = reinterpret_cast<LV2_State_Make_Path*> (f->data);
         }
@@ -470,21 +384,18 @@ StateStatus LV2Plugin::restore (StateRetrieve &retrieve, uint32_t flags, const F
     if (! map_path)
         return lvtk::STATE_ERR_UNKNOWN;
 
-    size_t size; uint32_t type; uint32_t rflags;
-    if (const void* data = retrieve (uris->slugs_file, &size, &type, &rflags))
-    {
-        if (type == uris->atom_Path)
-        {
+    size_t size;
+    uint32_t type;
+    uint32_t rflags;
+    if (const void* data = retrieve (uris->slugs_file, &size, &type, &rflags)) {
+        if (type == uris->atom_Path) {
             const char* abstract = (const char*) data;
-            if (char* absolute = map_path->absolute_path (map_path->handle, abstract))
-            {
+            if (char* absolute = map_path->absolute_path (map_path->handle, abstract)) {
                 const File file (String::fromUTF8 (absolute));
                 sampler->loadFile (file);
             }
         }
-    }
-    else if (const void* data = retrieve (uris->ksp1_SamplerSynth, &size, &type, &rflags))
-    {
+    } else if (const void* data = retrieve (uris->ksp1_SamplerSynth, &size, &type, &rflags)) {
         const String jsonStr (String::fromUTF8 ((const char*) data));
         sampler->loadJSON (jsonStr);
     }
@@ -493,12 +404,11 @@ StateStatus LV2Plugin::restore (StateRetrieve &retrieve, uint32_t flags, const F
     return STATE_SUCCESS;
 }
 
-SampleCache& LV2Plugin::get_sample_cache()
-{
+SampleCache& LV2Plugin::get_sample_cache() {
     return retainer->getSampleCache();
 }
 
-}
+} // namespace KSP1
 
 static unsigned ksp1i = KSP1::LV2Plugin::register_class (KSP1_URI);
 

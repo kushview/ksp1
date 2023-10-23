@@ -21,45 +21,38 @@
 
 namespace KSP1 {
 
-    Locations::Locations()
-        : fses()
-    {
-        FilesystemScanner (fses, fses.searchPath());
-    }
-
-    Locations::~Locations()
-    {
-    }
-
-    const KnownFilesystems&
-    Locations::getFilesystems() const
-    {
-        return fses;
-    }
-
-    void Locations::printAll()
-    {
-        Logger::writeToLog ("Beat Thang Locations: " + String (fses.size()) + String (" total"));
-        for (const Filesystem* fs : fses)
-            Logger::writeToLog (fs->name + String ("\t") + String (fs->uuid));
-    }
-
-    void Locations::rebuildIndexes()
-    {
-        // fses.buildAssetTreeIndexes();
-    }
-
-    File Locations::resolvePath (const String& path) const
-    {
-        File ret (File::nonexistent);
-
-        for (const Filesystem* fs : fses)
-        {
-            ret = fs->path.getChildFile (path);
-            if (ret.exists())
-                break;
-        }
-
-        return ret;
-    }
+Locations::Locations()
+    : fses() {
+    FilesystemScanner (fses, fses.searchPath());
 }
+
+Locations::~Locations() {
+}
+
+const KnownFilesystems&
+    Locations::getFilesystems() const {
+    return fses;
+}
+
+void Locations::printAll() {
+    Logger::writeToLog ("Beat Thang Locations: " + String (fses.size()) + String (" total"));
+    for (const Filesystem* fs : fses)
+        Logger::writeToLog (fs->name + String ("\t") + String (fs->uuid));
+}
+
+void Locations::rebuildIndexes() {
+    // fses.buildAssetTreeIndexes();
+}
+
+File Locations::resolvePath (const String& path) const {
+    File ret (File::nonexistent);
+
+    for (const Filesystem* fs : fses) {
+        ret = fs->path.getChildFile (path);
+        if (ret.exists())
+            break;
+    }
+
+    return ret;
+}
+} // namespace KSP1

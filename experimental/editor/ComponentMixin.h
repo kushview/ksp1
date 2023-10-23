@@ -18,4 +18,4 @@
 */
 
 #pragma once
-namespace KSP1 { }
+namespace KSP1 {}

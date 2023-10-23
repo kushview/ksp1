@@ -23,20 +23,15 @@
 
 namespace KSP1 {
 
-class LevelMeter : public kv::DigitalMeter
-{
+class LevelMeter : public kv::DigitalMeter {
 public:
-
     LevelMeter()
-        : DigitalMeter (2)
-    { }
+        : DigitalMeter (2) {}
 
     LevelMeter (int ports, bool horiz)
-        : DigitalMeter (jmax (1, ports), horiz)
-    { }
+        : DigitalMeter (jmax (1, ports), horiz) {}
 
-    virtual ~LevelMeter() { }
-
+    virtual ~LevelMeter() {}
 };
 
-}
+} // namespace KSP1

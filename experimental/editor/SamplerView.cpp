@@ -18,23 +18,21 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include <boost/bind.hpp>
 #include "Instrument.h"
 #include "editor/SamplerDisplay.h"
 #include "editor/Screens.h"
+#include <boost/bind.hpp>
 //[/Headers]
 
 #include "SamplerView.h"
-
 
 namespace KSP1 {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 
-class SamplerView::Updater :  public Timer
-{
+class SamplerView::Updater : public Timer {
 public:
-    Updater (SamplerView& v) : view (v) { }
+    Updater (SamplerView& v) : view (v) {}
     void timerCallback() { view.onDisplayUpdate(); }
 
 private:
@@ -44,8 +42,7 @@ private:
 //[/MiscUserDefs]
 
 //==============================================================================
-SamplerView::SamplerView ()
-{
+SamplerView::SamplerView() {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
@@ -53,7 +50,7 @@ SamplerView::SamplerView ()
     display.reset (new SamplerDisplay());
     addAndMakeVisible (display.get());
     volLabel.reset (new Label ("volume-label",
-                               TRANS("Volume\n")));
+                               TRANS ("Volume\n")));
     addAndMakeVisible (volLabel.get());
     volLabel->setFont (Font (11.60f, Font::plain).withTypefaceStyle ("Regular"));
     volLabel->setJustificationType (Justification::centredRight);
@@ -69,7 +66,7 @@ SamplerView::SamplerView ()
 
     volume.reset (new Slider ("volume"));
     addAndMakeVisible (volume.get());
-    volume->setTooltip (TRANS("Master Volume"));
+    volume->setTooltip (TRANS ("Master Volume"));
     volume->setRange (-70, 6, 0.001);
     volume->setSliderStyle (Slider::RotaryVerticalDrag);
     volume->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
@@ -86,7 +83,7 @@ SamplerView::SamplerView ()
     keyboard->setName ("keyboard");
 
     outputLabel.reset (new Label ("OutputLabel",
-                                  TRANS("Output")));
+                                  TRANS ("Output")));
     addAndMakeVisible (outputLabel.get());
     outputLabel->setFont (Font (11.60f, Font::plain).withTypefaceStyle ("Regular"));
     outputLabel->setJustificationType (Justification::centredRight);
@@ -96,7 +93,7 @@ SamplerView::SamplerView ()
     outputLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     ksp1Label.reset (new Label ("KSP1Label",
-                                TRANS("KSP-1\n")));
+                                TRANS ("KSP-1\n")));
     addAndMakeVisible (ksp1Label.get());
     ksp1Label->setFont (Font (20.00f, Font::plain).withTypefaceStyle ("Regular").withExtraKerningFactor (0.419f));
     ksp1Label->setJustificationType (Justification::centredLeft);
@@ -108,7 +105,7 @@ SamplerView::SamplerView ()
 
     soundsButton.reset (new TextButton ("SoundsButton"));
     addAndMakeVisible (soundsButton.get());
-    soundsButton->setButtonText (TRANS("Sounds"));
+    soundsButton->setButtonText (TRANS ("Sounds"));
     soundsButton->setConnectedEdges (Button::ConnectedOnRight);
     soundsButton->setRadioGroupId (1);
     soundsButton->addListener (this);
@@ -116,7 +113,7 @@ SamplerView::SamplerView ()
 
     layersButton.reset (new TextButton ("LayersButton"));
     addAndMakeVisible (layersButton.get());
-    layersButton->setButtonText (TRANS("Layers"));
+    layersButton->setButtonText (TRANS ("Layers"));
     layersButton->setConnectedEdges (Button::ConnectedOnLeft);
     layersButton->setRadioGroupId (1);
     layersButton->addListener (this);
@@ -124,13 +121,12 @@ SamplerView::SamplerView ()
 
     editButton.reset (new TextButton ("EditButton"));
     addAndMakeVisible (editButton.get());
-    editButton->setButtonText (TRANS("Edit"));
+    editButton->setButtonText (TRANS ("Edit"));
     editButton->setRadioGroupId (1);
     editButton->addListener (this);
     editButton->setColour (TextButton::buttonOnColourId, Colour (0xff1867ae));
 
     editButton->setBounds (4, 125, 36, 16);
-
 
     //[UserPreSize]
     display->connectUpdateClient (*this);
@@ -141,7 +137,6 @@ SamplerView::SamplerView ()
 
     setSize (720, 420);
 
-
     //[Constructor] You can add your own custom stuff here..
     display->setScreen (Screen::editScreen);
     volume->setRange (-70.0f, 12.0f);
@@ -151,32 +146,29 @@ SamplerView::SamplerView ()
     //[/Constructor]
 }
 
-SamplerView::~SamplerView()
-{
+SamplerView::~SamplerView() {
     //[Destructor_pre]. You can add your own custom destruction code here..
     updater->stopTimer();
     updater = nullptr;
     //[/Destructor_pre]
 
-    display = nullptr;
-    volLabel = nullptr;
-    meter = nullptr;
-    volume = nullptr;
-    keyboard = nullptr;
-    outputLabel = nullptr;
-    ksp1Label = nullptr;
+    display      = nullptr;
+    volLabel     = nullptr;
+    meter        = nullptr;
+    volume       = nullptr;
+    keyboard     = nullptr;
+    outputLabel  = nullptr;
+    ksp1Label    = nullptr;
     soundsButton = nullptr;
     layersButton = nullptr;
-    editButton = nullptr;
-
+    editButton   = nullptr;
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void SamplerView::paint (Graphics& g)
-{
+void SamplerView::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
@@ -186,8 +178,7 @@ void SamplerView::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void SamplerView::resized()
-{
+void SamplerView::resized() {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
@@ -203,13 +194,11 @@ void SamplerView::resized()
     //[/UserResized]
 }
 
-void SamplerView::sliderValueChanged (Slider* sliderThatWasMoved)
-{
+void SamplerView::sliderValueChanged (Slider* sliderThatWasMoved) {
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == volume.get())
-    {
+    if (sliderThatWasMoved == volume.get()) {
         //[UserSliderCode_volume] -- add your slider handling code here..
         //[/UserSliderCode_volume]
     }
@@ -218,29 +207,23 @@ void SamplerView::sliderValueChanged (Slider* sliderThatWasMoved)
     //[/UsersliderValueChanged_Post]
 }
 
-void SamplerView::buttonClicked (Button* buttonThatWasClicked)
-{
+void SamplerView::buttonClicked (Button* buttonThatWasClicked) {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == soundsButton.get())
-    {
+    if (buttonThatWasClicked == soundsButton.get()) {
         //[UserButtonCode_soundsButton] -- add your button handler code here..
         soundsButton->setToggleState (! soundsButton->getToggleState(), dontSendNotification);
         if (soundsButton->getToggleState())
             display->setScreen (Screen::editScreen, 0);
         //[/UserButtonCode_soundsButton]
-    }
-    else if (buttonThatWasClicked == layersButton.get())
-    {
+    } else if (buttonThatWasClicked == layersButton.get()) {
         //[UserButtonCode_layersButton] -- add your button handler code here..
         layersButton->setToggleState (! layersButton->getToggleState(), dontSendNotification);
         if (layersButton->getToggleState())
             display->setScreen (Screen::editScreen, 1);
         //[/UserButtonCode_layersButton]
-    }
-    else if (buttonThatWasClicked == editButton.get())
-    {
+    } else if (buttonThatWasClicked == editButton.get()) {
         //[UserButtonCode_editButton] -- add your button handler code here..
         //[/UserButtonCode_editButton]
     }
@@ -248,24 +231,16 @@ void SamplerView::buttonClicked (Button* buttonThatWasClicked)
     //[UserbuttonClicked_Post]
     editButton->setToggleState (layersButton->getToggleState() || soundsButton->getToggleState(),
                                 dontSendNotification);
-    
-    if (editButton->getToggleState())
-    {
-        
-    }
-    else
-    {
-        
+
+    if (editButton->getToggleState()) {
+    } else {
     }
     //[/UserbuttonClicked_Post]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void SamplerView::setVolume (float db, bool notify)
-{
+void SamplerView::setVolume (float db, bool notify) {
     NotificationType n = notify ? sendNotification : dontSendNotification;
     volume->setValue (db, n);
 }
@@ -290,33 +265,25 @@ SamplerView::acceptAtom (lvtk::Atom atom)
 }
 #endif
 
-void SamplerView::onKeyboardMidi (const MidiMessage& midi)
-{
-    if (midi.isNoteOn (false))
-    {
+void SamplerView::onKeyboardMidi (const MidiMessage& midi) {
+    if (midi.isNoteOn (false)) {
         display->selectNote (midi.getNoteNumber());
         updateControls (dontSendNotification);
     }
 }
 
-void SamplerView::onKeySelected (int k)
-{
+void SamplerView::onKeySelected (int k) {
     display->setNote (k);
     stabilizeView();
 }
 
-void SamplerView::onDisplayUpdate()
-{
-
+void SamplerView::onDisplayUpdate() {
 }
 
-void SamplerView::loadFile (const File& file)
-{
-
+void SamplerView::loadFile (const File& file) {
 }
 
-void SamplerView::layerChosen()
-{
+void SamplerView::layerChosen() {
 #if 0
     if (EditScreen* screen = dynamic_cast<EditScreen*> (display->findChildWithID ("edit-screen")))
     {
@@ -327,29 +294,24 @@ void SamplerView::layerChosen()
     updateControls();
 }
 
-void SamplerView::updateControls (NotificationType n)
-{
+void SamplerView::updateControls (NotificationType n) {
     InstrumentPtr instrument (display->getInstrument());
     volume->getValueObject().referTo (instrument->getPropertyAsValue (Tags::volume));
 }
 
-InstrumentPtr SamplerView::getInstrument (const int) const
-{
+InstrumentPtr SamplerView::getInstrument (const int) const {
     return display->getInstrument();
 }
 
-void SamplerView::valueChanged (Value& value)
-{
+void SamplerView::valueChanged (Value& value) {
     if (value.refersToSameSourceAs (activeSound))
         stabilizeView();
 }
 
-void SamplerView::setInstrument (InstrumentPtr i)
-{
+void SamplerView::setInstrument (InstrumentPtr i) {
     activeSound.removeListener (this);
     display->setInstrument (i);
-    if (auto instrument = getInstrument())
-    {
+    if (auto instrument = getInstrument()) {
         activeSound.referTo (instrument->getPropertyAsValue ("activeSound"));
         activeSound.addListener (this);
     }
@@ -357,20 +319,17 @@ void SamplerView::setInstrument (InstrumentPtr i)
     stabilizeView();
 }
 
-void SamplerView::stabilizeView()
-{
+void SamplerView::stabilizeView() {
     updateControls (dontSendNotification);
 }
 
-void SamplerView::setMainRMS (const float rmsL, const float rmsR)
-{
+void SamplerView::setMainRMS (const float rmsL, const float rmsR) {
     meter->setValue (0, rmsL);
     meter->setValue (1, rmsR);
     meter->refresh();
 }
 
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -434,10 +393,7 @@ END_JUCER_METADATA
 */
 #endif
 
-
-
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

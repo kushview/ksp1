@@ -17,43 +17,38 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "./DataPath.h"
 #include "./Filesystem.h"
+#include "./DataPath.h"
 #include "./Types.h"
 
 namespace KSP1 {
 
-    Filesystem::Filesystem (const String& uuid_,  const File& path_,  const String& name_)
-        : urid(0), uuid (uuid_), path (path_), name (name_)
-    {
-        if (uuid.isEmpty())
-            uuid = Utility::createGUID (path.getFullPathName() + name);
+Filesystem::Filesystem (const String& uuid_, const File& path_, const String& name_)
+    : urid (0), uuid (uuid_), path (path_), name (name_) {
+    if (uuid.isEmpty())
+        uuid = Utility::createGUID (path.getFullPathName() + name);
 
-        jassert (path.isDirectory());
-    }
+    jassert (path.isDirectory());
+}
 
-    KnownFilesystems::KnownFilesystems()
-    {
-        addSearchPath (DataPath::simBeatThangPath());
-        addSearchPath (DataPath::defaultUserPath().getParentDirectory());
-    }
+KnownFilesystems::KnownFilesystems() {
+    addSearchPath (DataPath::simBeatThangPath());
+    addSearchPath (DataPath::defaultUserPath().getParentDirectory());
+}
 
-    KnownFilesystems::~KnownFilesystems() { }
+KnownFilesystems::~KnownFilesystems() {}
 
-    void KnownFilesystems::add (const String& uuid_,
-                                const File& path_,
-                                const String& name_)
-    {
-        for (const Filesystem* fs : llist)
-            if (fs->path == path_)
-                return;
+void KnownFilesystems::add (const String& uuid_,
+                            const File& path_,
+                            const String& name_) {
+    for (const Filesystem* fs : llist)
+        if (fs->path == path_)
+            return;
 
-        llist.add (new Filesystem (uuid_, path_, name_));
-    }
+    llist.add (new Filesystem (uuid_, path_, name_));
+}
 
-    void
-    KnownFilesystems::buildAssetTreeIndexes()
-    {
+void KnownFilesystems::buildAssetTreeIndexes() {
 #if 0
         for (Filesystem* fs : llist)
         {
@@ -92,102 +87,84 @@ namespace KSP1 {
             }
         }
 #endif
+}
+
+const File&
+    KnownFilesystems::getPathForID (uint32 urid) const {
+    for (const Filesystem* fs : llist)
+        if (fs != nullptr && fs->hashCode() == urid)
+            return fs->path;
+
+    return File::nonexistent;
+}
+
+const File&
+    KnownFilesystems::getPathForUUID (const String& uuid) const {
+    for (const Filesystem* fs : llist) {
+        if (fs && fs->uuid == uuid)
+            return fs->path;
     }
 
-    const File&
-    KnownFilesystems::getPathForID (uint32 urid) const
-    {
-        for (const Filesystem* fs : llist)
-            if (fs != nullptr && fs->hashCode() == urid)
-                return fs->path;
+    return File::nonexistent;
+}
 
-        return File::nonexistent;
-    }
+File KnownFilesystems::getFile (const String& uuid, const String& path) const {
+    File f = getPathForUUID (uuid).getChildFile (path);
+    return f.existsAsFile() ? f : File::nonexistent;
+}
 
-    const File&
-    KnownFilesystems::getPathForUUID (const String& uuid) const
-    {
-        for (const Filesystem* fs : llist)
-        {
-            if (fs && fs->uuid == uuid)
-                return fs->path;
-        }
+File KnownFilesystems::getFile (const ValueTree& node) const {
+    return getFile (node.getProperty (Slugs::fsid),
+                    node.getProperty (Slugs::path));
+}
 
-        return File::nonexistent;
-    }
+void KnownFilesystems::getNames (StringArray& names) {
+    for (const Filesystem* fs : llist)
+        names.add (fs->name);
+}
 
-    File
-    KnownFilesystems::getFile (const String& uuid, const String& path) const
-    {
-        File f = getPathForUUID(uuid).getChildFile (path);
-        return f.existsAsFile() ? f : File::nonexistent;
-    }
+Filesystem*
+    KnownFilesystems::findByName (const String& name) const {
+    for (Filesystem* fs : llist)
+        if (fs != nullptr && fs->name == name)
+            return fs;
 
-    File
-    KnownFilesystems::getFile (const ValueTree& node) const
-    {
-        return getFile (node.getProperty (Slugs::fsid),
-                        node.getProperty (Slugs::path));
-    }
+    return nullptr;
+}
 
+Filesystem*
+    KnownFilesystems::get (uint32 index) const {
+    if (index < llist.size())
+        return llist.getUnchecked (index);
+    return nullptr;
+}
 
-    void
-    KnownFilesystems::getNames (StringArray& names)
-    {
-        for (const Filesystem* fs : llist)
-            names.add (fs->name);
-    }
+FilesystemScanner::FilesystemScanner (KnownFilesystems& fses, const FileSearchPath& searchPaths) {
+    for (int i = 0; i < searchPaths.getNumPaths(); ++i) {
+        File sbt (searchPaths[i]);
+        Array<File> subdirs;
+        sbt.findChildFiles (subdirs, File::findDirectories, false, "*");
 
-    Filesystem*
-    KnownFilesystems::findByName (const String& name) const
-    {
-        for (Filesystem* fs : llist)
-            if (fs != nullptr && fs->name == name)
-                return fs;
+        for (int i = 0; i < subdirs.size(); ++i) {
+            File fsid (subdirs[i].getChildFile ("fsid.xml"));
 
-       return nullptr;
-    }
+            if (! fsid.existsAsFile())
+                fsid = subdirs[i].getChildFile (".fsid.xml");
 
-    Filesystem*
-    KnownFilesystems::get (uint32 index) const
-    {
-        if (index < llist.size())
-            return llist.getUnchecked (index);
-        return nullptr;
-    }
-
-    FilesystemScanner::FilesystemScanner (KnownFilesystems& fses, const FileSearchPath& searchPaths)
-    {
-        for (int i = 0; i < searchPaths.getNumPaths(); ++i)
-        {
-            File sbt (searchPaths [i]);
-            Array<File> subdirs;
-            sbt.findChildFiles (subdirs, File::findDirectories, false, "*");
-
-            for (int i =0; i < subdirs.size(); ++i)
-            {
-                File fsid (subdirs[i].getChildFile ("fsid.xml"));
-
-                if (! fsid.existsAsFile())
-                    fsid = subdirs[i].getChildFile (".fsid.xml");
-
-                if (fsid.existsAsFile())
-                {
-                    ScopedXml e (XmlDocument::parse (fsid));
-                    fses.add (e->getChildByName("FilesystemId")->getAllSubText(),
-                              fsid.getParentDirectory(), e->getChildByName("FilesystemName")->getAllSubText());
-                }
-                else
-                {
-                    const File manifest = subdirs[i].getChildFile ("manifest.xml");
-                    if (manifest.existsAsFile())
-                    {
-                        fses.add (String::empty,
-                                  manifest.getParentDirectory(),
-                                  "New Filesystem");
-                    }
+            if (fsid.existsAsFile()) {
+                ScopedXml e (XmlDocument::parse (fsid));
+                fses.add (e->getChildByName ("FilesystemId")->getAllSubText(),
+                          fsid.getParentDirectory(),
+                          e->getChildByName ("FilesystemName")->getAllSubText());
+            } else {
+                const File manifest = subdirs[i].getChildFile ("manifest.xml");
+                if (manifest.existsAsFile()) {
+                    fses.add (String::empty,
+                              manifest.getParentDirectory(),
+                              "New Filesystem");
                 }
             }
         }
     }
 }
+} // namespace KSP1

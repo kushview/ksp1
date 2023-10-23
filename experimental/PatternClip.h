@@ -24,19 +24,17 @@
 
 namespace KSP1 {
 
-class PatternClip :  public ClipModel
-{
+class PatternClip : public ClipModel {
 public:
     PatternClip()
-        : ClipModel (0, 1, 0)
-    {
+        : ClipModel (0, 1, 0) {
         ValueTree n = node();
         n.setProperty (Slugs::media, Slugs::pattern.toString(), nullptr);
     }
 
-    ~PatternClip() { }
+    ~PatternClip() {}
 };
 
-}
+} // namespace KSP1
 
 #endif

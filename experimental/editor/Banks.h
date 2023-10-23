@@ -24,62 +24,55 @@
 
 namespace KSP1 {
 
-    class BankList : public Component,
-                     public ListBoxModel
-    {
-        Programming& progs;
+class BankList : public Component,
+                 public ListBoxModel {
+    Programming& progs;
 
-    public:
+public:
+    BankList (Programming& programs)
+        : progs (programs) {
+        addAndMakeVisible (&listbox);
+        listbox.setModel (this);
+        listbox.updateContent();
+    }
 
-        BankList (Programming& programs)
-            : progs (programs)
-        {
-            addAndMakeVisible (&listbox);
-            listbox.setModel (this);
-            listbox.updateContent();
-        }
+    ~BankList() {
+    }
 
-        ~BankList()
-        {
-        }
+    inline int
+        getNumRows() {
+        return progs.getNumBanks();
+    }
 
-        inline int
-        getNumRows()
-        {
-            return progs.getNumBanks();
-        }
-
-        inline void
+    inline void
         paintListBoxItem (int rowNumber, Graphics& g,
-                int width, int height,
-                bool rowIsSelected)
-        {
-            if (rowIsSelected) {
-                g.setColour (Colours::black.withAlpha (0.8f));
+                          int width, int height,
+                          bool rowIsSelected) {
+        if (rowIsSelected) {
+            g.setColour (Colours::black.withAlpha (0.8f));
 
-            }
-            else
-                g.setColour (Colours::black.withAlpha (1.0f));
+        } else
+            g.setColour (Colours::black.withAlpha (1.0f));
 
-            g.fillRect (0, 0, width, height);
+        g.fillRect (0, 0, width, height);
 
-            g.setColour (Colours::whitesmoke);
-            g.drawText (progs.getBankName (rowNumber),
-                        2, 0, width - 4, height,
-                        Justification::centredLeft, true);
-        }
+        g.setColour (Colours::whitesmoke);
+        g.drawText (progs.getBankName (rowNumber),
+                    2,
+                    0,
+                    width - 4,
+                    height,
+                    Justification::centredLeft,
+                    true);
+    }
 
-        inline void
-        listBoxItemClicked (int row, const MouseEvent& e)
-        {
+    inline void
+        listBoxItemClicked (int row, const MouseEvent& e) {
+    }
 
-        }
-
-        inline void
-        listBoxItemDoubleClicked (int row, const MouseEvent& e)
-        {
-
-        }
+    inline void
+        listBoxItemDoubleClicked (int row, const MouseEvent& e) {
+    }
 
 #if 0
 Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
@@ -101,44 +94,37 @@ String getTooltipForRow (int row);
 #endif
 
     inline void
-    resized()
-    {
+        resized() {
         listbox.setBoundsInset (BorderSize<int> (8));
     }
 
-    private:
-        ListBox listbox;
-    };
+private:
+    ListBox listbox;
+};
 
+class BankCombo : public ComboBox {
+public:
+    BankCombo (KSP1::Programming& programs) {
+        reset (programs);
+    }
 
-    class BankCombo : public ComboBox
-    {
-    public:
+    inline void
+        reset (KSP1::Programming& programs) {
+        clear (sendNotification);
 
-        BankCombo (KSP1::Programming& programs)
-        {
-            reset (programs);
-        }
+        int selected = getSelectedId();
 
-        inline void
-        reset (KSP1::Programming& programs)
-        {
-            clear (sendNotification);
+        for (int i = 0; i < programs.getNumBanks(); ++i)
+            addItem (programs.getBankName (i), i + 1);
 
-            int selected = getSelectedId();
+        if (this->indexOfItemId (selected) >= 0)
+            setSelectedId (selected, dontSendNotification);
+        else
+            setSelectedId (0, dontSendNotification);
+    }
 
-            for (int i = 0; i < programs.getNumBanks(); ++i)
-                addItem (programs.getBankName(i), i + 1);
-
-            if (this->indexOfItemId (selected) >= 0)
-                setSelectedId (selected, dontSendNotification);
-            else
-                setSelectedId (0, dontSendNotification);
-        }
-
-    private:
-
-    };
-}
+private:
+};
+} // namespace KSP1
 
 #endif /* KSP1_BANKS_H */

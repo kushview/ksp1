@@ -19,18 +19,16 @@
 
 #include "Instrument.h"
 #if 0
-#include "BeatThangKitLoader.h"
-#include "StandardLoader.h"
+#    include "BeatThangKitLoader.h"
+#    include "StandardLoader.h"
 #endif
 
 namespace KSP1 {
 
-struct KeySorter
-{
-    explicit KeySorter (bool asc = false) : ascending (asc) { }
+struct KeySorter {
+    explicit KeySorter (bool asc = false) : ascending (asc) {}
 
-    int compareElements (const ValueTree& left, const ValueTree& right)
-    {
+    int compareElements (const ValueTree& left, const ValueTree& right) {
         if ((left.hasType (Tags::key)) && (! right.hasType (Tags::key))) {
             return 1;
         } else if ((! left.hasType (Tags::key)) && (right.hasType (Tags::key))) {
@@ -49,8 +47,8 @@ struct KeySorter
 
         jassert (noteL == noteR);
 
-        const int lenL  = left.getProperty (kv::Slugs::length);
-        const int lenR  = right.getProperty (kv::Slugs::length);
+        const int lenL = left.getProperty (kv::Slugs::length);
+        const int lenR = right.getProperty (kv::Slugs::length);
 
         if (lenL < lenR)
             return -1;
@@ -65,60 +63,50 @@ private:
 };
 
 Instrument::Instrument (const String& name)
-    : MediaObject ("instrument")
-{
+    : MediaObject ("instrument") {
     selectedNote = 0;
     setName (name);
 }
 
 Instrument::Instrument (const ValueTree& data)
-    : MediaObject (data)
-{
+    : MediaObject (data) {
     selectedNote = 0;
 }
 
 Instrument::Instrument (const Instrument& other)
     : MediaObject (other.node()),
-        selectedNote (other.selectedNote)
-{ }
+      selectedNote (other.selectedNote) {}
 
-Instrument::~Instrument() { }
+Instrument::~Instrument() {}
 
-
-Instrument& Instrument::operator= (const Instrument& other)
-{
-    objectData = other.objectData;
+Instrument& Instrument::operator= (const Instrument& other) {
+    objectData         = other.objectData;
     this->selectedNote = other.selectedNote;
-    this->file = other.file;
+    this->file         = other.file;
     return *this;
 }
 
-static bool containsSound (const ValueTree& tree, int note, int span)
-{
-    for (int i = 0; i < tree.getNumChildren(); ++i)
-    {
+static bool containsSound (const ValueTree& tree, int note, int span) {
+    for (int i = 0; i < tree.getNumChildren(); ++i) {
         const auto child = tree.getChild (i);
-        if ((int) child[Tags::note] == note && span == (int) child [Tags::length])
+        if ((int) child[Tags::note] == note && span == (int) child[Tags::length])
             return true;
     }
     return false;
 }
 
-KeyItem Instrument::getSound (int index) const
-{
+KeyItem Instrument::getSound (int index) const {
     KeyItem sound (objectData.getChild (index));
     return sound;
 }
 
-void Instrument::setActiveSoundIndex (int index)
-{
+void Instrument::setActiveSoundIndex (int index) {
     const auto sound = getSound (index);
     if (sound.isValid())
         setProperty ("activeSound", sound.getProperty (Tags::id));
 }
 
-KeyItem Instrument::getActiveSound() const
-{
+KeyItem Instrument::getActiveSound() const {
     const auto soundId = (int) getProperty ("activeSound");
     if (soundId < 0)
         return getSound (0);
@@ -126,19 +114,18 @@ KeyItem Instrument::getActiveSound() const
     return sound;
 }
 
-void Instrument::removeSound (const KeyItem& item)
-{
-    if (objectData.indexOf (item.getValueTree()));
-        objectData.removeChild (item.getValueTree(), nullptr);
+void Instrument::removeSound (const KeyItem& item) {
+    if (objectData.indexOf (item.getValueTree()))
+        ;
+    objectData.removeChild (item.getValueTree(), nullptr);
 }
 
-KeyItem Instrument::addKey (int32 noteNumber, int32 keySpan)
-{
+KeyItem Instrument::addKey (int32 noteNumber, int32 keySpan) {
     if (! isPositiveAndBelow (noteNumber, 128))
         return KeyItem();
-    
+
     bool wasJustCreated = false;
-    
+
     ValueTree key = ValueTree (Tags::key);
     key.setProperty (kv::Slugs::note, noteNumber, nullptr);
     if (keySpan > 0)
@@ -146,34 +133,29 @@ KeyItem Instrument::addKey (int32 noteNumber, int32 keySpan)
 
     KeyItem item (key);
     item.setMissingProperties();
-    
-    if (key.isValid())
-    {
+
+    if (key.isValid()) {
         objectData.addChild (key, noteNumber, nullptr);
     }
 
     return item;
 }
 
-void Instrument::clear()
-{
+void Instrument::clear() {
     objectData.removeAllChildren (nullptr);
     file = File();
 }
 
-void Instrument::sortKeys()
-{
+void Instrument::sortKeys() {
     KeySorter s;
     objectData.sort (s, nullptr, true);
 }
 
-String Instrument::getName() const
-{
+String Instrument::getName() const {
     return getProperty (Tags::name);
 }
 
-void Instrument::setMissingProperties (bool recursive)
-{
+void Instrument::setMissingProperties (bool recursive) {
     ValueTree root (getValueTree());
 
     if (! objectData.hasProperty (kv::Slugs::name)) {
@@ -181,25 +163,22 @@ void Instrument::setMissingProperties (bool recursive)
     }
 
     if (! objectData.hasProperty (kv::Slugs::volume)) {
-        objectData.setProperty (kv::Slugs::volume, (double)1.0, 0);
+        objectData.setProperty (kv::Slugs::volume, (double) 1.0, 0);
     }
 
     if (! recursive)
         return;
 
-    for (int i = 0; i < root.getNumChildren(); ++i)
-    {
-        ValueTree child (root.getChild(i));
-        if (child.hasType (Tags::key))
-        {
+    for (int i = 0; i < root.getNumChildren(); ++i) {
+        ValueTree child (root.getChild (i));
+        if (child.hasType (Tags::key)) {
             KeyItem key (child);
             key.setMissingProperties();
         }
     }
 }
 
-KeyItem Instrument::getKey (int32 noteNumber, bool setMissing) const
-{
+KeyItem Instrument::getKey (int32 noteNumber, bool setMissing) const {
     if (! isPositiveAndBelow (noteNumber, 128))
         return KeyItem();
 
@@ -210,8 +189,7 @@ KeyItem Instrument::getKey (int32 noteNumber, bool setMissing) const
     return key;
 }
 
-KeyItem Instrument::getOrCreateKey (int32 noteNumber)
-{
+KeyItem Instrument::getOrCreateKey (int32 noteNumber) {
     KeyItem existing (getKey (noteNumber));
     if (existing.isValid())
         return existing;
@@ -219,19 +197,16 @@ KeyItem Instrument::getOrCreateKey (int32 noteNumber)
     return addKey (noteNumber);
 }
 
-LayerItem Instrument::getLayer (int32 key, int32 layer)
-{
+LayerItem Instrument::getLayer (int32 key, int32 layer) {
     KeyItem item (getKey (key));
     return item.getLayer (layer);
 }
 
-XmlElement* Instrument::createXml()
-{
+XmlElement* Instrument::createXml() {
     return objectData.createXml();
 }
 
-void Instrument::getSamples (StringArray& samples) const
-{
+void Instrument::getSamples (StringArray& samples) const {
     const ValueTree& node (objectData);
     for (int i = 0; i < node.getNumChildren(); ++i) {
         const ValueTree key (node.getChild (i));
@@ -244,16 +219,14 @@ void Instrument::getSamples (StringArray& samples) const
     }
 }
 
-void Instrument::loadFromXml (const XmlElement& xml)
-{
+void Instrument::loadFromXml (const XmlElement& xml) {
     ValueTree newData (ValueTree::fromXml (xml));
     if (newData.hasType (Tags::instrument))
         setData (newData);
 }
 
-void Instrument::setName (const String& name)
-{
+void Instrument::setName (const String& name) {
     getPropertyAsValue (kv::Slugs::name) = name;
 }
 
-}
+} // namespace KSP1

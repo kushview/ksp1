@@ -14,8 +14,8 @@
                 "${workspaceRoot}/libs/kv/modules",
                 "${workspaceRoot}/libs/juce/modules"
             ],
-            "defines": [ ],
-            "forcedInclude": [ ],
+            "defines": [],
+            "forcedInclude": [],
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
@@ -38,6 +38,23 @@
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++14"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/subprojects/juce/modules/*",
+                "${workspaceFolder}/subprojects/lvtk/include/*",
+                "${workspaceFolder}/src/*",
+                "${default}"
+            ],
+            "defines": [
+                "ROBOVERB_UI=1"
+            ],
+            "compilerPath": "${default}",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "${default}",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         }
     ]
 }

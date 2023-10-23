@@ -18,31 +18,26 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "editor/Screens.h"
-#include "editor/ScreenManager.h"
 #include "InstrumentLoader.h"
+#include "editor/ScreenManager.h"
+#include "editor/Screens.h"
 //[/Headers]
 
 #include "SamplerDisplay.h"
-
 
 namespace KSP1 {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 
-class SamplerDisplay::Models
-{
+class SamplerDisplay::Models {
 public:
+    Models() {}
 
-    Models() { }
-
-    ~Models()
-    {
-
+    ~Models() {
     }
 
     InstrumentPtr instrument (int index = 0) {
-        return this->instrments [index];
+        return this->instrments[index];
     }
 
     void setInstrument (int index, InstrumentPtr i) {
@@ -53,24 +48,19 @@ private:
     ReferenceCountedArray<Instrument> instrments;
 };
 
-class SamplerDisplay::Dispatch : public Timer
-{
+class SamplerDisplay::Dispatch : public Timer {
 public:
-
     Dispatch (SamplerDisplay& d)
-        : display (d)
-    {
+        : display (d) {
         setFrequencyMillis (64);
         startTimer (milliseconds);
     }
 
-    ~Dispatch()
-    {
+    ~Dispatch() {
         stopTimer();
     }
 
-    void setFrequencyMillis (int millis)
-    {
+    void setFrequencyMillis (int millis) {
         const bool wasRunning = isTimerRunning();
 
         if (wasRunning)
@@ -82,38 +72,32 @@ public:
             startTimer (milliseconds);
     }
 
-    void timerCallback () {
+    void timerCallback() {
         display.runDispatchLoop();
     }
 
     /** refresh rate in hertz */
-    double refreshRate() const
-    {
+    double refreshRate() const {
         if (milliseconds <= 0)
             return 0.0f;
 
-        return  1000.f / (double) milliseconds;
+        return 1000.f / (double) milliseconds;
     }
 
 private:
-
     SamplerDisplay& display;
     int milliseconds;
-
 };
 
-class DisplayProgressBar :  public ProgressBar,
-                            public ProgressSink
-{
+class DisplayProgressBar : public ProgressBar,
+                           public ProgressSink {
     SamplerDisplay& display;
 
 public:
-
     DisplayProgressBar (SamplerDisplay& parent)
         : ProgressBar (val),
           display (parent),
-          val(0.0f)
-    {
+          val (0.0f) {
         setPercentageDisplay (true);
         setInterceptsMouseClicks (false, false);
         setAlwaysOnTop (true);
@@ -121,26 +105,22 @@ public:
         setAlpha (0.6);
     }
 
-    void handleProgress (float p)
-    {
+    void handleProgress (float p) {
         val = p;
         repaint();
         MessageManager::getInstance()->runDispatchLoopUntil (1);
     }
 
-    void handleStatus (const String& msg)
-    {
+    void handleStatus (const String& msg) {
         display.setTitle (msg);
     }
 
-    void handleProgressStart()
-    {
+    void handleProgressStart() {
         val = 0.0f;
         setVisible (true);
     }
 
-    void handleProgressFinished()
-    {
+    void handleProgressFinished() {
         setVisible (false);
         display.setTitle ("Finished Loading...");
     }
@@ -152,15 +132,14 @@ private:
 //[/MiscUserDefs]
 
 //==============================================================================
-SamplerDisplay::SamplerDisplay ()
-{
+SamplerDisplay::SamplerDisplay() {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
     title.reset (new Label ("title",
-                            TRANS("Default Instrument")));
+                            TRANS ("Default Instrument")));
     addAndMakeVisible (title.get());
-    title->setTooltip (TRANS("Current Instrument"));
+    title->setTooltip (TRANS ("Current Instrument"));
     title->setFont (Font (18.00f, Font::plain).withTypefaceStyle ("Regular"));
     title->setJustificationType (Justification::centredLeft);
     title->setEditable (false, true, false);
@@ -172,9 +151,9 @@ SamplerDisplay::SamplerDisplay ()
     title->setBounds (1, -1, 279, 24);
 
     noteLabel.reset (new Label ("NoteLabel",
-                                TRANS("C0-1")));
+                                TRANS ("C0-1")));
     addAndMakeVisible (noteLabel.get());
-    noteLabel->setTooltip (TRANS("Current Note"));
+    noteLabel->setTooltip (TRANS ("Current Note"));
     noteLabel->setFont (Font (17.00f, Font::plain).withTypefaceStyle ("Bold"));
     noteLabel->setJustificationType (Justification::centredRight);
     noteLabel->setEditable (false, false, false);
@@ -191,16 +170,14 @@ SamplerDisplay::SamplerDisplay ()
     addAndMakeVisible (progressBar.get());
     progressBar->setName ("progress-bar");
 
-
     //[UserPreSize]
-    screens = new ScreenManager();
+    screens       = new ScreenManager();
     currentScreen = nullptr;
-    models = new Models();
+    models        = new Models();
     models->setInstrument (0, new Instrument ("New Instrument"));
     //[/UserPreSize]
 
     setSize (282, 147);
-
 
     //[Constructor] You can add your own custom stuff here..
     progressBar->setVisible (false);
@@ -212,27 +189,24 @@ SamplerDisplay::SamplerDisplay ()
     //[/Constructor]
 }
 
-SamplerDisplay::~SamplerDisplay()
-{
+SamplerDisplay::~SamplerDisplay() {
     //[Destructor_pre]. You can add your own custom destruction code here..
     stopTimer();
     //[/Destructor_pre]
 
-    title = nullptr;
-    noteLabel = nullptr;
-    screen = nullptr;
+    title       = nullptr;
+    noteLabel   = nullptr;
+    screen      = nullptr;
     progressBar = nullptr;
-
 
     //[Destructor]. You can add your own custom destruction code here..
     dispatch = nullptr;
-    models = nullptr;
+    models   = nullptr;
     //[/Destructor]
 }
 
 //==============================================================================
-void SamplerDisplay::paint (Graphics& g)
-{
+void SamplerDisplay::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
@@ -242,8 +216,7 @@ void SamplerDisplay::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void SamplerDisplay::resized()
-{
+void SamplerDisplay::resized() {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
@@ -256,13 +229,11 @@ void SamplerDisplay::resized()
     //[/UserResized]
 }
 
-void SamplerDisplay::labelTextChanged (Label* labelThatHasChanged)
-{
+void SamplerDisplay::labelTextChanged (Label* labelThatHasChanged) {
     //[UserlabelTextChanged_Pre]
     //[/UserlabelTextChanged_Pre]
 
-    if (labelThatHasChanged == title.get())
-    {
+    if (labelThatHasChanged == title.get()) {
         //[UserLabelCode_title] -- add your label text handling code here..
         //[/UserLabelCode_title]
     }
@@ -271,38 +242,30 @@ void SamplerDisplay::labelTextChanged (Label* labelThatHasChanged)
     //[/UserlabelTextChanged_Post]
 }
 
-void SamplerDisplay::mouseDown (const MouseEvent& e)
-{
+void SamplerDisplay::mouseDown (const MouseEvent& e) {
     //[UserCode_mouseDown] -- Add your code here...
     //[/UserCode_mouseDown]
 }
 
-void SamplerDisplay::mouseDoubleClick (const MouseEvent& e)
-{
+void SamplerDisplay::mouseDoubleClick (const MouseEvent& e) {
     //[UserCode_mouseDoubleClick] -- Add your code here...
     //[/UserCode_mouseDoubleClick]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-InstrumentPtr SamplerDisplay::getInstrument() const
-{
+InstrumentPtr SamplerDisplay::getInstrument() const {
     return models->instrument();
 }
 
-ProgressSink& SamplerDisplay::progressBarSink()
-{
+ProgressSink& SamplerDisplay::progressBarSink() {
     jassert (progressBar.get());
     return *progressBar;
 }
 
-void SamplerDisplay::runDispatchLoop()
-{
+void SamplerDisplay::runDispatchLoop() {
 #if 1
-    if (nullptr != getInstrument() && currentNote != getInstrument()->currentKeyId())
-    {
+    if (nullptr != getInstrument() && currentNote != getInstrument()->currentKeyId()) {
         currentNote = getInstrument()->currentKeyId();
         selectNote (currentNote, true);
     }
@@ -310,55 +273,49 @@ void SamplerDisplay::runDispatchLoop()
     updateSignal(); // emit signal to clients
 }
 
-KeyItem SamplerDisplay::selectedKey()
-{
+KeyItem SamplerDisplay::selectedKey() {
     KeyItem key (getInstrument()->getKey (selectedNote()));
     return key;
 }
 
-LayerItem SamplerDisplay::selectedLayer()
-{
+LayerItem SamplerDisplay::selectedLayer() {
     KeyItem item (selectedKey());
     int whichLayer = currentLayer > item.countLayers()
-                   ? item.countLayers() : (int) currentLayer;
+                         ? item.countLayers()
+                         : (int) currentLayer;
     return getInstrument()->getLayer (item.getNote(), whichLayer);
 }
 
-void SamplerDisplay::selectNote (int32 note, bool notify)
-{
-   #if 0
+void SamplerDisplay::selectNote (int32 note, bool notify) {
+#if 0
     KeyItem item = getInstrument()->getKey (note);
     if (currentScreen && notify)
         currentScreen->keySelectedEvent (item);
-   #endif
+#endif
 
     setNote (note);
 }
 
-void SamplerDisplay::setInstrument (InstrumentPtr inst)
-{
+void SamplerDisplay::setInstrument (InstrumentPtr inst) {
     if (inst == nullptr)
         return;
 
     models->setInstrument (0, inst);
 }
 
-void SamplerDisplay::setNote (int32 n)
-{
+void SamplerDisplay::setNote (int32 n) {
     String letter = MidiMessage::getMidiNoteName (n, false, true, 4);
     noteLabel->setText (letter, dontSendNotification);
     noteLabel->repaint();
     currentNote = n;
 }
 
-void SamplerDisplay::setScreen (Screen::ID s, int page)
-{
+void SamplerDisplay::setScreen (Screen::ID s, int page) {
     if (currentScreen)
         removeChildComponent (currentScreen);
     this->currentScreen = screens->getScreen (*this, (int) s);
 
-    if (currentScreen)
-    {
+    if (currentScreen) {
         addAndMakeVisible (currentScreen);
         currentScreen->setCurrentPage (page);
     }
@@ -366,20 +323,14 @@ void SamplerDisplay::setScreen (Screen::ID s, int page)
     resized();
 }
 
-
-void SamplerDisplay::setTitle (const String& t)
-{
+void SamplerDisplay::setTitle (const String& t) {
     title->setText (t, dontSendNotification);
 }
 
-
-void SamplerDisplay::timerCallback()
-{
-
+void SamplerDisplay::timerCallback() {
 }
 
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -423,10 +374,7 @@ END_JUCER_METADATA
 */
 #endif
 
-
-
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

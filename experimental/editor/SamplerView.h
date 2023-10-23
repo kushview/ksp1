@@ -20,13 +20,12 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "editor/LevelMeter.h"
-#include "editor/LayersListBox.h"
 #include "editor/Keyboard.h"
+#include "editor/LayersListBox.h"
+#include "editor/LevelMeter.h"
 //[/Headers]
 
 #include "SamplerDisplay.h"
-
 
 namespace KSP1 {
 
@@ -35,15 +34,14 @@ namespace KSP1 {
                                                                     //[Comments]
                                                                     //[/Comments]
 */
-class SamplerView  : public Component,
-                     public DragAndDropContainer,
-                     private Value::Listener,
-                     public Slider::Listener,
-                     public Button::Listener
-{
+class SamplerView : public Component,
+                    public DragAndDropContainer,
+                    private Value::Listener,
+                    public Slider::Listener,
+                    public Button::Listener {
 public:
     //==============================================================================
-    SamplerView ();
+    SamplerView();
     ~SamplerView();
 
     //==============================================================================
@@ -74,14 +72,13 @@ public:
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
 
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     Value activeSound;
     MidiKeyboardState keyboardState;
 
-    class Updater; friend class Updater;
+    class Updater;
+    friend class Updater;
     ScopedPointer<Updater> updater;
 
     void layerChosen();
@@ -101,14 +98,12 @@ private:
     std::unique_ptr<TextButton> layersButton;
     std::unique_ptr<TextButton> editButton;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SamplerView)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 
 //[/EndFile]
-

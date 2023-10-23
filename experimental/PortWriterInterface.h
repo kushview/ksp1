@@ -26,14 +26,13 @@ namespace KSP1 {
 
 class PortWriter;
 
-class PortWriterInterface : public SamplerInterface
-{
+class PortWriterInterface : public SamplerInterface {
 public:
     PortWriterInterface (PortWriter&);
     ~PortWriterInterface();
 
     void setFrozen (const bool freeze) { frozen = freeze; }
-    void handleMidi (const MidiMessage &midi) override;
+    void handleMidi (const MidiMessage& midi) override;
 
     void getKeyForNote (const int note) override;
 
@@ -44,7 +43,7 @@ protected:
     bool removeLayer (const LayerItem&) override;
     void clearKeyboard() override;
 
-    void loadFile (const File &) override;
+    void loadFile (const File&) override;
 
     void mutate (const Instrument& key, const Identifier& prop) override;
     void mutate (const KeyItem& key, const Identifier& prop) override;
@@ -57,6 +56,6 @@ private:
     bool frozen;
 };
 
-}
+} // namespace KSP1
 
 #endif // KSP1_ATOM_PORT_INTERFACE_H

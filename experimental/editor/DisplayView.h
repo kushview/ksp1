@@ -5,8 +5,7 @@
 
 namespace KSP1 {
 
-class DisplayView :  public Component
-{
+class DisplayView : public Component {
 public:
     DisplayView();
     virtual ~DisplayView();
@@ -20,6 +19,6 @@ private:
     SamplerDisplay display;
 };
 
-}
+} // namespace KSP1
 
 #endif // DISPLAYVIEW_H

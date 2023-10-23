@@ -18,15 +18,14 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "editor/SamplerDisplay.h"
-#include "editor/ProgramsListBox.h"
-#include "editor/Screens.h"
-#include "editor/QuickBrowser.h"
 #include "Instrument.h"
+#include "editor/ProgramsListBox.h"
+#include "editor/QuickBrowser.h"
+#include "editor/SamplerDisplay.h"
+#include "editor/Screens.h"
 //[/Headers]
 
 #include "PianoRoll.h"
-
 
 namespace KSP1 {
 
@@ -36,15 +35,14 @@ namespace KSP1 {
 
 //==============================================================================
 PianoRollScreen::PianoRollScreen (SamplerDisplay& owner)
-    : Screen (owner, "Test Screen", Screen::editScreen)
-{
+    : Screen (owner, "Test Screen", Screen::editScreen) {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
     buttonAddSample.reset (new TextButton ("add-sample-button"));
     addAndMakeVisible (buttonAddSample.get());
-    buttonAddSample->setTooltip (TRANS("Add a Sample"));
-    buttonAddSample->setButtonText (TRANS("+"));
+    buttonAddSample->setTooltip (TRANS ("Add a Sample"));
+    buttonAddSample->setButtonText (TRANS ("+"));
     buttonAddSample->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     buttonAddSample->addListener (this);
     buttonAddSample->setColour (TextButton::buttonColourId, Colour (0xc7282828));
@@ -54,8 +52,8 @@ PianoRollScreen::PianoRollScreen (SamplerDisplay& owner)
 
     buttonRemoveLayer.reset (new TextButton ("button-remove-layer"));
     addAndMakeVisible (buttonRemoveLayer.get());
-    buttonRemoveLayer->setTooltip (TRANS("Remove Sample"));
-    buttonRemoveLayer->setButtonText (TRANS("-"));
+    buttonRemoveLayer->setTooltip (TRANS ("Remove Sample"));
+    buttonRemoveLayer->setButtonText (TRANS ("-"));
     buttonRemoveLayer->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     buttonRemoveLayer->addListener (this);
     buttonRemoveLayer->setColour (TextButton::buttonColourId, Colour (0xc72d2d2d));
@@ -63,34 +61,29 @@ PianoRollScreen::PianoRollScreen (SamplerDisplay& owner)
     buttonRemoveLayer->setColour (TextButton::textColourOffId, Colour (0xff858585));
     buttonRemoveLayer->setColour (TextButton::textColourOnId, Colour (0xffe2e2e2));
 
-
     //[UserPreSize]
     //[/UserPreSize]
 
     setSize (600, 400);
-
 
     //[Constructor] You can add your own custom stuff here..
     lastNote = display().selectedKey().getNote();
     //[/Constructor]
 }
 
-PianoRollScreen::~PianoRollScreen()
-{
+PianoRollScreen::~PianoRollScreen() {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    buttonAddSample = nullptr;
+    buttonAddSample   = nullptr;
     buttonRemoveLayer = nullptr;
-
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void PianoRollScreen::paint (Graphics& g)
-{
+void PianoRollScreen::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
@@ -100,8 +93,7 @@ void PianoRollScreen::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void PianoRollScreen::resized()
-{
+void PianoRollScreen::resized() {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
@@ -111,18 +103,14 @@ void PianoRollScreen::resized()
     //[/UserResized]
 }
 
-void PianoRollScreen::buttonClicked (Button* buttonThatWasClicked)
-{
+void PianoRollScreen::buttonClicked (Button* buttonThatWasClicked) {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == buttonAddSample.get())
-    {
+    if (buttonThatWasClicked == buttonAddSample.get()) {
         //[UserButtonCode_buttonAddSample] -- add your button handler code here..
         //[/UserButtonCode_buttonAddSample]
-    }
-    else if (buttonThatWasClicked == buttonRemoveLayer.get())
-    {
+    } else if (buttonThatWasClicked == buttonRemoveLayer.get()) {
         //[UserButtonCode_buttonRemoveLayer] -- add your button handler code here..
         //[/UserButtonCode_buttonRemoveLayer]
     }
@@ -131,31 +119,20 @@ void PianoRollScreen::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void
-PianoRollScreen::keySelectedEvent (const KeyItem& item)
-{
-
+void PianoRollScreen::keySelectedEvent (const KeyItem& item) {
 }
 
-void PianoRollScreen::timerCallback()
-{
+void PianoRollScreen::timerCallback() {
 }
 
-void PianoRollScreen::updateComponents()
-{
+void PianoRollScreen::updateComponents() {
 }
 
-void
-PianoRollScreen::onDisplayUpdate()
-{
-
+void PianoRollScreen::onDisplayUpdate() {
 }
 
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -186,10 +163,7 @@ END_JUCER_METADATA
 */
 #endif
 
-
-
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

@@ -26,8 +26,7 @@ namespace KSP1 {
 class Screen;
 class SamplerDisplay;
 
-class ScreenManager
-{
+class ScreenManager {
 public:
     ScreenManager();
     virtual ~ScreenManager();
@@ -40,4 +39,4 @@ private:
     Screen* createScreen (const int type);
 };
 
-}
+} // namespace KSP1

@@ -19,9 +19,11 @@
 
 #pragma once
 
-#include "engine/SamplerKeys.h"
+#include "juce.hpp"
 
-namespace KSP1 {
+#include "samplerkeys.hpp"
+
+namespace ksp1 {
 
 class LayerItem;
 class LowPassFilter;
@@ -30,14 +32,13 @@ class SamplerSound;
 class SamplerSynth;
 class SamplerVoice;
 
-class LayerData : public ReferenceCountedObject
-{
+class LayerData : public juce::ReferenceCountedObject {
 public:
     LayerData (SampleCache&, int layerId);
     ~LayerData();
 
     /** Create a DynamicObject representing this LayerData */
-    DynamicObject::Ptr createDynamicObject() const;
+    juce::DynamicObject::Ptr createDynamicObject() const;
 
     void setStartTime (double timeIn);
     void setEndTime (double timeOut);
@@ -46,26 +47,26 @@ public:
     void setVolume (const double vol);
 
     /** Returns the audio file this data was loaded from if any */
-    const File& getAudioFile() const { return currentFile; }
+    const juce::File& getAudioFile() const { return currentFile; }
 
     /** Get the frame offset */
-    const int64& getOffset() const { return offset; }
+    constexpr int64_t getOffset() const noexcept { return offset; }
 
     /** Get the length frames */
-    const int64& getLength() const { return length; }
+    constexpr int64_t getLength() const noexcept { return length; }
 
     /** Get the start frame in the parent sound */
-    const int64& getStart() const { return start; }
+    constexpr int64_t getStart() const noexcept { return start; }
 
     /** Get the parent SamplerSound's ID for this LayerData */
-    const uint32& getParent() const { return parent; }
+    constexpr uint32_t getParent() const noexcept { return parent; }
 
     /** Get the SamplerSound this layer belongs to.  Returns
         nullptr if it isn't a part of a sound */
-    SamplerSound* getSound() const { return sound; }
+    constexpr SamplerSound* getSound() const noexcept { return sound; }
 
     /** Load an audio file into memory and set the render buffer */
-    bool loadAudioFile (const File& audioFile);
+    bool loadAudioFile (const juce::File& audioFile);
 
     /** Reset properties to default values */
     void reset();
@@ -73,12 +74,12 @@ public:
     void bindTo (const LayerItem&);
 
     /** Restore properties from a JSON formatted var */
-    void restoreFromJSON (const var& json);
+    void restoreFromJSON (const juce::var& json);
 
     /** Restore properties from an XmlElement */
-    void restoreFromXml (const XmlElement& e);
+    void restoreFromXml (const juce::XmlElement& e);
 
-   #if defined (HAVE_LVTK)
+#if defined(HAVE_LVTK)
     /** Set a property using a PatchSet */
     void setProperty (const URIs& uris, const PatchSet& set);
 
@@ -90,20 +91,20 @@ public:
 
     /** Write Layer properties to an AtomObject */
     ForgeRef writeAtomObject (Forge& forge);
-   #endif
+#endif
 
 protected:
-    Atomic<double> gain;
-    Atomic<double> pitch;
-    Atomic<double> panning;
-    Atomic<double> cutoff;
-    Atomic<double> resonance;
-    Atomic<int>  in, out;
-    Range<double> velocityRange;
-    int64 start, offset, length;
+    juce::Atomic<double> gain;
+    juce::Atomic<double> pitch;
+    juce::Atomic<double> panning;
+    juce::Atomic<double> cutoff;
+    juce::Atomic<double> resonance;
+    juce::Atomic<int> in, out;
+    juce::Range<double> velocityRange;
+    int64_t start, offset, length;
 
     /** Set the type (URID) of this Layer (unused) */
-    void setType (const uint32 t) { type = t; }
+    void setType (const uint32_t t) { type = t; }
 
 private:
     friend class SampleCache;
@@ -111,28 +112,28 @@ private:
     friend class SamplerSynth;
     friend class SamplerVoice;
 
-    SampleCache&    cache;
-    uint32          type;
-    int64           lengthInSamples;
-    uint32          numChannels;
-    double          sampleRate;
+    SampleCache& cache;
+    uint32_t type;
+    int64_t lengthInSamples;
+    uint32_t numChannels;
+    double sampleRate;
 
-    const int32   id;
-    uint32        parent;
+    const int id;
+    uint32_t parent;
     SamplerSound* sound;
-    int           index;
-    int           note;
-    File          currentFile;
+    int index;
+    int note;
+    juce::File currentFile;
 
-    std::shared_ptr<AudioSampleBuffer> scratch;
-    AudioSampleBuffer* renderBuffer = nullptr;
+    std::shared_ptr<juce::AudioSampleBuffer> scratch;
+    juce::AudioSampleBuffer* renderBuffer = nullptr;
 
-    ScopedPointer<LowPassFilter> filter;
+    std::unique_ptr<LowPassFilter> filter;
 
     void startNote (int voice, const KeyInfo& key);
-    const float* getSampleData (int32 chan, int32 frame) const;
+    const float* getSampleData (int chan, int frame) const;
 };
 
-using LayerPtr = ReferenceCountedObjectPtr<LayerData>;
+using LayerPtr = juce::ReferenceCountedObjectPtr<LayerData>;
 
-}
+} // namespace ksp1

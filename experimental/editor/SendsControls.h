@@ -23,8 +23,6 @@
 #include "KSP1.h"
 //[/Headers]
 
-
-
 namespace KSP1 {
 
 //==============================================================================
@@ -35,12 +33,11 @@ namespace KSP1 {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class SendsControls  : public Component,
-                       public Slider::Listener
-{
+class SendsControls : public Component,
+                      public Slider::Listener {
 public:
     //==============================================================================
-    SendsControls ();
+    SendsControls();
     ~SendsControls();
 
     //==============================================================================
@@ -50,8 +47,6 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-
-
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -64,14 +59,12 @@ private:
     std::unique_ptr<Label> label2;
     std::unique_ptr<GroupComponent> groupComponent;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SendsControls)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 
 //[/EndFile]
-

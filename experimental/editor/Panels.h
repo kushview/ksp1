@@ -23,44 +23,41 @@
 
 namespace KSP1 {
 
-    class Panel :  public Component
-    {
-    public:
-        /** Panel types */
-        enum ID {
-            assetsPanel   = 0,
-            programsPanel = 1,
-            samplerPanel  = 2,
-            settingsPanel = 3,
-            numPanels     = 4
+class Panel : public Component {
+public:
+    /** Panel types */
+    enum ID {
+        assetsPanel   = 0,
+        programsPanel = 1,
+        samplerPanel  = 2,
+        settingsPanel = 3,
+        numPanels     = 4
+    };
+
+    Panel() {}
+    virtual ~Panel() {}
+
+    inline static const String&
+        name (Panel::ID type) {
+        static const String __names[numPanels + 1] = {
+            String ("Assets"),
+            String ("Programs"),
+            String ("Sampler"),
+            String ("Settings"),
+            String ("Empty Panel")
         };
 
-        Panel () { }
-        virtual ~Panel() { }
+        return __names[type];
+    }
 
-        inline static const String&
-        name (Panel::ID type)
-        {
-            static const String __names [numPanels + 1] = {
-                String ("Assets"),
-                String ("Programs"),
-                String ("Sampler"),
-                String ("Settings"),
-                String ("Empty Panel")
-            };
+    virtual int32 type() const = 0;
+};
 
-            return __names [type];
-        }
+class EmptyPanel : public Panel {
+public:
+    EmptyPanel() {}
+    ~EmptyPanel() {}
+    int32 type() const { return Panel::numPanels; }
+};
 
-        virtual int32 type() const = 0;
-    };
-
-    class EmptyPanel : public Panel
-    {
-    public:
-        EmptyPanel() { }
-        ~EmptyPanel() { }
-        int32 type() const { return Panel::numPanels; }
-    };
-
-}
+} // namespace KSP1

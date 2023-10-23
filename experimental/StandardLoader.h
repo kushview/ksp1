@@ -23,46 +23,39 @@
 #include "Instrument.h"
 #include "InstrumentLoader.h"
 
-namespace KSP1
-{
-    class XmlLoader  : public InstrumentLoader
-    {
-    public:
-        XmlLoader (Instrument& i, ProgressSink& sink)
-            : InstrumentLoader (i)
-        {
-            setSink (sink);
-        }
+namespace KSP1 {
+class XmlLoader : public InstrumentLoader {
+public:
+    XmlLoader (Instrument& i, ProgressSink& sink)
+        : InstrumentLoader (i) {
+        setSink (sink);
+    }
 
-        ~XmlLoader() { }
+    ~XmlLoader() {}
 
-        virtual void loadFile (const File &file)
-        {
-            error = String::empty;
-            ScopedXml xml (XmlDocument::parse (file));
-            if (! xml)
-            {
-                error = "Could not parse instrument";
-                return;
-            }
-
-            loadXml (*xml);
-        }
-
-        virtual void loadResource (const String &file)
-        {
-            loadFile (File (file));
-        }
-
-        void loadXml (const XmlElement& xml)
-        {
-            ValueTree data = ValueTree::fromXml (xml);
-            if (! data.hasType ("instrument"))
-                return;
-
-            instrument.setData (data);
-            finishedLoading();
+    virtual void loadFile (const File& file) {
+        error = String::empty;
+        ScopedXml xml (XmlDocument::parse (file));
+        if (! xml) {
+            error = "Could not parse instrument";
             return;
+        }
+
+        loadXml (*xml);
+    }
+
+    virtual void loadResource (const String& file) {
+        loadFile (File (file));
+    }
+
+    void loadXml (const XmlElement& xml) {
+        ValueTree data = ValueTree::fromXml (xml);
+        if (! data.hasType ("instrument"))
+            return;
+
+        instrument.setData (data);
+        finishedLoading();
+        return;
 #if 0
             // FIXME or MOVEME
             totalSteps = 0;
@@ -110,38 +103,34 @@ namespace KSP1
             instrument.setName (name);
             finishedLoading();
 #endif
+    }
+
+private:
+    String error;
+    int totalSteps;
+};
+
+class StandardLoader : public XmlLoader {
+public:
+    StandardLoader (Instrument& i, ProgressSink& sink)
+        : XmlLoader (i, sink) {}
+
+    ~StandardLoader() {}
+
+    void loadFile (const File& file) {
+        error = String::empty;
+        ScopedXml xml (XmlDocument::parse (file));
+        if (! xml) {
+            error = "Could not parse instrument";
+            return;
         }
 
-    private:
-        String error;
-        int totalSteps;
-    };
+        loadXml (*xml);
+    }
 
-    class StandardLoader  : public XmlLoader
-    {
-    public:
-        StandardLoader (Instrument& i, ProgressSink& sink)
-            : XmlLoader (i, sink)
-        { }
-
-        ~StandardLoader() { }
-
-        void loadFile (const File &file)
-        {
-            error = String::empty;
-            ScopedXml xml (XmlDocument::parse (file));
-            if (! xml)
-            {
-                error = "Could not parse instrument";
-                return;
-            }
-
-            loadXml (*xml);
-        }
-
-    private:
-        String error;
-    };
-}
+private:
+    String error;
+};
+} // namespace KSP1
 
 #endif // KSP1_STANDARD_LOADER_H

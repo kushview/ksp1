@@ -19,4 +19,4 @@
 
 #include "URIs.h"
 
-namespace KSP1 { }
+namespace KSP1 {}

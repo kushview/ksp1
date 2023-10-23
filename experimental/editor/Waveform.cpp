@@ -17,54 +17,41 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "editor/AudioPeaks.h"
 #include "editor/Waveform.h"
 #include "InstrumentLoader.h"
+#include "editor/AudioPeaks.h"
 
 namespace KSP1 {
 
-class Waveform::Sink :  public ProgressSink
-{
+class Waveform::Sink : public ProgressSink {
 public:
-    Sink (Waveform& w) : wave(w) { }
-    void handleProgress (float p)
-    {
-
+    Sink (Waveform& w) : wave (w) {}
+    void handleProgress (float p) {
     }
 
-    void handleStatus (const String& msg)
-    {
-
+    void handleStatus (const String& msg) {
     }
 
-    void handleProgressStart()
-    {
-
+    void handleProgressStart() {
     }
 
-    void handleProgressFinished()
-    {
-
+    void handleProgressFinished() {
     }
-
 
 private:
     Waveform& wave;
 };
 
-Waveform::Waveform()
-{
+Waveform::Waveform() {
     sink = new Sink (*this);
 }
 
-Waveform::~Waveform()
-{
+Waveform::~Waveform() {
     peak = nullptr;
     sink = nullptr;
 }
 
-void Waveform::setAudioPeak (AudioPeakPtr nextPeak)
-{
+void Waveform::setAudioPeak (AudioPeakPtr nextPeak) {
     if (peak == nextPeak)
         return;
 
@@ -75,42 +62,33 @@ void Waveform::setAudioPeak (AudioPeakPtr nextPeak)
 
     if (nextPeak) {
         nextPeak->addChangeListener (this);
-        timeSpan.setEnd (nextPeak->getTotalLength ());
+        timeSpan.setEnd (nextPeak->getTotalLength());
     }
 
-    peak = nextPeak;
+    peak    = nextPeak;
     oldPeak = nullptr;
 }
 
-AudioPeakPtr Waveform::audioPeak()
-{
+AudioPeakPtr Waveform::audioPeak() {
     return peak;
 }
 
-void Waveform::paint (Graphics& g)
-{
+void Waveform::paint (Graphics& g) {
     g.fillAll (Colours::white);
     g.setColour (Colours::lightgreen);
 
-    if (peak && timeSpan.getLength() > 0)
-    {
-        peak->drawChannels (g, getLocalBounds().reduced (2),
-                                timeSpan.getStart(),
-                                timeSpan.getEnd(),
-                                1.0f);
-    }
-    else
-    {
+    if (peak && timeSpan.getLength() > 0) {
+        peak->drawChannels (g, getLocalBounds().reduced (2), timeSpan.getStart(), timeSpan.getEnd(), 1.0f);
+    } else {
         g.setFont (14.0f);
         g.drawFittedText ("No data", getLocalBounds(), Justification::centred, 2);
     }
 }
 
-void Waveform::changeListenerCallback (ChangeBroadcaster* source)
-{
+void Waveform::changeListenerCallback (ChangeBroadcaster* source) {
     if (peak && (void*) peak.get() == (void*) source) {
         repaint();
     }
 }
 
-}
+} // namespace KSP1

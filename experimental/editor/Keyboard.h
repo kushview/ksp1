@@ -22,149 +22,133 @@
 #include "editor/MidiKeyboardComponent.h"
 
 namespace KSP1 {
-    class KeyboardWidget;
+class KeyboardWidget;
 
-    class KeySelectedTimer : public Timer
-    {
-    public:
-        KeySelectedTimer (KeyboardWidget& k);
-        inline void timerCallback();
+class KeySelectedTimer : public Timer {
+public:
+    KeySelectedTimer (KeyboardWidget& k);
+    inline void timerCallback();
 
-    private:
-        KeyboardWidget& keyboard;
-        int lastSentKey;
+private:
+    KeyboardWidget& keyboard;
+    int lastSentKey;
+};
 
-    };
-
-
-    /** Keyboard extension class.
+/** Keyboard extension class.
         This one extends the juce keyboard component by adding boost signals
         for event notification and changes.
      */
-    class KeyboardWidget : public DragAndDropTarget,
-                           public KSP1::MidiKeyboardComponent
-    {
-    public:
+class KeyboardWidget : public DragAndDropTarget,
+                       public KSP1::MidiKeyboardComponent {
+public:
+    KeyboardWidget (MidiKeyboardState& state)
+        : MidiKeyboardComponent (state, MidiKeyboardComponent::horizontalKeyboard),
+          selectedTimer (*this),
+          lastPressedNote (-1) {
+        setKeyPressBaseOctave (0);
+        setWantsKeyboardFocus (true);
+        setKeyWidth (18);
+        selectedTimer.startTimer (300);
+    }
 
-        KeyboardWidget (MidiKeyboardState& state)
-            : MidiKeyboardComponent (state, MidiKeyboardComponent::horizontalKeyboard),
-              selectedTimer (*this), lastPressedNote (-1)
-        {
-            setKeyPressBaseOctave (0);
-            setWantsKeyboardFocus (true);
-            setKeyWidth (18);
-            selectedTimer.startTimer (300);
-        }
+    KeyboardWidget (MidiKeyboardState& state, Orientation orientation)
+        : MidiKeyboardComponent (state, orientation),
+          selectedTimer (*this),
+          lastPressedNote (-1) {
+        setKeyPressBaseOctave (0);
+        setWantsKeyboardFocus (true);
+        selectedTimer.startTimer (300);
+    }
 
-        KeyboardWidget (MidiKeyboardState& state, Orientation orientation)
-            : MidiKeyboardComponent (state, orientation),
-              selectedTimer (*this), lastPressedNote (-1)
-        {
-            setKeyPressBaseOctave (0);
-            setWantsKeyboardFocus (true);
-            selectedTimer.startTimer (300);
-        }
+    ~KeyboardWidget() {
+        selectedTimer.stopTimer();
+    }
 
-        ~KeyboardWidget()
-        {
-            selectedTimer.stopTimer();
-        }
+    inline int getSelectedKey() const {
+        return lastPressedNote;
+    }
 
-        inline int getSelectedKey() const
-        {
-            return lastPressedNote;
-        }
-
-        inline boost::signals2::signal<void(const MidiMessage&)>&
+    inline boost::signals2::signal<void (const MidiMessage&)>&
         signalMidi() { return midiSignal; }
 
-        inline boost::signals2::signal<void(int)>&
+    inline boost::signals2::signal<void (int)>&
         signalKeySelected() { return keySelectedSignal; }
 
+    // Drag and Drop
+    bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
+    void itemDragEnter (const SourceDetails& dragSourceDetails) override;
+    void itemDragMove (const SourceDetails& dragSourceDetails) override;
+    void itemDragExit (const SourceDetails& dragSourceDetails) override;
+    void itemDropped (const SourceDetails& dragSourceDetails) override;
+    bool shouldDrawDragImageWhenOver() override;
 
-        // Drag and Drop
-        bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
-        void itemDragEnter (const SourceDetails& dragSourceDetails) override;
-        void itemDragMove (const SourceDetails& dragSourceDetails) override;
-        void itemDragExit (const SourceDetails& dragSourceDetails) override;
-        void itemDropped (const SourceDetails& dragSourceDetails) override;
-        bool shouldDrawDragImageWhenOver() override;
+protected:
+    inline void mouseUp (const MouseEvent& ev) override {
+        MidiKeyboardComponent::mouseUp (ev);
+        keySelectedSignal (lastPressedNote);
+    }
 
-    protected:
-        inline void mouseUp (const MouseEvent& ev) override
-        {
-            MidiKeyboardComponent::mouseUp (ev);
-            keySelectedSignal (lastPressedNote);
-        }
+    inline void mouseUpOnKey (int n, const MouseEvent& e) override {
+    }
 
-        inline void mouseUpOnKey (int n, const MouseEvent& e) override
-        {
+    inline bool keyPressed (const KeyPress& key) override {
+        const int code = key.getKeyCode();
 
-        }
+        if (KeyPress::F1Key == code)
+            setKeyPressBaseOctave (0);
+        else if (KeyPress::F2Key == code)
+            setKeyPressBaseOctave (1);
+        else if (KeyPress::F3Key == code)
+            setKeyPressBaseOctave (2);
+        else if (KeyPress::F4Key == code)
+            setKeyPressBaseOctave (3);
+        else if (KeyPress::F5Key == code)
+            setKeyPressBaseOctave (4);
+        else if (KeyPress::F6Key == code)
+            setKeyPressBaseOctave (5);
+        else if (KeyPress::F7Key == code)
+            setKeyPressBaseOctave (6);
+        else if (KeyPress::F8Key == code)
+            setKeyPressBaseOctave (7);
+        else if (KeyPress::F9Key == code)
+            setKeyPressBaseOctave (8);
+        else if (KeyPress::F10Key == code)
+            setKeyPressBaseOctave (9);
+        else if (KeyPress::F11Key == code)
+            setKeyPressBaseOctave (10);
 
-        inline bool keyPressed (const KeyPress& key) override
-        {
-            const int code = key.getKeyCode();
+        return MidiKeyboardComponent::keyPressed (key);
+    }
 
-            if (KeyPress::F1Key == code)
-                setKeyPressBaseOctave (0);
-            else if (KeyPress::F2Key == code)
-                setKeyPressBaseOctave (1);
-            else if (KeyPress::F3Key == code)
-                setKeyPressBaseOctave (2);
-            else if (KeyPress::F4Key == code)
-                setKeyPressBaseOctave (3);
-            else if (KeyPress::F5Key == code)
-                setKeyPressBaseOctave (4);
-            else if (KeyPress::F6Key == code)
-                setKeyPressBaseOctave (5);
-            else if (KeyPress::F7Key == code)
-                setKeyPressBaseOctave (6);
-            else if (KeyPress::F8Key == code)
-                setKeyPressBaseOctave (7);
-            else if (KeyPress::F9Key == code)
-                setKeyPressBaseOctave (8);
-            else if (KeyPress::F10Key == code)
-                setKeyPressBaseOctave (9);
-            else if (KeyPress::F11Key == code)
-                setKeyPressBaseOctave (10);
+private:
+    friend class KeySelectedTimer;
+    KeySelectedTimer selectedTimer;
 
-            return MidiKeyboardComponent::keyPressed (key);
-        }
+    boost::signals2::signal<void (const MidiMessage&)> midiSignal;
+    boost::signals2::signal<void (int)> keySelectedSignal;
 
-    private:
-        friend class KeySelectedTimer;
-        KeySelectedTimer selectedTimer;
+    int lastPressedNote;
 
-        boost::signals2::signal<void(const MidiMessage&)> midiSignal;
-        boost::signals2::signal<void(int)> keySelectedSignal;
+    inline void handleNoteOn (MidiKeyboardState* s, int chan, int note, float velocity) override {
+        lastPressedNote = note;
+        midiSignal (MidiMessage::noteOn (chan, note, velocity));
 
-        int lastPressedNote;
+        MidiKeyboardComponent::handleNoteOn (s, chan, note, velocity);
+    }
 
-        inline void handleNoteOn (MidiKeyboardState* s, int chan, int note, float velocity) override
-        {
-            lastPressedNote = note;
-            midiSignal (MidiMessage::noteOn (chan, note, velocity));
+    inline void handleNoteOff (MidiKeyboardState* s, int chan, int note) {
+        midiSignal (MidiMessage::noteOff (chan, note));
+        MidiKeyboardComponent::handleNoteOff (s, chan, note, 0.0f);
+    }
+};
 
-            MidiKeyboardComponent::handleNoteOn (s, chan, note, velocity);
-        }
+inline KeySelectedTimer::KeySelectedTimer (KeyboardWidget& k)
+    : keyboard (k), lastSentKey (-1) {}
 
-        inline void handleNoteOff (MidiKeyboardState* s, int chan, int note)
-        {
-            midiSignal (MidiMessage::noteOff (chan, note));
-            MidiKeyboardComponent::handleNoteOff (s, chan, note, 0.0f);
-        }
-    };
-
-    inline KeySelectedTimer::KeySelectedTimer (KeyboardWidget &k)
-        : keyboard (k), lastSentKey(-1) { }
-
-    inline void KeySelectedTimer::timerCallback()
-    {
-        if (lastSentKey != keyboard.lastPressedNote)
-        {
-            keyboard.keySelectedSignal (keyboard.lastPressedNote);
-            lastSentKey = keyboard.lastPressedNote;
-        }
+inline void KeySelectedTimer::timerCallback() {
+    if (lastSentKey != keyboard.lastPressedNote) {
+        keyboard.keySelectedSignal (keyboard.lastPressedNote);
+        lastSentKey = keyboard.lastPressedNote;
     }
 }
+} // namespace KSP1

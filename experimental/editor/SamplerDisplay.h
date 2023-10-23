@@ -29,11 +29,9 @@
 namespace KSP1 {
 class ScreenManager;
 class DisplayProgressBar;
-}
+} // namespace KSP1
 
 //[/Headers]
-
-
 
 namespace KSP1 {
 
@@ -45,13 +43,12 @@ namespace KSP1 {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class SamplerDisplay  : public Component,
-                        public Timer,
-                        public Label::Listener
-{
+class SamplerDisplay : public Component,
+                       public Timer,
+                       public Label::Listener {
 public:
     //==============================================================================
-    SamplerDisplay ();
+    SamplerDisplay();
     ~SamplerDisplay();
 
     //==============================================================================
@@ -74,8 +71,8 @@ public:
     void setInstrument (InstrumentPtr i);
     InstrumentPtr getInstrument() const;
 
-    template<class ClientType> inline
-    Connection connectUpdateClient (ClientType& client) {
+    template <class ClientType>
+    inline Connection connectUpdateClient (ClientType& client) {
         return updateSignal.connect (boost::bind (&ClientType::onDisplayUpdate, &client));
     }
 
@@ -88,8 +85,6 @@ public:
     void labelTextChanged (Label* labelThatHasChanged) override;
     void mouseDown (const MouseEvent& e) override;
     void mouseDoubleClick (const MouseEvent& e) override;
-
-
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -119,13 +114,11 @@ private:
     std::unique_ptr<Component> screen;
     std::unique_ptr<DisplayProgressBar> progressBar;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SamplerDisplay)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

@@ -18,25 +18,21 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "Locations.h"
 #include "editor/AssetsListBox.h"
 #include "editor/SamplerDisplay.h"
 #include "editor/Screens.h"
-#include "Locations.h"
 //[/Headers]
 
 #include "BrowseScreen.h"
-
 
 namespace KSP1 {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 
-class AssetsListBoxHeader : public Component
-{
+class AssetsListBoxHeader : public Component {
 public:
-
-    AssetsListBoxHeader (const String& title = String::empty)
-    {
+    AssetsListBoxHeader (const String& title = String::empty) {
         addAndMakeVisible (assetLabel = new Label ("assetLabel", title));
         setSize (100, 24);
     }
@@ -48,8 +44,7 @@ public:
     ScopedPointer<Label> assetLabel;
 };
 
-void BrowseScreen::onAssetSelected (const AssetItem& item)
-{
+void BrowseScreen::onAssetSelected (const AssetItem& item) {
     DBG ("On asset selected (browse screen)");
 }
 
@@ -57,17 +52,14 @@ void BrowseScreen::onAssetSelected (const AssetItem& item)
 
 //==============================================================================
 BrowseScreen::BrowseScreen (SamplerDisplay& disp)
-    : Screen (disp, "Browse Screen", Screen::browseScreen)
-{
+    : Screen (disp, "Browse Screen", Screen::browseScreen) {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
-
 
     //[UserPreSize]
     //[/UserPreSize]
 
     setSize (600, 400);
-
 
     //[Constructor] You can add your own custom stuff here..
 
@@ -84,24 +76,19 @@ BrowseScreen::BrowseScreen (SamplerDisplay& disp)
     }
 #endif
 
-
     //[/Constructor]
 }
 
-BrowseScreen::~BrowseScreen()
-{
+BrowseScreen::~BrowseScreen() {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
-
-
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void BrowseScreen::paint (Graphics& g)
-{
+void BrowseScreen::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
@@ -109,8 +96,7 @@ void BrowseScreen::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void BrowseScreen::resized()
-{
+void BrowseScreen::resized() {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
@@ -118,11 +104,8 @@ void BrowseScreen::resized()
     //[/UserResized]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -145,10 +128,7 @@ END_JUCER_METADATA
 */
 #endif
 
-
-
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

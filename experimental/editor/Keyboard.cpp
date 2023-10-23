@@ -23,31 +23,26 @@
 
 namespace KSP1 {
 
-bool KeyboardWidget::isInterestedInDragSource (const SourceDetails& details)
-{
+bool KeyboardWidget::isInterestedInDragSource (const SourceDetails& details) {
     return details.description.isArray() && details.description[0] == "files";
 }
 
-void KeyboardWidget::itemDragEnter (const SourceDetails& details)
-{
+void KeyboardWidget::itemDragEnter (const SourceDetails& details) {
     DragAndDropTarget::itemDragEnter (details);
 }
 
-void KeyboardWidget::itemDragMove (const SourceDetails& details)
-{
+void KeyboardWidget::itemDragMove (const SourceDetails& details) {
     DragAndDropTarget::itemDragMove (details);
 }
 
-void KeyboardWidget::itemDragExit (const SourceDetails& details)
-{
+void KeyboardWidget::itemDragExit (const SourceDetails& details) {
     DragAndDropTarget::itemDragExit (details);
 }
 
-void KeyboardWidget::itemDropped (const SourceDetails& details)
-{
-    SamplerView* view = findParentComponentOfClass<SamplerView>();
+void KeyboardWidget::itemDropped (const SourceDetails& details) {
+    SamplerView* view       = findParentComponentOfClass<SamplerView>();
     SamplerDisplay* display = view->getDisplay();
-    InstrumentPtr inst = display->getInstrument();
+    InstrumentPtr inst      = display->getInstrument();
     const int note (findNoteAt (details.localPosition));
 
     KeyItem key (inst->getOrCreateKey (note));
@@ -56,8 +51,7 @@ void KeyboardWidget::itemDropped (const SourceDetails& details)
 
     key.clearLayers();
 
-    for (int i = 1; i < details.description.size(); ++i)
-    {
+    for (int i = 1; i < details.description.size(); ++i) {
         const File file (details.description[i].toString());
         LayerItem layer (key.addLayer (file));
     }
@@ -65,9 +59,8 @@ void KeyboardWidget::itemDropped (const SourceDetails& details)
     view->getDisplay()->selectNote (note, true);
 }
 
-bool KeyboardWidget::shouldDrawDragImageWhenOver()
-{
+bool KeyboardWidget::shouldDrawDragImageWhenOver() {
     return true;
 }
 
-}
+} // namespace KSP1

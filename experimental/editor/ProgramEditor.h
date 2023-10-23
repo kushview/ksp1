@@ -20,21 +20,20 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "KSP1.h"
 #include "Banks.h"
-#include "Panels.h"
 #include "Controller.h"
+#include "KSP1.h"
+#include "Panels.h"
 
 namespace KSP1 {
 namespace Gui {
 
-    class ProgramsListBox;
+class ProgramsListBox;
 
-}}
+}
+} // namespace KSP1
 
 //[/Headers]
-
-
 
 namespace KSP1 {
 
@@ -43,8 +42,7 @@ namespace KSP1 {
                                                                     //[Comments]
                                                                     //[/Comments]
 */
-class ProgramEditorView  : public KSP1::Gui::Panel
-{
+class ProgramEditorView : public KSP1::Gui::Panel {
 public:
     //==============================================================================
     ProgramEditorView (Controller& ctrl);
@@ -58,8 +56,6 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     Controller& controller;
@@ -70,13 +66,11 @@ private:
     std::unique_ptr<ProgramsListBox> programList;
     std::unique_ptr<KSP1::Gui::BankList> banklist2;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProgramEditorView)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

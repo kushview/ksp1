@@ -1,6 +1,7 @@
 {
     "python.pythonPath": "/usr/local/bin/python2",
     "files.associations": {
+        "*.ttl.in": "ttl",
         "Vagrantfile": "ruby",
         "memory": "cpp",
         "functional": "cpp",
@@ -66,6 +67,8 @@
         "unordered_map": "cpp",
         "vector": "cpp",
         "cinttypes": "cpp",
-        "hashtable": "cpp"
+        "hashtable": "cpp",
+        "*.mm": "cpp",
+        "variant": "cpp"
     }
 }

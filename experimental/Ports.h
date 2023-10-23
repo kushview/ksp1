@@ -22,15 +22,15 @@
 
 namespace KSP1 {
 
-    class Port {
-    public:
-        enum Index {
-            AtomInput  = 0,
-            AtomOutput = 1,
-            MainLeft   = 2,
-            MainRight  = 3
-        };
+class Port {
+public:
+    enum Index {
+        AtomInput  = 0,
+        AtomOutput = 1,
+        MainLeft   = 2,
+        MainRight  = 3
     };
-}
+};
+} // namespace KSP1
 
 #endif // PORTS_H

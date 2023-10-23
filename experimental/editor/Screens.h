@@ -23,88 +23,80 @@
 
 namespace KSP1 {
 
-    class KeyItem;
-    class SamplerDisplay;
-    class SamplerView;
+class KeyItem;
+class SamplerDisplay;
+class SamplerView;
 
-    class Screen : public Component
-    {
+class Screen : public Component {
+public:
+    enum ID {
+        editScreen,
+        numScreens
+    };
+
+    virtual ~Screen();
+
+    Screen::ID getScreenID() const { return id; }
+    static Screen* create (SamplerDisplay& disp, Screen::ID type);
+
+    inline void setTabOrientation (TabbedButtonBar::Orientation o) { pages.setOrientation (o); }
+    inline int getNumPages() const { return pages.getNumTabs(); }
+    inline int getCurrentPage() const { return pages.getCurrentTabIndex(); }
+    inline void setCurrentPage (int page) { pages.setCurrentTabIndex (page); }
+    inline void addPage (const String& name, Component* page) {
+        pages.addTab (name, Colours::transparentBlack, page, true);
+    }
+
+    /** This is called by the display when a note has been selected */
+    inline virtual void keySelectedEvent (const KeyItem& /*note*/) {}
+
+    /** Find a page by class type */
+    template <class T>
+    inline T* findPage() {
+        for (int i = pages.getNumTabs(); --i >= 0;)
+            if (T* p = dynamic_cast<T*> (pages.getTabContentComponent (i)))
+                return p;
+        return nullptr;
+    }
+
+    virtual void onDisplayUpdate() {}
+
+    virtual void resized() {
+        pages.setBounds (getLocalBounds());
+    }
+
+    SamplerDisplay& display();
+    SamplerView* getSamplerView() const;
+
+protected:
+    Screen (SamplerDisplay& disp, const String& name, Screen::ID t);
+    TabbedComponent& getTabs() { return pages; }
+    std::function<void()> onPageChanged;
+
+private:
+    SamplerDisplay& owner;
+    class Pages : public TabbedComponent {
     public:
-        enum ID
-        {
-            editScreen,
-            numScreens
-        };
+        Pages (Screen& s) : TabbedComponent (TabbedButtonBar::TabsAtLeft),
+                            screen (s) {}
 
-        virtual ~Screen();
-
-        Screen::ID getScreenID() const { return id; }
-        static Screen* create (SamplerDisplay& disp, Screen::ID type);
-
-        inline void setTabOrientation (TabbedButtonBar::Orientation o) { pages.setOrientation (o); }
-        inline int getNumPages()        const { return pages.getNumTabs(); }
-        inline int getCurrentPage()     const { return pages.getCurrentTabIndex(); }
-        inline void setCurrentPage (int page) { pages.setCurrentTabIndex (page); }
-        inline void addPage (const String& name, Component* page)
-        {
-            pages.addTab (name, Colours::transparentBlack, page, true);
+        void currentTabChanged (int newIndex, const String& newName) override {
+            ignoreUnused (newIndex, newName);
+            if (screen.onPageChanged)
+                screen.onPageChanged();
         }
 
-        /** This is called by the display when a note has been selected */
-        inline virtual void keySelectedEvent (const KeyItem& /*note*/) { }
-
-        /** Find a page by class type */
-        template<class T>
-        inline T* findPage()
-        {
-            for (int i = pages.getNumTabs(); --i >= 0;)
-                if (T* p = dynamic_cast<T*> (pages.getTabContentComponent(i)))
-                    return p;
-            return nullptr;
-        }
-
-        virtual void onDisplayUpdate() { }
-
-        virtual void resized()
-        {
-            pages.setBounds (getLocalBounds());
-        }
-
-        SamplerDisplay& display();
-        SamplerView* getSamplerView() const;
-
-    protected:
-        Screen (SamplerDisplay& disp, const String& name, Screen::ID t);
-        TabbedComponent& getTabs() { return pages; }
-        std::function<void()> onPageChanged;
+        std::function<void()> onTabChanged;
 
     private:
-        SamplerDisplay& owner;
-        class Pages : public TabbedComponent
-        {
-        public:
-            Pages (Screen& s) : TabbedComponent (TabbedButtonBar::TabsAtLeft),
-                screen (s) { }
-            
-            void currentTabChanged (int newIndex, const String& newName) override
-            {
-                ignoreUnused (newIndex, newName);
-                if (screen.onPageChanged)
-                    screen.onPageChanged();
-            }
-
-            std::function<void()> onTabChanged;
-        
-        private:
-            Screen& screen;
-        };
-
-        Pages pages;
-        ValueTree props;
-        Screen::ID id;
-
-        friend class Display;
-        boost::signals2::connection displayConnection;
-
+        Screen& screen;
     };
-}
+
+    Pages pages;
+    ValueTree props;
+    Screen::ID id;
+
+    friend class Display;
+    boost::signals2::connection displayConnection;
+};
+} // namespace KSP1

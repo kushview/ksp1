@@ -53,18 +53,16 @@ class MidiKeyboardUpDownButton;
 
     @see MidiKeyboardState
 */
-class JUCE_API  MidiKeyboardComponent  : public Component,
-                                         public MidiKeyboardStateListener,
-                                         public ChangeBroadcaster,
-                                         private Timer
-{
+class JUCE_API MidiKeyboardComponent : public Component,
+                                       public MidiKeyboardStateListener,
+                                       public ChangeBroadcaster,
+                                       private Timer {
 public:
     //==============================================================================
     /** The direction of the keyboard.
         @see setOrientation
     */
-    enum Orientation
-    {
+    enum Orientation {
         horizontalKeyboard,
         verticalKeyboardFacingLeft,
         verticalKeyboardFacingRight,
@@ -107,7 +105,7 @@ public:
     /** Returns the midi channel that the keyboard is using for midi messages.
         @see setMidiChannel
     */
-    int getMidiChannel() const noexcept                             { return midiChannel; }
+    int getMidiChannel() const noexcept { return midiChannel; }
 
     /** Sets a mask to indicate which incoming midi channels should be represented by
         key movements.
@@ -126,20 +124,20 @@ public:
     /** Returns the current set of midi channels represented by the component.
         This is the value that was set with setMidiChannelsToDisplay().
     */
-    int getMidiChannelsToDisplay() const noexcept                   { return midiInChannelMask; }
+    int getMidiChannelsToDisplay() const noexcept { return midiInChannelMask; }
 
     //==============================================================================
     /** Changes the width used to draw the white keys. */
     void setKeyWidth (float widthInPixels);
 
     /** Returns the width that was set by setKeyWidth(). */
-    float getKeyWidth() const noexcept                              { return keyWidth; }
+    float getKeyWidth() const noexcept { return keyWidth; }
 
     /** Changes the keyboard's current direction. */
     void setOrientation (Orientation newOrientation);
 
     /** Returns the keyboard's current direction. */
-    Orientation getOrientation() const noexcept                     { return orientation; }
+    Orientation getOrientation() const noexcept { return orientation; }
 
     /** Sets the range of midi notes that the keyboard will be limited to.
 
@@ -154,12 +152,12 @@ public:
     /** Returns the first note in the available range.
         @see setAvailableRange
     */
-    int getRangeStart() const noexcept                              { return rangeStart; }
+    int getRangeStart() const noexcept { return rangeStart; }
 
     /** Returns the last note in the available range.
         @see setAvailableRange
     */
-    int getRangeEnd() const noexcept                                { return rangeEnd; }
+    int getRangeEnd() const noexcept { return rangeEnd; }
 
     /** If the keyboard extends beyond the size of the component, this will scroll
         it to show the given key at the start.
@@ -172,12 +170,12 @@ public:
     /** Returns the number of the first key shown in the component.
         @see setLowestVisibleKey
     */
-    int getLowestVisibleKey() const noexcept                        { return (int) firstKey; }
+    int getLowestVisibleKey() const noexcept { return (int) firstKey; }
 
     /** Returns the length of the black notes.
         This will be their vertical or horizontal length, depending on the keyboard's orientation.
     */
-    int getBlackNoteLength() const noexcept                         { return blackNoteLength; }
+    int getBlackNoteLength() const noexcept { return blackNoteLength; }
 
     /** If set to true, then scroll buttons will appear at either end of the keyboard
         if there are too many notes to fit them all in the component at once.
@@ -192,17 +190,16 @@ public:
 
         @see Component::setColour, Component::findColour, LookAndFeel::setColour, LookAndFeel::findColour
     */
-    enum ColourIds
-    {
-        whiteNoteColourId               = 0x1005000,
-        blackNoteColourId               = 0x1005001,
-        keySeparatorLineColourId        = 0x1005002,
-        mouseOverKeyOverlayColourId     = 0x1005003,  /**< This colour will be overlaid on the normal note colour. */
-        keyDownOverlayColourId          = 0x1005004,  /**< This colour will be overlaid on the normal note colour. */
-        textLabelColourId               = 0x1005005,
-        upDownButtonBackgroundColourId  = 0x1005006,
-        upDownButtonArrowColourId       = 0x1005007,
-        shadowColourId                  = 0x1005008
+    enum ColourIds {
+        whiteNoteColourId              = 0x1005000,
+        blackNoteColourId              = 0x1005001,
+        keySeparatorLineColourId       = 0x1005002,
+        mouseOverKeyOverlayColourId    = 0x1005003, /**< This colour will be overlaid on the normal note colour. */
+        keyDownOverlayColourId         = 0x1005004, /**< This colour will be overlaid on the normal note colour. */
+        textLabelColourId              = 0x1005005,
+        upDownButtonBackgroundColourId = 0x1005006,
+        upDownButtonArrowColourId      = 0x1005007,
+        shadowColourId                 = 0x1005008
     };
 
     /** Returns the position within the component of the left-hand edge of a key.
@@ -264,7 +261,7 @@ public:
     /** This returns the value set by setOctaveForMiddleC().
         @see setOctaveForMiddleC
     */
-    int getOctaveForMiddleC() const noexcept            { return octaveNumForMiddleC; }
+    int getOctaveForMiddleC() const noexcept { return octaveNumForMiddleC; }
 
     //==============================================================================
     /** @internal */
@@ -299,7 +296,6 @@ public:
     void colourChanged() override;
 
 protected:
-    
     /** Draws a white note in the given rectangle.
 
         isOver indicates whether the mouse is over the key, isDown indicates whether the key is
@@ -423,4 +419,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiKeyboardComponent)
 };
 
-}
+} // namespace KSP1

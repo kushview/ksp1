@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "InstrumentLoader.h"
 #include "KSP1.h"
 #include "MediaObject.h"
-#include "InstrumentLoader.h"
 #include "engine/SamplerKeys.h"
 
 namespace KSP1 {
@@ -29,16 +29,14 @@ namespace KSP1 {
 class SamplerSound;
 class SamplerSynth;
 
-static inline Identifier fxSendIdentifier (int sendNumber)
-{
-    static const Identifier fxSendSlug      = "fxSend";
+static inline Identifier fxSendIdentifier (int sendNumber) {
+    static const Identifier fxSendSlug = "fxSend";
     String s (fxSendSlug.toString());
-    s << String("-") << String (sendNumber);
+    s << String ("-") << String (sendNumber);
     return Identifier (s);
 }
 
-class LayerItem :  public kv::ObjectModel
-{
+class LayerItem : public kv::ObjectModel {
 public:
     LayerItem();
     LayerItem (const ValueTree& data);
@@ -46,58 +44,52 @@ public:
 
     inline bool isEmpty() const { return ! objectData.hasProperty (Tags::file); }
     inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::layer)
-                                    && (int32) objectData.getProperty(Tags::index, -1) >= 0
-                                    && (int32) objectData.getProperty (Tags::note, -1) >= 0; }
+                                         && (int32) objectData.getProperty (Tags::index, -1) >= 0
+                                         && (int32) objectData.getProperty (Tags::note, -1) >= 0; }
     int32 index() const;
     int32 getNote() const;
-    
-    double getStart() const     { return objectData.getProperty ("start"); }
-    double getLength() const    { return objectData.getProperty ("length"); }
-    
+
+    double getStart() const { return objectData.getProperty ("start"); }
+    double getLength() const { return objectData.getProperty ("length"); }
+
     inline String fileString() const { return get (Tags::file); }
 
-    inline void setFile (const File& file)
-    {
+    inline void setFile (const File& file) {
         set (Tags::file, file.getFullPathName());
         set (Tags::name, file.getFileNameWithoutExtension());
     }
 
-    inline void setStartTime (double time)  { set (Tags::start,  time); }
-    inline void setEndTime (double time)    { set (Tags::length, time - startTime()); }
+    inline void setStartTime (double time) { set (Tags::start, time); }
+    inline void setEndTime (double time) { set (Tags::length, time - startTime()); }
     inline double startTime() const { return (double) get (Tags::start); }
-    inline double endTime()   const { return startTime() + (double)get(Tags::length); }
+    inline double endTime() const { return startTime() + (double) get (Tags::length); }
 
-    inline double gain() const
-    {
+    inline double gain() const {
         double vol = get (Tags::volume);
         return Decibels::decibelsToGain (vol);
     }
 
-    inline double panning()   const { return get (Tags::panning); }
-    inline double pitch()     const { return get (Tags::pitch); }
-    inline double cutoff()    const { return get (Tags::cutoff);  }
+    inline double panning() const { return get (Tags::panning); }
+    inline double pitch() const { return get (Tags::pitch); }
+    inline double cutoff() const { return get (Tags::cutoff); }
     inline double resonance() const { return get (Tags::resonance); }
 
-    inline void getVelocityRange (Range<double>& vel) const
-    {
+    inline void getVelocityRange (Range<double>& vel) const {
         vel.setStart (get (Tags::velocityLower));
         vel.setEnd (get (Tags::velocityUpper));
     }
 
-    inline void setRange (const Range<double>& range)
-    {
+    inline void setRange (const Range<double>& range) {
         setEndTime (range.getEnd());
         setStartTime (range.getStart());
     }
 
-    inline void getRange (Range<double>& range) const
-    {
+    inline void getRange (Range<double>& range) const {
         range.setStart (startTime());
         range.setEnd (endTime());
     }
 
-    inline double duration() const
-    {
+    inline double duration() const {
         Range<double> r;
         getRange (r);
         return r.getLength();
@@ -108,19 +100,17 @@ public:
     }
 
     inline const var&
-    getProperty (const Identifier& prop) const {
+        getProperty (const Identifier& prop) const {
         return get (prop);
     }
 
     inline void
-    setProperty (const Identifier& prop, const var& val)
-    {
+        setProperty (const Identifier& prop, const var& val) {
         set (prop, val);
     }
 
     inline LayerItem&
-    operator= (const LayerItem& other)
-    {
+        operator= (const LayerItem& other) {
         objectData = other.node();
         return *this;
     }
@@ -156,8 +146,7 @@ private:
 };
 
 /** The model representation of a key on the sampler */
-class KeyItem :  public kv::ObjectModel
-{
+class KeyItem : public kv::ObjectModel {
 public:
     explicit KeyItem (bool setMissing = true);
     KeyItem (const int note, const bool setMissing = true);
@@ -165,8 +154,8 @@ public:
 
     SamplerSound* getObject() const;
 
-    bool isValid()      const { return objectData.isValid(); }
-    bool isNotValid()   const { return ! objectData.isValid(); }
+    bool isValid() const { return objectData.isValid(); }
+    bool isNotValid() const { return ! objectData.isValid(); }
 
     LayerItem addLayer (const File& file);
     LayerItem addLayer (const LayerItem& layer);
@@ -176,18 +165,18 @@ public:
     void clearLayers();
     int countLayers() const;
 
-    double getVolume()     const { return (double) objectData.getProperty (Tags::volume); }
-    Value getVolumeValue()       { return objectData.getPropertyAsValue (Tags::volume, nullptr); }
+    double getVolume() const { return (double) objectData.getProperty (Tags::volume); }
+    Value getVolumeValue() { return objectData.getPropertyAsValue (Tags::volume, nullptr); }
 
     int32 getTriggerMode() const { return (int32) objectData.getProperty (Tags::triggerMode); }
-    Value getTriggerModeValue()  { return objectData.getPropertyAsValue (Tags::triggerMode, nullptr); }
+    Value getTriggerModeValue() { return objectData.getPropertyAsValue (Tags::triggerMode, nullptr); }
     void setTriggerMode (const int t) { objectData.setProperty (Tags::triggerMode, t, 0); }
 
-    int32 getVoiceGroup()  const { return (int32) objectData.getProperty (Tags::voiceGroup); }
-    Value getVoiceGroupValue()   { return objectData.getPropertyAsValue (Tags::voiceGroup, nullptr); }
+    int32 getVoiceGroup() const { return (int32) objectData.getProperty (Tags::voiceGroup); }
+    Value getVoiceGroupValue() { return objectData.getPropertyAsValue (Tags::voiceGroup, nullptr); }
 
-    int32 getNote()        const { return (int32) objectData.getProperty (Tags::note, -1); }
-    Value getNoteValue()         { return objectData.getPropertyAsValue (Tags::note, nullptr); }
+    int32 getNote() const { return (int32) objectData.getProperty (Tags::note, -1); }
+    Value getNoteValue() { return objectData.getPropertyAsValue (Tags::note, nullptr); }
 
     KeyItem& operator= (const KeyItem& other);
 
@@ -201,8 +190,7 @@ private:
     friend class Instrument;
 };
 
-class Instrument : public MediaObject
-{
+class Instrument : public MediaObject {
 public:
     Instrument (const String& name);
     Instrument (const ValueTree& data);
@@ -223,7 +211,7 @@ public:
     void setActiveSoundIndex (int index);
     KeyItem getActiveSound() const;
     void removeSound (const KeyItem& item);
-    
+
     KeyItem addKey (int32 noteNumber, int32 keySpan = 0);
     KeyItem getKey (int32 noteNumber, bool setMissing = false) const;
     KeyItem getOrCreateKey (int32 noteNumber);
@@ -241,14 +229,13 @@ public:
 
     Instrument& operator= (const Instrument& other);
 
-    inline void selectNote (int note) {  selectedNote = note; }
+    inline void selectNote (int note) { selectedNote = note; }
     inline const int currentKeyId() const { return selectedNote; }
 
     inline void setFile (const File& f) { file = f; }
     inline File getFile() const { return file; }
 
-    void print()
-    {
+    void print() {
         auto copy = objectData.createCopy();
         DBG (copy.toXmlString());
     }
@@ -259,9 +246,8 @@ private:
     File file;
     friend class Pattern;
     int selectedNote;
-
 };
 
 using InstrumentPtr = ReferenceCountedObjectPtr<Instrument>;
 
-}
+} // namespace KSP1

@@ -19,19 +19,20 @@
 
 #pragma once
 
-#include "KSP1.h"
+namespace juce {
+class MidiBuffer;
+}
 
-namespace KSP1 {
+namespace ksp1 {
 
-class MidiFilter
-{
+class MidiFilter {
 public:
-    MidiFilter() { }
-    virtual ~MidiFilter() { }
+    MidiFilter() {}
+    virtual ~MidiFilter() {}
 
-    virtual void prepareToPlay (double sampleRate, int32 blockSize) = 0;
-    virtual void processMidi (MidiBuffer& midi, int32 nframes) = 0;
-    virtual void releaseResources() = 0;
+    virtual void prepareToPlay (double sampleRate, int blockSize)  = 0;
+    virtual void processMidi (juce::MidiBuffer& midi, int nframes) = 0;
+    virtual void releaseResources()                                = 0;
 };
 
-}
+} // namespace ksp1

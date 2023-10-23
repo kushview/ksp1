@@ -24,13 +24,12 @@
 
 namespace KSP1 {
 
-    class MidiFilterScreen :  public Screen
-    {
-    public:
-        MidiFilterScreen (SamplerDisplay& owner);
-        ~MidiFilterScreen();
-    };
+class MidiFilterScreen : public Screen {
+public:
+    MidiFilterScreen (SamplerDisplay& owner);
+    ~MidiFilterScreen();
+};
 
-}
+} // namespace KSP1
 
 #endif /* KSP1_MIDI_FILTER_SCREEN_H */

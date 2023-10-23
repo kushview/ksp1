@@ -22,11 +22,10 @@
 namespace KSP1 {
 
 AudioPeakFactory::AudioPeakFactory()
-    : AudioThumbnailCache (32)
-{
+    : AudioThumbnailCache (32) {
     formats.registerBasicFormats();
 }
 
-AudioPeakFactory::~AudioPeakFactory() { }
+AudioPeakFactory::~AudioPeakFactory() {}
 
-}
+} // namespace KSP1

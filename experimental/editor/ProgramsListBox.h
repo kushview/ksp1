@@ -25,45 +25,43 @@
 
 namespace KSP1 {
 
-    class ProgramsListBox: public ListBox,
-            public ListBoxModel
-    {
-    public:
+class ProgramsListBox : public ListBox,
+                        public ListBoxModel {
+public:
+    typedef boost::signals2::signal<void (const Programming::Item&)> Engaged;
 
-        typedef boost::signals2::signal<void(const Programming::Item&)> Engaged;
+    ProgramsListBox (Programming&);
+    ~ProgramsListBox();
+    int getNumRows() override;
+    void paintListBoxItem (int rowNumber, Graphics& g,
+                           int width, int height, bool rowIsSelected) override;
 
-        ProgramsListBox (Programming&);
-        ~ProgramsListBox();
-        int getNumRows() override;
-        void paintListBoxItem (int rowNumber, Graphics& g,
-                               int width, int height, bool rowIsSelected) override;
+    Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
+                                       Component* existingComponentToUpdate) override;
+    void listBoxItemClicked (int row, const MouseEvent& e) override;
+    void listBoxItemDoubleClicked (int row, const MouseEvent& e) override;
+    void backgroundClicked (const MouseEvent&) override;
+    void selectedRowsChanged (int lastRowSelected) override;
+    void deleteKeyPressed (int lastRowSelected) override;
+    void returnKeyPressed (int lastRowSelected) override;
+    void listWasScrolled() override;
+    var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows) override;
+    String getTooltipForRow (int row) override;
 
-        Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
-                                           Component* existingComponentToUpdate) override;
-        void listBoxItemClicked (int row, const MouseEvent& e) override;
-        void listBoxItemDoubleClicked (int row, const MouseEvent& e) override;
-        void backgroundClicked (const MouseEvent&) override;
-        void selectedRowsChanged (int lastRowSelected) override;
-        void deleteKeyPressed (int lastRowSelected) override;
-        void returnKeyPressed (int lastRowSelected) override;
-        void listWasScrolled() override;
-        var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows) override;
-        String getTooltipForRow (int row) override;
+    Programming::Item selectedItem() const;
+    Engaged& signalEngaged() { return notifyEngaged; }
 
-        Programming::Item selectedItem() const;
-        Engaged& signalEngaged() { return notifyEngaged; }
+private:
+    Programming& progs;
+    int totalRows;
 
-    private:
-        Programming& progs;
-        int totalRows;
+    Programming::Item item;
 
-        Programming::Item item;
+    Engaged notifyEngaged;
 
-        Engaged notifyEngaged;
-
-        void buildRows();
-        Programming::Item getItemForRow (int row) const;
-    };
-}
+    void buildRows();
+    Programming::Item getItemForRow (int row) const;
+};
+} // namespace KSP1
 
 #endif // KSP1_PROGRAMS_LISTBOX_H

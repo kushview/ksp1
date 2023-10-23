@@ -18,12 +18,12 @@
 */
 
 #ifndef KSP1_SAMPLER_VIEWS_H
-#define KSP1_SAMPLER_VIEWS_H
+#    define KSP1_SAMPLER_VIEWS_H
 
-#if 0
-#include "editor/SamplerPluginView.h"
-#include "editor/ProgramEditor.h"
-#include "editor/SamplerView.h"
+#    if 0
+#        include "editor/ProgramEditor.h"
+#        include "editor/SamplerPluginView.h"
+#        include "editor/SamplerView.h"
 
 namespace KSP1 {
 namespace Gui {
@@ -31,4 +31,4 @@ namespace Gui {
 
 }}
 
-#endif /* KSP1_SAMPLER_VIEWS_H */
+#    endif /* KSP1_SAMPLER_VIEWS_H */

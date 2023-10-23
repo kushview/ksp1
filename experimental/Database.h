@@ -20,14 +20,13 @@
 #ifndef KSP1_DATABASE_H
 #define KSP1_DATABASE_H
 
-#include <initializer_list>
 #include "KSP1.h"
+#include <initializer_list>
 struct sqlite3;
 
 namespace KSP1 {
 
-class Database
-{
+class Database {
 public:
     typedef std::initializer_list<var> QueryArgs;
 
@@ -47,9 +46,8 @@ public:
     void executeUpdate (const String& sql, const QueryArgs& args = {});
 
     bool tableExists (const String& name) const;
-    
-    Database& operator= (const Database& other)
-    {
+
+    Database& operator= (const Database& other) {
         this->db = other.db;
         return *this;
     }
@@ -58,20 +56,18 @@ private:
     sqlite3* db;
 };
 
-class DatabaseSchema
-{
+class DatabaseSchema {
 public:
-    inline DatabaseSchema (Database& db)
-    {
+    inline DatabaseSchema (Database& db) {
         String sql =
-        "CREATE TABLE IF NOT EXISTS assets ("
-        "    id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "    name VARCHAR(128), "
-        "    path VARCHAR(255), "
-        "    type VARCHAR(64));";
-        
+            "CREATE TABLE IF NOT EXISTS assets ("
+            "    id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "    name VARCHAR(128), "
+            "    path VARCHAR(255), "
+            "    type VARCHAR(64));";
+
         db.executeUpdate (sql);
     }
 };
-}
+} // namespace KSP1
 #endif // KSP1_DATABASE_H

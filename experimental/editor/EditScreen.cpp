@@ -3,61 +3,53 @@
     This is an automatically generated GUI class created by the Introjucer!
 */
 
-#include "KSP1.h"
 #include "editor/EditScreen.h"
+#include "Instrument.h"
+#include "KSP1.h"
 #include "editor/SamplerDisplay.h"
 #include "editor/SamplerView.h"
 #include "editor/Screens.h"
-#include "Instrument.h"
 
 using namespace kv;
 
 namespace KSP1 {
 
-class SoundsTimeline : public TimelineComponent
-{
+class SoundsTimeline : public TimelineComponent {
 public:
     SoundsTimeline()
-        : TimelineComponent()
-    {
+        : TimelineComponent() {
         setTrackWidth (100);
         setIndicator (nullptr);
         const_cast<kv::TimeScale&> (timeScale()).setPixelsPerBeat (24);
         const_cast<kv::TimeScale&> (timeScale()).updateScale();
     }
 
-    ~SoundsTimeline() { }
+    ~SoundsTimeline() {}
 
-    void mouseDown (const MouseEvent& ev) override
-    {
+    void mouseDown (const MouseEvent& ev) override {
         TimelineComponent::mouseDown (ev);
     }
 
-    void timelineBodyClicked (const MouseEvent& ev, int track) override
-    {
+    void timelineBodyClicked (const MouseEvent& ev, int track) override {
         if (instrument && isPositiveAndBelow (track, instrument->getNumSounds()))
             instrument->setActiveSoundIndex (track);
     }
 
-    void timelineTrackHeadersClicked (const MouseEvent&, int track) override
-    { 
+    void timelineTrackHeadersClicked (const MouseEvent&, int track) override {
         if (instrument && isPositiveAndBelow (track, instrument->getNumSounds()))
             instrument->setActiveSoundIndex (track);
     }
 
-    void clipClicked (kv::TimelineClip* clip, const MouseEvent&) override
-    {
+    void clipClicked (kv::TimelineClip* clip, const MouseEvent&) override {
         if (instrument && isPositiveAndBelow (clip->trackIndex(), instrument->getNumSounds()))
             instrument->setActiveSoundIndex (clip->trackIndex());
     }
 
-    int getNumTracks() const override
-    {
+    int getNumTracks() const override {
         return (instrument) ? instrument->getNumSounds() : 0;
     }
 
-    void refresh()
-    {
+    void refresh() {
         removeClips();
 
         if (auto* view = findParentComponentOfClass<SamplerView>())
@@ -65,11 +57,10 @@ public:
 
         if (! instrument)
             return;
-        
+
         ValueTree node = instrument->getValueTree();
-        for (int i = 0; i < node.getNumChildren(); ++i)
-        {
-            if (! node.getChild(i).hasType (Tags::key))
+        for (int i = 0; i < node.getNumChildren(); ++i) {
+            if (! node.getChild (i).hasType (Tags::key))
                 continue;
 
             KeyItem item (node.getChild (i));
@@ -81,8 +72,7 @@ public:
         repaint();
     }
 
-    void paintTrackHeader (Graphics& g, int track, const Rectangle<int>& area) override
-    {
+    void paintTrackHeader (Graphics& g, int track, const Rectangle<int>& area) override {
         g.setColour (Colours::lightgrey);
         g.fillRect (area);
 
@@ -101,58 +91,52 @@ public:
         }
 
         g.setFont (9.f);
-        g.drawText (txt, area.withX(10).withWidth(area.getWidth() - 10), Justification::centredLeft);
+        g.drawText (txt, area.withX (10).withWidth (area.getWidth() - 10), Justification::centredLeft);
     }
 
 private:
     InstrumentPtr instrument;
     ComponentDragger dragger;
 
-    class KeyItemClip : public kv::TimelineClip
-    {
+    class KeyItemClip : public kv::TimelineClip {
     public:
         KeyItemClip (SoundsTimeline& timeline, const KeyItem& item)
             : kv::TimelineClip (timeline),
-              key (item) { }
+              key (item) {}
 
         virtual bool moveable() const { return true; }
         virtual bool resizable() const { return true; }
         virtual bool timeIsMusical() const { return false; }
 
-        virtual void getClipRange (ClipRange<double>& loc)
-        {
-            if (key.isValid())
-            {
+        virtual void getClipRange (ClipRange<double>& loc) {
+            if (key.isValid()) {
                 loc.setStart ((double) key.getNote());
                 loc.setLength ((double) (int) key.getProperty (Slugs::length) + 1);
                 loc.setOffset (0);
             }
         }
 
-        virtual void setClipRange (const ClipRange<double>& loc)
-        {
+        virtual void setClipRange (const ClipRange<double>& loc) {
             int note = jmax (0, roundToInt (loc.getStart()));
-            int len =  jmax (0, roundToInt (loc.getLength() - 1.0));
+            int len  = jmax (0, roundToInt (loc.getLength() - 1.0));
 
-            if (isPositiveAndBelow (note, 127))
-            {
+            if (isPositiveAndBelow (note, 127)) {
                 key.setProperty (Slugs::note, note);
                 key.setProperty (Slugs::length, len);
             }
         }
 
         virtual TimeUnit getTimeUnit() const { return TimeUnit::Beats; }
-        virtual int32 trackIndex() const
-        {
-            ValueTree node = key.node(); ValueTree parent = node.getParent();
+        virtual int32 trackIndex() const {
+            ValueTree node   = key.node();
+            ValueTree parent = node.getParent();
             return (node.isValid() && parent.isValid()) ? parent.indexOf (node) : 0;
         }
 
-        void paint (Graphics& g)
-        {
+        void paint (Graphics& g) {
             const int letterSpace = 24;
             String n1 (MidiMessage::getMidiNoteName (key.getNote(), true, true, 3));
-            String n2 (MidiMessage::getMidiNoteName (key.getNote() + (int) key.getProperty(Slugs::length), true, true, 3));
+            String n2 (MidiMessage::getMidiNoteName (key.getNote() + (int) key.getProperty (Slugs::length), true, true, 3));
 
             if (isSelected())
                 g.setColour (Colours::teal);
@@ -162,61 +146,49 @@ private:
             g.fillAll();
 
             g.setColour (Colours::black);
-            g.drawRect(0, 0, getWidth(), getHeight(), 1);
+            g.drawRect (0, 0, getWidth(), getHeight(), 1);
 
             g.setColour (Colours::black);
             g.setFont (10.f);
             g.drawText (n1, 0, 0, letterSpace, getHeight(), Justification::centred);
-            if ((int) key.getProperty (Slugs::length) > 0)
-            {
-                g.drawText (n2, getWidth() - (letterSpace + 1), 0,
-                            letterSpace, getHeight(), Justification::centred);
+            if ((int) key.getProperty (Slugs::length) > 0) {
+                g.drawText (n2, getWidth() - (letterSpace + 1), 0, letterSpace, getHeight(), Justification::centred);
             }
         }
 
         KeyItem key;
 
     protected:
-        virtual void reset()
-        {
-
+        virtual void reset() {
         }
 
-        virtual void selectedStateChanged()
-        {
-
+        virtual void selectedStateChanged() {
         }
 
-        virtual int32 trackRequested (const int32 track)
-        {
+        virtual int32 trackRequested (const int32 track) {
             return trackIndex();
         }
     };
 };
 
 //=============================================================================
-class LayersTimeline : public kv::TimelineComponent
-{
+class LayersTimeline : public kv::TimelineComponent {
 public:
-
     LayersTimeline()
         : kv::TimelineComponent(),
-          key (nullptr)
-    {
+          key (nullptr) {
         setTrackWidth (100);
         const_cast<kv::TimeScale&> (timeScale()).setPixelsPerBeat (640);
         const_cast<kv::TimeScale&> (timeScale()).updateScale();
     }
 
-    ~LayersTimeline() { }
+    ~LayersTimeline() {}
 
-    int getNumTracks() const override
-    {
+    int getNumTracks() const override {
         return (key && key->isValid()) ? key->countLayers() : 0;
     }
 
-    void mouseWheelMove (const MouseEvent& ev, const MouseWheelDetails& md) override
-    {
+    void mouseWheelMove (const MouseEvent& ev, const MouseWheelDetails& md) override {
         auto& ts = const_cast<kv::TimeScale&> (timeScale());
 
         if (md.deltaY > 0.0)
@@ -228,8 +200,7 @@ public:
         triggerAsyncUpdate();
     }
 
-    void setKey (const KeyItem& item)
-    {
+    void setKey (const KeyItem& item) {
         key = new KeyItem (item);
         Instrument i (key->node().getParent());
         i.sortKeys();
@@ -238,20 +209,20 @@ public:
 
         if (key && key->isValid()) {
             for (int i = key->countLayers(); --i >= 0;)
-                addTimelineClip (new LayerClip (*this, key->getLayer(i)));
+                addTimelineClip (new LayerClip (*this, key->getLayer (i)));
         }
 
         setAllTrackHeights (TrackHeights::Large);
         repaint();
     }
 
-    void paintTrackHeader (Graphics& g, int track, const Rectangle<int>& area) override
-    {
+    void paintTrackHeader (Graphics& g, int track, const Rectangle<int>& area) override {
         g.setColour (Colours::lightgrey);
         g.fillRect (area);
 
         g.setColour (Colours::black);
-        String txt ("  Layer "); txt << track + 1;
+        String txt ("  Layer ");
+        txt << track + 1;
         g.drawText (txt, area, Justification::centred);
     }
 
@@ -260,16 +231,13 @@ public:
 private:
     AudioPeakFactory peaks;
     ScopedPointer<KeyItem> key;
-    class LayerClip : public kv::TimelineClip
-    {
+    class LayerClip : public kv::TimelineClip {
     public:
         LayerClip (LayersTimeline& tl, const LayerItem& item)
             : kv::TimelineClip (tl),
-              layer (item)
-        {
+              layer (item) {
             const File file (item.fileString());
-            if (file.existsAsFile())
-            {
+            if (file.existsAsFile()) {
                 peak = new AudioPeak (tl.getPeaks());
                 peak->setSource (new FileInputSource (file));
             }
@@ -279,43 +247,38 @@ private:
         virtual bool resizable() const { return true; }
         virtual bool timeIsMusical() const { return false; }
 
-        virtual void getClipRange (ClipRange<double>& loc)
-        {
-            if (layer.isValid())
-            {
+        virtual void getClipRange (ClipRange<double>& loc) {
+            if (layer.isValid()) {
                 loc.setStart (layer.getStart());
                 loc.setLength (layer.getLength());
                 loc.setOffset ((double) layer.getProperty (Slugs::offset));
             }
         }
 
-        virtual void setClipRange (const ClipRange<double>& loc)
-        {
+        virtual void setClipRange (const ClipRange<double>& loc) {
             layer.setProperty (Slugs::offset, loc.getOffset());
-            layer.setProperty (Slugs::start,  loc.getStart());
+            layer.setProperty (Slugs::start, loc.getStart());
             layer.setProperty (Slugs::length, loc.getLength());
         }
 
         virtual TimeUnit getTimeUnit() const { return TimeUnit::Seconds; }
         virtual int32 trackIndex() const { return (int32) layer.getProperty (Slugs::index); }
 
-        void paint (Graphics& g)
-        {
+        void paint (Graphics& g) {
             g.setColour (Colours::white);
             g.fillAll();
 
             //g.setColour (Colours::lightgrey);
             //g.drawLine (0, getHeight() / 2, getWidth(), getHeight() / 2, 1.0);
 
-            if (peak)
-            {
-                ClipRange<double> range; getClipRange (range);
+            if (peak) {
+                ClipRange<double> range;
+                getClipRange (range);
                 double start = range.getOffset();
-                double end = range.getOffset() + range.getLength();
+                double end   = range.getOffset() + range.getLength();
                 Rectangle<int> r (getLocalBounds());
 
-                if (start < 0.0)
-                {
+                if (start < 0.0) {
                     r.setX (timeline().timeToWidth (std::fabs (start)));
                     r.setWidth (r.getWidth() - r.getX());
                     start = 0.0;
@@ -327,47 +290,39 @@ private:
 
             g.setColour (Colours::black);
             String txt ("Pos: ");
-            #if 0
+#if 0
             // FIXME
             txt << roundDoubleToInt (layer.offset() * timeline().timeScale().getSampleRate())
                 << " : " << roundDoubleToInt (layer.start() * timeline().timeScale().getSampleRate())
                 << " : " << roundDoubleToInt (layer.end() * timeline().timeScale().getSampleRate());
-            #endif
+#endif
             g.drawText (txt, 1, 1, getWidth(), getHeight(), Justification::topLeft);
         }
 
         LayerItem layer;
 
     protected:
-
-        virtual void reset()
-        {
-
+        virtual void reset() {
         }
 
-        virtual void selectedStateChanged()
-        {
-
+        virtual void selectedStateChanged() {
         }
 
-        virtual int32 trackRequested (const int32 track)
-        {
+        virtual int32 trackRequested (const int32 track) {
             return trackIndex();
         }
 
     private:
         AudioPeakPtr peak;
     };
-
 };
 
 //=============================================================================
 EditScreen::EditScreen (SamplerDisplay& owner)
-    : Screen (owner, "Edit Screen", Screen::editScreen)
-{
+    : Screen (owner, "Edit Screen", Screen::editScreen) {
     addAndMakeVisible (addButton);
-    addButton.setTooltip (TRANS("Add a Sample"));
-    addButton.setButtonText (TRANS("+"));
+    addButton.setTooltip (TRANS ("Add a Sample"));
+    addButton.setButtonText (TRANS ("+"));
     addButton.setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     addButton.addListener (this);
     addButton.setColour (TextButton::buttonColourId, Colour (0xc7282828));
@@ -376,8 +331,8 @@ EditScreen::EditScreen (SamplerDisplay& owner)
     addButton.setColour (TextButton::textColourOffId, Colour (0xffe2e2e2));
 
     addAndMakeVisible (removeButton);
-    removeButton.setTooltip (TRANS("Remove Sample"));
-    removeButton.setButtonText (TRANS("-"));
+    removeButton.setTooltip (TRANS ("Remove Sample"));
+    removeButton.setButtonText (TRANS ("-"));
     removeButton.setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     removeButton.addListener (this);
     removeButton.setColour (TextButton::buttonColourId, Colour (0xc72d2d2d));
@@ -400,15 +355,12 @@ EditScreen::EditScreen (SamplerDisplay& owner)
     addButton.setAlwaysOnTop (true);
     removeButton.setAlwaysOnTop (true);
 
-    onPageChanged = [this]
-    {
-        switch (getCurrentPage())
-        {
+    onPageChanged = [this] {
+        switch (getCurrentPage()) {
             case 0:
                 sounds->refresh();
                 break;
-            case 1:
-            {
+            case 1: {
                 if (auto i = display().getInstrument())
                     timeline->setKey (i->getActiveSound());
             } break;
@@ -416,23 +368,20 @@ EditScreen::EditScreen (SamplerDisplay& owner)
     };
 }
 
-EditScreen::~EditScreen()
-{
+EditScreen::~EditScreen() {
     timeline.reset();
     sounds.reset();
 }
 
-void EditScreen::setPropertiesVisible (bool visible)
-{
+void EditScreen::setPropertiesVisible (bool visible) {
     if (properties.isVisible() == visible)
         return;
-    
+
     properties.setVisible (visible);
     resized();
 }
 
-void EditScreen::paint (Graphics& g)
-{
+void EditScreen::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     Screen::paint (g);
     //[/UserPrePaint]
@@ -441,13 +390,11 @@ void EditScreen::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void EditScreen::resized()
-{
+void EditScreen::resized() {
     Screen::resized();
     auto tabBounds (getTabs().getBoundsInParent());
 
-    if (properties.isVisible())
-    {
+    if (properties.isVisible()) {
         properties.setBounds (tabBounds.removeFromRight (140));
     }
 
@@ -455,75 +402,53 @@ void EditScreen::resized()
 
     addButton.setBounds (getWidth() - 56, getHeight() - 18, 24, 16);
     removeButton.setBounds (getWidth() - 28, getHeight() - 18, 24, 16);
-    
 }
 
-void EditScreen::parentHierarchyChanged()
-{
+void EditScreen::parentHierarchyChanged() {
     sounds->refresh();
     if (auto i = display().getInstrument())
         timeline->setKey (i->getActiveSound());
 }
 
-void EditScreen::buttonClicked (Button* buttonThatWasClicked)
-{
+void EditScreen::buttonClicked (Button* buttonThatWasClicked) {
     KeyItem key (display().getInstrument()->getActiveSound());
 
-    if (buttonThatWasClicked == &addButton)
-    {
-        if (getCurrentPage() == 1)
-        {
-            auto dir = File::getSpecialLocation(File::userHomeDirectory).getChildFile("Downloads");
+    if (buttonThatWasClicked == &addButton) {
+        if (getCurrentPage() == 1) {
+            auto dir = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("Downloads");
             FileChooser chooser ("Open media", dir, "*.btdk;*.xml;*.wav;*.aiff;*.flac", false);
 
-            if (chooser.browseForMultipleFilesToOpen())
-            {
-                for (const File& f : chooser.getResults())
-                {
-                    if (f.getFileExtension() == ".xml" ||
-                        f.getFileExtension() == ".btdk")
-                    {
+            if (chooser.browseForMultipleFilesToOpen()) {
+                for (const File& f : chooser.getResults()) {
+                    if (f.getFileExtension() == ".xml" || f.getFileExtension() == ".btdk") {
                         if (SamplerView* view = getSamplerView()) {
                             view->loadFile (chooser.getResult());
                         }
-                    }
-                    else
-                    {
-                        if (key.isValid())
-                        {
+                    } else {
+                        if (key.isValid()) {
                             key.addLayer (f);
                             timeline->setKey (key);
-                        }
-                        else
-                        {
+                        } else {
                             jassertfalse;
                         }
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             auto instrument = display().getInstrument();
             instrument->addKey (display().selectedNote());
             sounds->refresh();
         }
-    }
-    else if (buttonThatWasClicked == &removeButton)
-    {
-        switch (getCurrentPage())
-        {
-            case 0:
-            {
+    } else if (buttonThatWasClicked == &removeButton) {
+        switch (getCurrentPage()) {
+            case 0: {
                 auto instrument = display().getInstrument();
-                auto sound = instrument->getActiveSound();
+                auto sound      = instrument->getActiveSound();
                 instrument->removeSound (sound);
                 sounds->refresh();
             } break;
-            
-            case 1:
-            {
 
+            case 1: {
             } break;
         }
     }
@@ -532,26 +457,19 @@ void EditScreen::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
-
-
 //[MiscUserCode]
-void EditScreen::keySelectedEvent (const KeyItem& item)
-{
+void EditScreen::keySelectedEvent (const KeyItem& item) {
 }
 
-void EditScreen::timerCallback()
-{
+void EditScreen::timerCallback() {
 }
 
-void EditScreen::updateComponents()
-{
+void EditScreen::updateComponents() {
 }
 
-void EditScreen::onDisplayUpdate()
-{
+void EditScreen::onDisplayUpdate() {
     // detect a note change from the display
-    if (lastNote != display().selectedKey().getNote())
-    {
+    if (lastNote != display().selectedKey().getNote()) {
         lastNote = display().selectedKey().getNote();
         timeline->setKey (display().selectedKey());
     }
@@ -559,4 +477,4 @@ void EditScreen::onDisplayUpdate()
 
 //[/MiscUserCode]
 
-}
+} // namespace KSP1

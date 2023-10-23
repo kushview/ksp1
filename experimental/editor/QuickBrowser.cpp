@@ -19,15 +19,13 @@
 
 //[Headers] You can add your own extra header files here...
 
-
-#include "ProgramsListBox.h"
 #include "../Instrument.h"
+#include "ProgramsListBox.h"
 #include "SamplerDisplay.h"
 #include "Screens.h"
 //[/Headers]
 
 #include "QuickBrowser.h"
-
 
 namespace KSP1 {
 
@@ -175,7 +173,7 @@ void QuickBrowser::buttonClicked (Button* buttonThatWasClicked)
 
 
 //==============================================================================
-#if 0
+#    if 0
 /*  -- Projucer information section --
 
     This is where the Projucer stores the metadata that describe this GUI layout, so
@@ -199,7 +197,7 @@ BEGIN_JUCER_METADATA
 
 END_JUCER_METADATA
 */
-#endif
+#    endif
 
 
 
@@ -208,4 +206,3 @@ END_JUCER_METADATA
 //[EndFile] You can add extra defines here...
 #endif
 //[/EndFile]
-

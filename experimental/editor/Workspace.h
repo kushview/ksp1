@@ -20,92 +20,81 @@
 #ifndef KSP1_WORKSPACE_H
 #define KSP1_WORKSPACE_H
 
-#include "editor/Views.h"
 #include "editor/Panels.h"
+#include "editor/Views.h"
 
 namespace KSP1 {
 
-    /** A light weight container for showing Panels */
-    class Workspace : public Component
-    {
-    public:
+/** A light weight container for showing Panels */
+class Workspace : public Component {
+public:
+    Workspace (SamplerEditor& e)
+        : editor (e) {
+        panel = nullptr;
+        while (panels.size() < Panel::numPanels)
+            panels.add (nullptr);
 
-        Workspace (SamplerEditor& e)
-            : editor (e)
-        {
-            panel = nullptr;
-            while (panels.size() < Panel::numPanels)
-                panels.add (nullptr);
-            
-            // create all panel objects
-            for (int i = 0; i < Panel::numPanels; ++i)
-                switchPanel ((Panel::ID) i);
+        // create all panel objects
+        for (int i = 0; i < Panel::numPanels; ++i)
+            switchPanel ((Panel::ID) i);
 
-            switchPanel (Panel::samplerPanel);
-        }
+        switchPanel (Panel::samplerPanel);
+    }
 
-        ~Workspace()
-        {
-            panels.clear();
-        }
+    ~Workspace() {
+        panels.clear();
+    }
 
-        inline void
-        resized()
-        {
-            if (panel != nullptr)
-                panel->setBounds (getLocalBounds().reduced (1));
-        }
+    inline void
+        resized() {
+        if (panel != nullptr)
+            panel->setBounds (getLocalBounds().reduced (1));
+    }
 
-        inline void
-        switchPanel (Panel::ID p, bool reset = false)
-        {
-            if (panels [p] == nullptr || reset)
-            {
-                switch (p)
-                {
-                    case Panel::samplerPanel:
-                        panels.set (p, new SamplerView(), true);
-                        break;
-                    case Panel::programsPanel:
-                    case Panel::settingsPanel:
-                    case Panel::assetsPanel:
-                        panels.set (p, new EmptyPanel(), true);
-                        break;
-                    case Panel::numPanels:
-                    default:
-                        jassertfalse; // This isn't a real panel
-                        return;
-                        break;
-                }
-            }
-
-            if (panel != nullptr)
-                removeChildComponent (panel);
-
-            panel = panels [p];
-
-            if (panel != nullptr) {
-                addAndMakeVisible (panel);
-                resized();
+    inline void
+        switchPanel (Panel::ID p, bool reset = false) {
+        if (panels[p] == nullptr || reset) {
+            switch (p) {
+                case Panel::samplerPanel:
+                    panels.set (p, new SamplerView(), true);
+                    break;
+                case Panel::programsPanel:
+                case Panel::settingsPanel:
+                case Panel::assetsPanel:
+                    panels.set (p, new EmptyPanel(), true);
+                    break;
+                case Panel::numPanels:
+                default:
+                    jassertfalse; // This isn't a real panel
+                    return;
+                    break;
             }
         }
 
-        SamplerDisplay* display()
-        {
-            for (Panel* p : panels)
-                if (SamplerView* view = dynamic_cast<SamplerView*> (p))
-                    return view->getDisplay();
-            return nullptr;
+        if (panel != nullptr)
+            removeChildComponent (panel);
+
+        panel = panels[p];
+
+        if (panel != nullptr) {
+            addAndMakeVisible (panel);
+            resized();
         }
+    }
 
-    private:
+    SamplerDisplay* display() {
+        for (Panel* p : panels)
+            if (SamplerView* view = dynamic_cast<SamplerView*> (p))
+                return view->getDisplay();
+        return nullptr;
+    }
 
-        SamplerEditor&  editor;
-        OwnedArray<Panel> panels;
-        Panel* panel;
+private:
+    SamplerEditor& editor;
+    OwnedArray<Panel> panels;
+    Panel* panel;
+};
 
-    };
-
-}
+} // namespace KSP1
 
 #endif /* KSP1_WORKSPACE_H */

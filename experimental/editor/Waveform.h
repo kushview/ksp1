@@ -24,11 +24,10 @@
 
 namespace KSP1 {
 
-class Waveform :  public Component,
-                  public ChangeListener
-{
+class Waveform : public Component,
+                 public ChangeListener {
 public:
-    Waveform ();
+    Waveform();
     virtual ~Waveform();
 
     void setAudioPeak (AudioPeakPtr peak);
@@ -39,11 +38,11 @@ public:
     void changeListenerCallback (ChangeBroadcaster* source);
 
 private:
-    AudioPeakPtr  peak;
+    AudioPeakPtr peak;
     Range<double> timeSpan;
 
     class Sink;
     ScopedPointer<Sink> sink;
 };
 
-}
+} // namespace KSP1

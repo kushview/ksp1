@@ -20,15 +20,13 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "KSP1.h"
 #include "../Instrument.h"
+#include "KSP1.h"
 
 namespace KSP1 {
 class LayersListBox;
 }
 //[/Headers]
-
-
 
 namespace KSP1 {
 
@@ -40,11 +38,10 @@ namespace KSP1 {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class LayerCell  : public Component
-{
+class LayerCell : public Component {
 public:
     //==============================================================================
-    LayerCell ();
+    LayerCell();
     ~LayerCell();
 
     //==============================================================================
@@ -52,13 +49,11 @@ public:
     void setLayer (const LayerItem& item);
     void setSelected (bool yn);
     int layerIndex() const { return (layer.isValid()) ? layer.index() : -1; }
-    void mouseWheelMove (const MouseEvent &e, const MouseWheelDetails &d) override;
+    void mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& d) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
-
-
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -73,13 +68,11 @@ private:
     //==============================================================================
     Path internalPath1;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LayerCell)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

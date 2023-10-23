@@ -23,46 +23,47 @@
 
 namespace KSP1 {
 
-    /** This class describes the common directories where BTV session data is stored */
-    class DataPath
-    {
-    public:
+/** This class describes the common directories where BTV session data is stored */
+class DataPath {
+public:
+    DataPath();
+    DataPath (const File& srcDir);
+    DataPath (const DataPath& other);
+    ~DataPath();
 
-        DataPath();
-        DataPath (const File& srcDir);
-        DataPath (const DataPath& other);
-        ~DataPath();
-
-        /** Resolves a relative path to a file in the best matching
+    /** Resolves a relative path to a file in the best matching
             datapath */
-        static File resolvePath (const String& path);
+    static File resolvePath (const String& path);
 
-        /** Returns BKE's factory content path (e.g. SimBeatThang) */
-        static const File& simBeatThangPath();
+    /** Returns BKE's factory content path (e.g. SimBeatThang) */
+    static const File& simBeatThangPath();
 
-        /** Returns the default library db file */
-        static const File& defaultDatabaseFile();
+    /** Returns the default library db file */
+    static const File& defaultDatabaseFile();
 
-        /** Returns the default user data path */
-        static const File& defaultUserPath();
+    /** Returns the default user data path */
+    static const File& defaultUserPath();
 
-        /** Returns the expansion content path */
-        static const File& expansionContentPath();
+    /** Returns the expansion content path */
+    static const File& expansionContentPath();
 
-        /** Returns the factory content path */
-        static const File& factoryContentPath();
+    /** Returns the factory content path */
+    static const File& factoryContentPath();
 
-        /** Get the Directory associated with this datapath */
-        inline const File& getFile() const { return file; }
+    /** Get the Directory associated with this datapath */
+    inline const File& getFile() const { return file; }
 
-        // operators
-        inline operator const File& () { return file; }
-        inline DataPath& operator= (const DataPath& other) { this->file = other.file; return *this; }
-        inline bool operator== (const DataPath& other) const { return file == other.file; }
-        inline bool operator!= (const DataPath& other) const { return ! (operator==(other)); }
+    // operators
+    inline operator const File&() { return file; }
+    inline DataPath& operator= (const DataPath& other) {
+        this->file = other.file;
+        return *this;
+    }
+    inline bool operator== (const DataPath& other) const { return file == other.file; }
+    inline bool operator!= (const DataPath& other) const { return ! (operator== (other)); }
 
-    private:
-        File file;
-    };
+private:
+    File file;
+};
 
-}
+} // namespace KSP1

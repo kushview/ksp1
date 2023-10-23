@@ -23,7 +23,6 @@
 
 #include "ProgramEditor.h"
 
-
 namespace KSP1 {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -31,8 +30,7 @@ namespace KSP1 {
 
 //==============================================================================
 ProgramEditorView::ProgramEditorView (Controller& ctrl)
-    : controller (ctrl)
-{
+    : controller (ctrl) {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
@@ -48,34 +46,29 @@ ProgramEditorView::ProgramEditorView (Controller& ctrl)
     addAndMakeVisible (banklist2.get());
     banklist2->setName ("bank-list-2");
 
-
     //[UserPreSize]
     //[/UserPreSize]
 
     setSize (584, 350);
 
-
     //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
 }
 
-ProgramEditorView::~ProgramEditorView()
-{
+ProgramEditorView::~ProgramEditorView() {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    bankList1 = nullptr;
+    bankList1   = nullptr;
     programList = nullptr;
-    banklist2 = nullptr;
-
+    banklist2   = nullptr;
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void ProgramEditorView::paint (Graphics& g)
-{
+void ProgramEditorView::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
@@ -85,8 +78,7 @@ void ProgramEditorView::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void ProgramEditorView::resized()
-{
+void ProgramEditorView::resized() {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
@@ -97,11 +89,8 @@ void ProgramEditorView::resized()
     //[/UserResized]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -133,10 +122,7 @@ END_JUCER_METADATA
 */
 #endif
 
-
-
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

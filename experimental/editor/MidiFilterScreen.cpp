@@ -22,29 +22,25 @@
 
 namespace KSP1 {
 
-class ArticulationPropertyPage :  public PropertyPage
-{
+class ArticulationPropertyPage : public PropertyPage {
 public:
-
-    ArticulationPropertyPage()
-    {
+    ArticulationPropertyPage() {
         Array<PropertyComponent*> props;
-        props.add (new TextPropertyComponent(val, "Test", 128, false));
+        props.add (new TextPropertyComponent (val, "Test", 128, false));
         getPanel().addSection ("Articulation", props, true);
     }
 
-    ~ArticulationPropertyPage() { }
+    ~ArticulationPropertyPage() {}
 
 private:
     Value val;
 };
 
-    MidiFilterScreen::MidiFilterScreen (SamplerDisplay &d)
-        : Screen (d, "Midi Filters", Screen::midiFilterScreen)
-    {
-        addPage ("Articulation", new ArticulationPropertyPage ());
-    }
-
-    MidiFilterScreen::~MidiFilterScreen() { }
-
+MidiFilterScreen::MidiFilterScreen (SamplerDisplay& d)
+    : Screen (d, "Midi Filters", Screen::midiFilterScreen) {
+    addPage ("Articulation", new ArticulationPropertyPage());
 }
+
+MidiFilterScreen::~MidiFilterScreen() {}
+
+} // namespace KSP1

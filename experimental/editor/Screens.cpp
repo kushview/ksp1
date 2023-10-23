@@ -18,8 +18,8 @@
 */
 
 #if 0
- #include "BrowseScreen.h"
- #include "PropertiesScreen.h"
+#    include "BrowseScreen.h"
+#    include "PropertiesScreen.h"
 #endif
 
 #include "EditScreen.h"
@@ -29,42 +29,39 @@
 
 namespace KSP1 {
 
-    SamplerDisplay& Screen::display() { return owner; }
+SamplerDisplay& Screen::display() { return owner; }
 
-    Screen::Screen (SamplerDisplay& disp, const String& name, Screen::ID t)
-        : owner (disp),
-          pages (*this),
-          props ("screen"), id (t)
-    {
-        props.setProperty (kv::Slugs::name, name, nullptr);
-        props.setProperty (kv::Slugs::type, (int) getScreenID(), nullptr);
+Screen::Screen (SamplerDisplay& disp, const String& name, Screen::ID t)
+    : owner (disp),
+      pages (*this),
+      props ("screen"),
+      id (t) {
+    props.setProperty (kv::Slugs::name, name, nullptr);
+    props.setProperty (kv::Slugs::type, (int) getScreenID(), nullptr);
 
-        addAndMakeVisible (&pages);
-        pages.setOutline (0);
-        pages.setIndent (0);
-        pages.setTabBarDepth (0);
-        pages.setAlwaysOnTop (true);
+    addAndMakeVisible (&pages);
+    pages.setOutline (0);
+    pages.setIndent (0);
+    pages.setTabBarDepth (0);
+    pages.setAlwaysOnTop (true);
 
-        pages.setOrientation (TabbedButtonBar::TabsAtBottom);
+    pages.setOrientation (TabbedButtonBar::TabsAtBottom);
 
-        displayConnection = disp.connectUpdateClient (*this);
-    }
-
-    Screen::~Screen()
-    {
-        displayConnection.disconnect();
-    }
-
-    Screen* Screen::create (SamplerDisplay& disp, Screen::ID type)
-    {
-        if (type == Screen::editScreen)
-            return new EditScreen (disp);
-
-        return new EditScreen (disp);
-    }
-
-    SamplerView* Screen::getSamplerView() const
-    {
-        return findParentComponentOfClass<SamplerView>();
-    }
+    displayConnection = disp.connectUpdateClient (*this);
 }
+
+Screen::~Screen() {
+    displayConnection.disconnect();
+}
+
+Screen* Screen::create (SamplerDisplay& disp, Screen::ID type) {
+    if (type == Screen::editScreen)
+        return new EditScreen (disp);
+
+    return new EditScreen (disp);
+}
+
+SamplerView* Screen::getSamplerView() const {
+    return findParentComponentOfClass<SamplerView>();
+}
+} // namespace KSP1

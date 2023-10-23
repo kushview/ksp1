@@ -23,12 +23,10 @@
 namespace KSP1 {
 
 class MidiNoteSliderPropertyComponent : public SliderPropertyComponent,
-                                        private ValueListener
-{
+                                        private ValueListener {
 public:
     MidiNoteSliderPropertyComponent (const Value& midiNoteValue, const String& name = "MIDI Note")
-        : SliderPropertyComponent (midiNoteValue, name, 0.0, 127.0, 1.0)
-    {
+        : SliderPropertyComponent (midiNoteValue, name, 0.0, 127.0, 1.0) {
         slider.getValueObject().addListener (this);
         valueChanged (slider.getValueObject());
     }
@@ -40,8 +38,7 @@ public:
 
 private:
     friend class ValueListener;
-    inline void valueChanged (Value& value) override
-    {
+    inline void valueChanged (Value& value) override {
         String suffix = " (";
         suffix << MidiMessage::getMidiNoteName ((int) value.getValue(), true, true, 3)
                << ")";
@@ -49,6 +46,6 @@ private:
     }
 };
 
-}
+} // namespace KSP1
 
 #endif /* KSP1_MIDI_NOTE_SLIDER_PROPERTY_COMPONENT_H */

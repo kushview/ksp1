@@ -2,24 +2,18 @@
 
 namespace KSP1 {
 
-DisplayView::DisplayView()
-{
+DisplayView::DisplayView() {
     addAndMakeVisible (display);
 }
 
-DisplayView::~DisplayView()
-{
-
+DisplayView::~DisplayView() {
 }
 
-void DisplayView::paint (Graphics& g)
-{
-
+void DisplayView::paint (Graphics& g) {
 }
 
-void DisplayView::resized()
-{
+void DisplayView::resized() {
     display.setBounds (getLocalBounds());
 }
 
-}
+} // namespace KSP1

@@ -23,8 +23,6 @@
 #include "JuceHeader.h"
 //[/Headers]
 
-
-
 namespace KSP1 {
 
 //==============================================================================
@@ -35,12 +33,11 @@ namespace KSP1 {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class FilterControls  : public Component,
-                        public ComboBox::Listener
-{
+class FilterControls : public Component,
+                       public ComboBox::Listener {
 public:
     //==============================================================================
-    FilterControls ();
+    FilterControls();
     ~FilterControls();
 
     //==============================================================================
@@ -51,8 +48,6 @@ public:
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     //[/UserVariables]
@@ -60,13 +55,11 @@ private:
     //==============================================================================
     std::unique_ptr<ComboBox> filterTypes;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterControls)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

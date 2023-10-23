@@ -24,62 +24,59 @@
 #include "Forge.h"
 #include "KSP1.h"
 
-namespace KSP1
-{
+namespace KSP1 {
 
-struct PatchMessage
-{
-    PatchMessage (const URIs& u, const lvtk::AtomObject &o) : uris(u), object (o) { }
+struct PatchMessage {
+    PatchMessage (const URIs& u, const lvtk::AtomObject& o) : uris (u), object (o) {}
     const URIs& uris;
     const lvtk::AtomObject object;
     const lvtk::Atom subject;
 };
 
-struct PatchDelete : public PatchMessage
-{
+struct PatchDelete : public PatchMessage {
     PatchDelete (const URIs& u, const lvtk::AtomObject& o)
-        : PatchMessage (u, o)
-    {
+        : PatchMessage (u, o) {
         lv2_atom_object_get (o, uris.patch_subject, &subject, 0);
     }
 };
 
-struct PatchGet : public PatchMessage
-{
+struct PatchGet : public PatchMessage {
     PatchGet (const URIs& u, const lvtk::AtomObject& o)
-        : PatchMessage (u, o)
-    {
+        : PatchMessage (u, o) {
         lv2_atom_object_get (o,
-            uris.patch_subject, &subject,
-        0);
+                             uris.patch_subject,
+                             &subject,
+                             0);
     }
 };
 
-struct PatchSet : public PatchMessage
-{
+struct PatchSet : public PatchMessage {
     inline PatchSet (const URIs& uris, const lvtk::AtomObject& obj)
-        : PatchMessage (uris, obj)
-    {
+        : PatchMessage (uris, obj) {
         lv2_atom_object_get (obj,
-            uris.patch_subject, &subject,
-            uris.patch_property, &property,
-            uris.patch_value, &value,
-        0);
+                             uris.patch_subject,
+                             &subject,
+                             uris.patch_property,
+                             &property,
+                             uris.patch_value,
+                             &value,
+                             0);
     }
 
     const lvtk::Atom property, value;
 };
 
-struct Patch : public PatchMessage
-{
+struct Patch : public PatchMessage {
     Patch (const URIs& uris, const lvtk::AtomObject& obj)
-        : PatchMessage (uris, obj)
-    {
+        : PatchMessage (uris, obj) {
         lv2_atom_object_get (obj,
-            uris.patch_subject, &subject,
-            uris.patch_add, &add,
-            uris.patch_remove, &remove,
-        0);
+                             uris.patch_subject,
+                             &subject,
+                             uris.patch_add,
+                             &add,
+                             uris.patch_remove,
+                             &remove,
+                             0);
     }
 
     const lvtk::Atom add, remove;
@@ -87,14 +84,16 @@ struct Patch : public PatchMessage
 
 struct PatchResponse {
     PatchResponse (const URIs& uris, const AtomObject& o)
-        : object (o)
-    {
+        : object (o) {
         assert (object.otype() == uris.patch_Response);
         lv2_atom_object_get (object,
-            uris.patch_body, &body,
-            uris.patch_request, &request,
-            uris.patch_sequenceNumber, &sequenceNumber,
-        0);
+                             uris.patch_body,
+                             &body,
+                             uris.patch_request,
+                             &request,
+                             uris.patch_sequenceNumber,
+                             &sequenceNumber,
+                             0);
     }
 
     const AtomObject object;
@@ -106,10 +105,10 @@ class LV2Plugin;
 class SampleCache;
 class SamplerSynth;
 typedef lvtk::Plugin<LV2Plugin, lvtk::URID<true>, lvtk::Worker<true>,
-                     lvtk::State<false> > LV2PluginType;
+                     lvtk::State<false>>
+    LV2PluginType;
 
-class LV2Plugin : public LV2PluginType
-{
+class LV2Plugin : public LV2PluginType {
 public:
     LV2Plugin (double _sampleRate);
     ~LV2Plugin();
@@ -125,13 +124,13 @@ public:
     void trigger_restored();
 
     // LV2 Worker Callbacks
-    lvtk::WorkerStatus work (lvtk::WorkerRespond &respond, uint32_t size, const void* data);
+    lvtk::WorkerStatus work (lvtk::WorkerRespond& respond, uint32_t size, const void* data);
     lvtk::WorkerStatus work_response (uint32_t size, const void* body);
     lvtk::WorkerStatus end_run();
 
     // LV2 State Callbacks
-    lvtk::StateStatus save (lvtk::StateStore &store, uint32_t flags, const lvtk::FeatureVec &features);
-    lvtk::StateStatus restore (lvtk::StateRetrieve &retrieve, uint32_t flags, const lvtk::FeatureVec &features);
+    lvtk::StateStatus save (lvtk::StateStore& store, uint32_t flags, const lvtk::FeatureVec& features);
+    lvtk::StateStatus restore (lvtk::StateRetrieve& retrieve, uint32_t flags, const lvtk::FeatureVec& features);
 
 private:
     double sampleRate;

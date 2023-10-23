@@ -23,12 +23,12 @@
 #include "KSP1.h"
 #include "editor/SamplerView.h"
 
-#include "../../libs/lvtk/lvtk/ui.hpp"
 #include "../../libs/lvtk/lvtk/ext/atom.hpp"
 #include "../../libs/lvtk/lvtk/ext/idle_interface.hpp"
+#include "../../libs/lvtk/lvtk/ui.hpp"
 
 namespace Element {
-    class Style;
+class Style;
 }
 
 namespace KSP1 {
@@ -44,10 +44,10 @@ typedef lvtk::UI<LV2Editor, lvtk::URID<true>,
                  lvtk::InstanceAccess<false>,
                  lvtk::UIResize<false>,
                  lvtk::Parent<false>,
-                 lvtk::IdleInterface<false> > LV2EditorType;
+                 lvtk::IdleInterface<false>>
+    LV2EditorType;
 
-class LV2Editor : public LV2EditorType
-{
+class LV2Editor : public LV2EditorType {
 public:
     LV2Editor (const char* plugin);
     ~LV2Editor();
@@ -64,7 +64,7 @@ private:
     bool runLoop;
     ScopedPointer<AudioPeakFactory> peaks;
     ScopedPointer<Forge> forge;
-    ScopedPointer<KSP1::URIs>  uris;
+    ScopedPointer<KSP1::URIs> uris;
     ScopedPointer<KeyboardGetter> keyboard;
     Element::LookAndFeel_E1 style;
     ScopedPointer<PortWriter> writer;
@@ -73,6 +73,7 @@ private:
     DisplayView* create_view();
 };
 
-}}
+} // namespace Gui
+} // namespace KSP1
 
 #endif /* KSP1_LV2_EDITOR_H */

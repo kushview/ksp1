@@ -23,43 +23,34 @@
 
 namespace KSP1 {
 
-    class Articulation :  public ObjectModel
-    {
-    public:
+class Articulation : public ObjectModel {
+public:
+    Articulation()
+        : ObjectModel (Tags::articulation) {
+        setMissingProperties();
+    }
 
-        Articulation()
-            : ObjectModel (Tags::articulation)
-        {
-            setMissingProperties();
-        }
+    Articulation (const Articulation& o)
+        : ObjectModel (o) {
+    }
 
-        Articulation (const Articulation& o)
-            : ObjectModel (o)
-        {
+    Articulation (const ValueTree& data)
+        : ObjectModel (data) {
+        setMissingProperties();
+    }
 
-        }
+    inline String getTypeString() const {
+        return getProperty (Tags::type);
+    }
 
-        Articulation (const ValueTree &data)
-            : ObjectModel (data)
-        {
-            setMissingProperties();
-        }
+    inline int32 getNoteNumber() const {
+        ValueTree parent (node().getParent());
+        return parent.getProperty (Tags::note, -1);
+    }
 
-        inline String getTypeString() const
-        {
-            return getProperty (Tags::type);
-        }
-
-        inline int32 getNoteNumber() const
-        {
-            ValueTree parent (node().getParent());
-            return parent.getProperty (Tags::note, -1);
-        }
-
-    private:
-        void setMissingProperties();
-    
-    };
-}
+private:
+    void setMissingProperties();
+};
+} // namespace KSP1
 
 #endif

@@ -22,92 +22,74 @@
 
 namespace KSP1 {
 
+class H2DrumkitLoader {
+    SampleCache cache;
+    SoundSet<SamplerSound> soundSet;
 
-    class H2DrumkitLoader
-    {
-        SampleCache cache;
-        SoundSet<SamplerSound> soundSet;
+    File kitPath;
+    int currentLayer;
 
-        File kitPath;
-        int currentLayer;
+    struct Meta {
+        String name;
+    } meta;
 
-        struct Meta {
+public:
+    H2DrumkitLoader() : root (0), currentLayer (0) {}
+    H2DrumkitLoader (const File& kit) : root (0), currentLayer (0) {
+        loadKit (kit);
+    }
 
-            String name;
-        } meta;
+    const String& name() const { return meta.name; }
 
+    void loadKit (const File& kitFile) {
+        kitPath   = kitFile;
+        meta.name = String::empty;
+        error     = String::empty;
 
-    public:
-
-        H2DrumkitLoader() : root (0), currentLayer(0) { }
-        H2DrumkitLoader (const File& kit) : root (0), currentLayer(0)
-        {
-            loadKit (kit);
+        if (! kitPath.isDirectory()) {
+            kitPath = File::nonexistent;
+            error   = "Not a valid Hydrogen drumkit";
+            return;
         }
 
+        File drumkit (kitPath.getChildFile ("drumkit.xml"));
+        if (! drumkit.existsAsFile()) {
+            error = "Not a valid Hydrogen drumkit";
+            return;
+        }
 
-        const String& name() const { return meta.name; }
+        root.reset (XmlDocument::parse (drumkit));
+        soundSet.clearSounds();
 
-        void loadKit (const File& kitFile)
-        {
-            kitPath = kitFile;
-            meta.name = String::empty;
-            error = String::empty;
+        error = root != 0 ? String::empty : "Could not parse Hydrogen drumkit";
 
-            if (! kitPath.isDirectory())
-            {
-                kitPath = File::nonexistent;
-                error = "Not a valid Hydrogen drumkit";
-                return;
+        if (String::empty == error) {
+            if (XmlElement* n = root->getChildByName ("name")) {
+                meta.name = n->getAllSubText();
             }
 
-            File drumkit (kitPath.getChildFile("drumkit.xml"));
-            if (! drumkit.existsAsFile())
-            {
-                error = "Not a valid Hydrogen drumkit";
-                return;
-            }
+            if (XmlElement* list = root->getChildByName ("instrumentList")) {
+                forEachXmlChildElementWithTagName (*list, inst, "instrument") {
+                    currentLayer = 0;
 
-            root.reset (XmlDocument::parse (drumkit));
-            soundSet.clearSounds();
+                    XmlElement* eId = inst->getChildByName ("id");
+                    const int keyid = eId->getAllSubText().getIntValue();
 
-            error = root != 0 ? String::empty : "Could not parse Hydrogen drumkit";
+                    const int slot = soundSet.findByRootNote (keyid);
 
-            if (String::empty == error)
-            {
-                if (XmlElement* n = root->getChildByName ("name"))
-                {
-                    meta.name = n->getAllSubText();
-                }
+                    if (slot < 0) {
+                        //XX   Shared<SamplerSound> sound = SamplerSound::create (keyid);
+                        //XX   soundSet.addSound (sound);
+                    }
 
-                if (XmlElement* list = root->getChildByName ("instrumentList"))
-                {
-                    forEachXmlChildElementWithTagName (*list, inst, "instrument")
-                    {
-                        currentLayer = 0;
-
-                        XmlElement* eId = inst->getChildByName("id");
-                        const int keyid = eId->getAllSubText().getIntValue();
-
-                        const int slot = soundSet.findByRootNote (keyid);
-
-                        if (slot < 0)
-                        {
-                         //XX   Shared<SamplerSound> sound = SamplerSound::create (keyid);
-                         //XX   soundSet.addSound (sound);
-                        }
-
-                        forEachXmlChildElement (*inst, child)
-                        {
-                            if (child->getTagName() == "layer")
-                            {
-                                handleLayer (keyid, *child);
-                            }
-                            else
-                                handleKeyProperty (keyid, *child);
-                        }
+                    forEachXmlChildElement (*inst, child) {
+                        if (child->getTagName() == "layer") {
+                            handleLayer (keyid, *child);
+                        } else
+                            handleKeyProperty (keyid, *child);
                     }
                 }
+            }
 #if 0
                 BOOST_FOREACH (const Shared<SamplerSound>& snd, soundSet.getSounds())
                 {
@@ -115,16 +97,15 @@ namespace KSP1 {
                         snd->prepare();
                 }
 #endif
-            }
         }
+    }
 
-        bool ok() const { return error == String::empty; }
-        String getError() { return error; }
+    bool ok() const { return error == String::empty; }
+    String getError() { return error; }
 
-        //fish::SoundSet<SamplerSound>& getSounds() { return soundSet; }
+    //fish::SoundSet<SamplerSound>& getSounds() { return soundSet; }
 
-        void loadMedia()
-        {
+    void loadMedia() {
 #if 0
             for (int i = soundSet.getSounds().size(); --i >= 0;)
             {
@@ -142,23 +123,21 @@ namespace KSP1 {
                 }
             }
 #endif
-        }
+    }
 
-    private:
-        String      error;
-        ScopedXml   root;
+private:
+    String error;
+    ScopedXml root;
 
-       // typedef Shared<SamplerSound::Layer> SharedLayer;
+    // typedef Shared<SamplerSound::Layer> SharedLayer;
 
-        void handleLayer (const int keyid, XmlElement& e)
-        {
-            forEachXmlChildElement (e, child)
-                handleLayerProperty (keyid, *child);
-            ++currentLayer;
-        }
+    void handleLayer (const int keyid, XmlElement& e) {
+        forEachXmlChildElement (e, child)
+            handleLayerProperty (keyid, *child);
+        ++currentLayer;
+    }
 
-        void handleLayerProperty (const int keyid, XmlElement& e)
-        {
+    void handleLayerProperty (const int keyid, XmlElement& e) {
 #if 0
             const int slot = soundSet.findByRootNote (keyid);
             assert (slot >= 0);
@@ -206,10 +185,9 @@ namespace KSP1 {
                 layer->pitch = e.getAllSubText().getFloatValue();
             }
 #endif
-        }
+    }
 
-        void handleKeyProperty (int keyid, XmlElement& e)
-        {
+    void handleKeyProperty (int keyid, XmlElement& e) {
 #if 0
             const int slot = soundSet.findByRootNote (keyid);
             const Shared<SamplerSound>& key (soundSet.getSound (slot));
@@ -271,10 +249,8 @@ namespace KSP1 {
                 currentLayer++;
             }
 #endif
-        }
+    }
+};
 
-    };
-
-
-}
+} // namespace KSP1
 #endif // KSP1_H2DRUMKIT_LOADER_H

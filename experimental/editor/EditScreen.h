@@ -29,10 +29,9 @@ namespace KSP1 {
 class LayersTimeline;
 class SoundsTimeline;
 
-class EditScreen  : public Screen,
-                    public Timer,
-                    public Button::Listener
-{
+class EditScreen : public Screen,
+                   public Timer,
+                   public Button::Listener {
 public:
     EditScreen (SamplerDisplay& owner);
     ~EditScreen();
@@ -49,7 +48,7 @@ public:
     void parentHierarchyChanged() override;
 
 private:
-    OwnedArray<AudioThumbnail>   peaks;
+    OwnedArray<AudioThumbnail> peaks;
     int lastNote;
     void timerCallback() override;
     void updateComponents();
@@ -62,4 +61,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditScreen)
 };
 
-} 
+} // namespace KSP1

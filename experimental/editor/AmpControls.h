@@ -24,8 +24,6 @@
 
 //[/Headers]
 
-
-
 namespace KSP1 {
 
 //==============================================================================
@@ -36,12 +34,11 @@ namespace KSP1 {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class AmpControls  : public Component,
-                     public Slider::Listener
-{
+class AmpControls : public Component,
+                    public Slider::Listener {
 public:
     //==============================================================================
-    AmpControls ();
+    AmpControls();
     ~AmpControls();
 
     //==============================================================================
@@ -51,8 +48,6 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-
-
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -64,13 +59,11 @@ private:
     std::unique_ptr<Slider> slider3;
     std::unique_ptr<Slider> slider4;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpControls)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

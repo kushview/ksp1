@@ -23,8 +23,6 @@
 #include "editor/Screens.h"
 //[/Headers]
 
-
-
 namespace KSP1 {
 
 //==============================================================================
@@ -32,8 +30,7 @@ namespace KSP1 {
                                                                     //[Comments]
                                                                     //[/Comments]
 */
-class BrowseScreen  : public Screen
-{
+class BrowseScreen : public Screen {
 public:
     //==============================================================================
     BrowseScreen (SamplerDisplay& disp);
@@ -47,21 +44,17 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     //[/UserVariables]
 
     //==============================================================================
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrowseScreen)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

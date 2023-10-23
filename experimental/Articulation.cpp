@@ -20,17 +20,15 @@
 #include "Articulation.h"
 
 namespace KSP1 {
-   
-    void Articulation::setMissingProperties()
-    {
-        ValueTree n (node());
-        
-        if (! n.hasProperty (Tags::type))
-            n.setProperty (Tags::type, "singleStroke", nullptr);
-        if (! n.hasProperty (Tags::interval))
-            n.setProperty (Tags::interval, (double)0.25, nullptr);
-        if (! n.hasProperty (Tags::legato))
-            n.setProperty (Tags::legato, (double)0.6, nullptr);
 
-    }
+void Articulation::setMissingProperties() {
+    ValueTree n (node());
+
+    if (! n.hasProperty (Tags::type))
+        n.setProperty (Tags::type, "singleStroke", nullptr);
+    if (! n.hasProperty (Tags::interval))
+        n.setProperty (Tags::interval, (double) 0.25, nullptr);
+    if (! n.hasProperty (Tags::legato))
+        n.setProperty (Tags::legato, (double) 0.6, nullptr);
 }
+} // namespace KSP1

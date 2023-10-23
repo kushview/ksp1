@@ -25,26 +25,19 @@
 
 namespace KSP1 {
 
-    class PatternLoader :  public AssetLoader
-    {
+class PatternLoader : public AssetLoader {
+    const KnownFilesystems& fses;
 
-        const KnownFilesystems& fses;
+public:
+    PatternLoader (Pattern& p, const KnownFilesystems& f)
+        : fses (f),
+          patsy (p) {
+    }
 
-    public:
+protected:
+    Pattern& patsy;
+    OwnedArray<MidiMessageSequence> midi;
+};
 
-        PatternLoader (Pattern& p, const KnownFilesystems& f)
-            : fses (f),
-              patsy (p)
-        {
-        
-        }
-
-    protected:
-
-        Pattern& patsy;
-        OwnedArray<MidiMessageSequence> midi;
-
-    };
-
-}
+} // namespace KSP1
 #endif // PATTERNLOADER_H

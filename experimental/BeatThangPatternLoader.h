@@ -21,36 +21,31 @@
 #define KSP1_BEATTHANG_PATTERN_LOADER_H
 #if KSP1_SEQUENCER
 
-#include "../PatternLoader.h"
+#    include "../PatternLoader.h"
 
 namespace KSP1 {
 
-class BeatThangPatternLoader :  public PatternLoader
-{
+class BeatThangPatternLoader : public PatternLoader {
 public:
-
     BeatThangPatternLoader (Pattern& p, const KnownFilesystems& f)
-        : PatternLoader (p, f) { }
+        : PatternLoader (p, f) {}
 
     inline int getNumSteps() { return 16; }
 
     inline void
-    loadFile (const File& file)
-    {
+        loadFile (const File& file) {
         ScopedXml xml = XmlDocument::parse (file);
         if (xml)
             loadXml (*xml);
     }
 
     inline void
-    loadXml (const XmlElement &e)
-    {
+        loadXml (const XmlElement& e) {
         startLoading();
         {
-            if (e.getTagName() == "Pattern")
-            {
+            if (e.getTagName() == "Pattern") {
                 // legacy patterns go top-down
-/*
+                /*
                 <Notes>Created with the BeatThang</Notes>
                 <Writable>true</Writable>
                 <PPQ>96</PPQ>
@@ -65,23 +60,21 @@ public:
                 <Step_Div>1</Step_Div>
     */
                 patsy.setProperty (Slugs::name, "Beat Thang Pattern");
-                patsy.setProperty (Slugs::ppq, e.getChildByName("PPQ")->getAllSubText().getIntValue());
-                patsy.setProperty (Slugs::bpm, e.getChildByName("Tempo")->getAllSubText().getFloatValue());
-                patsy.setProperty (Slugs::version, e.getChildByName("Version")->getAllSubText().getIntValue());
+                patsy.setProperty (Slugs::ppq, e.getChildByName ("PPQ")->getAllSubText().getIntValue());
+                patsy.setProperty (Slugs::bpm, e.getChildByName ("Tempo")->getAllSubText().getFloatValue());
+                patsy.setProperty (Slugs::version, e.getChildByName ("Version")->getAllSubText().getIntValue());
 
                 const int32 beatsPerBar = 4;
-                const int32 ppqn = patsy.ppqn();
+                const int32 ppqn        = patsy.ppqn();
 
-                if (XmlElement* list = e.getChildByName ("TrackList"))
-                {
+                if (XmlElement* list = e.getChildByName ("TrackList")) {
                     int32 trackIndex = 0;
-                    forEachXmlChildElementWithTagName (*list, t, "Track")
-                    {
+                    forEachXmlChildElementWithTagName (*list, t, "Track") {
                         this->midi.set (trackIndex, new MidiMessageSequence());
                         MidiMessageSequence& mseq = *midi.getUnchecked (trackIndex);
                         Pattern::Track track (patsy.getTrack (trackIndex));
 
-                        int32 numBars = 0;
+                        int32 numBars     = 0;
                         int32 totalLength = 0;
 
                         if (XmlElement* ble = t->getChildByName ("BarLength"))
@@ -90,32 +83,26 @@ public:
                         assert (numBars > 0);
                         totalLength = numBars * beatsPerBar;
 
-                        forEachXmlChildElement (*t, el)
-                        {
+                        forEachXmlChildElement (*t, el) {
                             XmlElement* node = el;
-                            if (node->getTagName() == "KitReference")
-                            {
+                            if (node->getTagName() == "KitReference") {
                                 int32 parts = 0;
-                                String data [2];
+                                String data[2];
 
-                                if (XmlElement* fs = node->getChildByName ("Filesystem"))
-                                {
-                                    if (XmlElement* fsid = fs->getChildByName ("FilesystemId"))
-                                    {
+                                if (XmlElement* fs = node->getChildByName ("Filesystem")) {
+                                    if (XmlElement* fsid = fs->getChildByName ("FilesystemId")) {
                                         data[0] << fsid->getAllSubText();
                                         ++parts;
                                     }
                                 }
 
-                                if (XmlElement* path = node->getChildByName ("FilePath"))
-                                {
+                                if (XmlElement* path = node->getChildByName ("FilePath")) {
                                     data[1] << path->getAllSubText();
                                     if (data[1].isNotEmpty())
                                         ++parts;
                                 }
 
-                                if (parts == 2)
-                                {
+                                if (parts == 2) {
                                     ValueTree tnode = track.state();
                                     ValueTree block (tnode.getOrCreateChildWithName (Slugs::block, nullptr));
                                     block.setProperty ("id", KSP1_SAMPLER_URI, nullptr);
@@ -127,17 +114,14 @@ public:
                                     asset.setProperty ("version", 1.0f, nullptr);
                                 }
                             } // kit reference end
-                            else if (node->getTagName() == "EventList")
-                            {
-
+                            else if (node->getTagName() == "EventList") {
                                 // build a MidiMessageSequence, let it do the note sorting...
                                 // MidiMessageSequence mseq;
-                                forEachXmlChildElementWithTagName (*node, ev, "NoteEvent")
-                                {
-                                    XmlElement* event = ev;
-                                    const int32 note      = event->getChildByName ("Note")->getAllSubText().getIntValue();
-                                    const float velocity  = event->getChildByName ("Volume")->getAllSubText().getFloatValue();
-                                    const double when     = Shuttle::scaledTick (event->getChildByName("When")->getAllSubText().getDoubleValue(), ppqn);
+                                forEachXmlChildElementWithTagName (*node, ev, "NoteEvent") {
+                                    XmlElement* event    = ev;
+                                    const int32 note     = event->getChildByName ("Note")->getAllSubText().getIntValue();
+                                    const float velocity = event->getChildByName ("Volume")->getAllSubText().getFloatValue();
+                                    const double when    = Shuttle::scaledTick (event->getChildByName ("When")->getAllSubText().getDoubleValue(), ppqn);
 
                                     MidiMessage msg = velocity > 0 ? MidiMessage::noteOn (1, note, velocity)
                                                                    : MidiMessage::noteOff (1, note);
@@ -165,17 +149,15 @@ public:
     }
 
     inline void
-    loadResource (const String& res)
-    {
-        if (FileHelpers::isAbsolutePath (res))
-        {
+        loadResource (const String& res) {
+        if (FileHelpers::isAbsolutePath (res)) {
             File file (res);
             loadFile (file);
         }
     }
 };
 
-}
+} // namespace KSP1
 
 #endif
 #endif

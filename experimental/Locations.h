@@ -24,23 +24,21 @@
 
 namespace KSP1 {
 
-    class Locations
-    {
-    public:
+class Locations {
+public:
+    Locations();
+    ~Locations();
 
-        Locations();
-        ~Locations();
+    void printAll();
+    void rebuildIndexes();
 
-        void printAll();
-        void rebuildIndexes();
+    const KnownFilesystems& getFilesystems() const;
 
-        const KnownFilesystems& getFilesystems() const;
+    File resolvePath (const String& data) const;
 
-        File resolvePath (const String& data) const;
-
-    private:
-        KnownFilesystems fses;
-    };
-}
+private:
+    KnownFilesystems fses;
+};
+} // namespace KSP1
 
 #endif // KSP1_LOCATIONS_H

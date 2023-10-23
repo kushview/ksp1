@@ -1,5 +1,5 @@
 /*
-    Articulator.h - This file is part of KSP1
+    Disposable.h - This file is part of KSP1
     Copyright (C) 2014  Kushview, LLC. All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -19,26 +19,12 @@
 
 #pragma once
 
-#include "MidiFilter.h"
+namespace ksp1 {
 
-namespace KSP1 {
-
-class StrokeType;
-
-class Articulator :  public MidiFilter
-{
+class Disposable {
 public:
-    Articulator();
-    ~Articulator();
-
-    bool setStrokeType (int32 note, const StrokeType& type);
-
-    void prepareToPlay (double sampleRate, int32 blockSize);
-    void processMidi (MidiBuffer& midi, int32 nframes);
-    void releaseResources();
-
-private:
-    class Impl; ScopedPointer<Impl> impl;
+    Disposable() {}
+    virtual ~Disposable() {}
 };
 
-}
+} // namespace ksp1

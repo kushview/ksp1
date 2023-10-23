@@ -17,24 +17,20 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "ContentScanner.h"
-#include "Database.h"
-#include "DataPath.h"
 #include "MediaLibrary.h"
+#include "ContentScanner.h"
+#include "DataPath.h"
+#include "Database.h"
 
 namespace KSP1 {
 
-MediaLibrary::MediaLibrary()
-{
+MediaLibrary::MediaLibrary() {
 }
 
-MediaLibrary::~MediaLibrary()
-{
-
+MediaLibrary::~MediaLibrary() {
 }
 
-void MediaLibrary::initialize()
-{
+void MediaLibrary::initialize() {
     const File& dbFile = DataPath::defaultDatabaseFile();
 
     DBG (dbFile.getFullPathName());
@@ -43,28 +39,27 @@ void MediaLibrary::initialize()
         Database db (dbFile.getFullPathName().toRawUTF8());
         db.executeUpdate ("DROP TABLE IF EXISTS assets;"
                           "CREATE TABLE assets ("
-                            "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-                            "name VARCHAR (255) NOT NULL, "
-                            "path VARCHAR (255) NOT NULL, "
-                            "type VARCHAR (64) NOT NULL);");
+                          "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                          "name VARCHAR (255) NOT NULL, "
+                          "path VARCHAR (255) NOT NULL, "
+                          "type VARCHAR (64) NOT NULL);");
         db.executeUpdate ("DROP TABLE IF EXISTS tags;"
                           "CREATE TABLE tags ("
-                            "id VARCHAR(36) PRIMARY KEY NOT NULL, "
-                            "slug VARCHAR (64) NOT NULL"
+                          "id VARCHAR(36) PRIMARY KEY NOT NULL, "
+                          "slug VARCHAR (64) NOT NULL"
                           ");");
         db.executeUpdate ("DROP TABLE IF EXISTS tagged;"
                           "CREATE TABLE tagged ("
-                            "id VARCHAR(36) PRIMARY KEY NOT NULL, "
-                            "object_id INTEGER NOT NULL, "
-                            "tag_id INTEGER NOT NULL"
+                          "id VARCHAR(36) PRIMARY KEY NOT NULL, "
+                          "object_id INTEGER NOT NULL, "
+                          "tag_id INTEGER NOT NULL"
                           ");");
 
         const char* _tags[] = { "snare", "tom", "kick", 0 };
         StringArray tags (_tags);
         String sql ("INSERT INTO tags (id, slug) VALUES \n");
 
-        for (int i = 0; i < tags.size(); ++i)
-        {
+        for (int i = 0; i < tags.size(); ++i) {
             Uuid id;
             sql << "('" << id.toDashedString() << "', '" << tags[i] << "')";
             if (i < (tags.size() - 1))
@@ -77,4 +72,4 @@ void MediaLibrary::initialize()
     }
 }
 
-}
+} // namespace KSP1

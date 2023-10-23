@@ -17,21 +17,24 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/LayerData.h"
-#include "engine/SamplerSounds.h"
-#include "engine/SamplerSynth.h"
-#include "Instrument.h"
+#include "ksp1.hpp"
 
-namespace KSP1 {
+#include "layerdata.hpp"
+#include "sounds.hpp"
+#include "synth.hpp"
+#include "util.hpp"
 
-static int32 lastSoundIdSeed = 0;
+namespace ksp1 {
+using DynamicObject = juce::DynamicObject;
+using Decibels      = juce::Decibels;
+
+static int lastSoundIdSeed = 0;
 
 SamplerSound::SamplerSound (int noteNumber, int soundID)
-    : id ((soundID != 0) ? soundID : generateObjectID (++lastSoundIdSeed))
-{
+    : id ((soundID != 0) ? soundID : generateObjectID (++lastSoundIdSeed)) {
     duration.set (0);
-    zerostruct (key);
-    zerostruct (key.adsr);
+    juce::zerostruct (key);
+    juce::zerostruct (key.adsr);
 
     key.note        = noteNumber;
     key.length      = 0;
@@ -48,25 +51,14 @@ SamplerSound::SamplerSound (int noteNumber, int soundID)
     midiChans.setRange (0, 17, true);
     midiNotes.setRange (0, 128, false);
     midiNotes.setBit (key.note);
-
-    noteValue.addListener (this);
-    lengthValue.addListener (this);
-    volumeValue.addListener (this);
-    pitchValue.addListener (this);
-    panningValue.addListener (this);
 }
 
-SamplerSound::~SamplerSound()
-{
-    noteValue.removeListener (this);
-    lengthValue.removeListener (this);
-}
+SamplerSound::~SamplerSound() {}
 
-DynamicObject::Ptr SamplerSound::createDynamicObject() const
-{
+DynamicObject::Ptr SamplerSound::createDynamicObject() const {
     DynamicObject::Ptr object = new DynamicObject();
     jassertfalse;
-   #if 0
+#if 0
     object->setProperty (Slugs::id, id);
     object->setProperty (Slugs::note, key.note);
     object->setProperty (Slugs::length, key.length);
@@ -82,55 +74,18 @@ DynamicObject::Ptr SamplerSound::createDynamicObject() const
 
     if (layers.size() > 0)
         object->setProperty ("layers", layers);
-   #endif
+#endif
     return object;
 }
 
-void SamplerSound::bindTo (const KeyItem& _item)
-{
-    KeyItem item = _item;
-    noteValue.referTo (item.getPropertyAsValue (Tags::note));
-    lengthValue.referTo (item.getPropertyAsValue (Tags::length));
-    volumeValue.referTo (item.getPropertyAsValue (Tags::volume));
-    panningValue.referTo (item.getPropertyAsValue (Tags::panning));
-    pitchValue.referTo (item.getPropertyAsValue (Tags::pitch));
-}
-
-void SamplerSound::valueChanged (Value& value)
-{
-    if (noteValue.refersToSameSourceAs (value))
-    {
-        setRootNote ((int) value.getValue());
-    }
-    else if (lengthValue.refersToSameSourceAs (value))
-    {
-        auto newlen = (int) value.getValue();
-        Lock sl (*this);
-        key.length = newlen;
-    }
-    else if (volumeValue.refersToSameSourceAs (value))
-    {
-        setVolume (value.getValue());
-    }
-    else if (panningValue.refersToSameSourceAs (value))
-    {
-        setPan (value.getValue());
-    }
-    else if (pitchValue.refersToSameSourceAs (value))
-    {
-        setPitch (value.getValue());
-    }
-}
-
-bool SamplerSound::insertLayerData (LayerData* data)
-{
-    if (activeLayers.contains (data) || ! isPositiveAndBelow (activeLayers.size(), 32))
+bool SamplerSound::insertLayerData (LayerData* data) {
+    if (activeLayers.contains (data) || ! juce::isPositiveAndBelow (activeLayers.size(), 32))
         return false;
 
-    data->parent    = static_cast<uint32> (id);
-    data->sound     = this;
-    data->note      = key.note;
-    data->index     = activeLayers.size() - 1;
+    data->parent = static_cast<uint32_t> (id);
+    data->sound  = this;
+    data->note   = key.note;
+    data->index  = activeLayers.size() - 1;
 
     dataLock.lock();
     activeLayers.add (data);
@@ -140,29 +95,23 @@ bool SamplerSound::insertLayerData (LayerData* data)
     return true;
 }
 
-void SamplerSound::setDefaultLength()
-{
+void SamplerSound::setDefaultLength() {
     start.set (0);
-    
-    int64 begin = 0;
-    int64 end = 0;
 
-    for (int i = 0; i < activeLayers.size(); ++i)
-    {
+    int64_t begin = 0;
+    int64_t end   = 0;
+
+    for (int i = 0; i < activeLayers.size(); ++i) {
         auto* const data = activeLayers.getUnchecked (i);
 
-        if (data->getLength() <= 0)
-        {
+        if (data->getLength() <= 0) {
             jassertfalse;
         }
 
-        if (i == 0)
-        {
+        if (i == 0) {
             begin = data->getStart();
-            end = data->getStart() + data->getLength();
-        }
-        else
-        {
+            end   = data->getStart() + data->getLength();
+        } else {
             if (data->getStart() < begin)
                 begin = data->getStart();
 
@@ -171,8 +120,7 @@ void SamplerSound::setDefaultLength()
         }
     }
 
-    if (activeLayers.size() > 0)
-    {
+    if (activeLayers.size() > 0) {
         // avoid asserting when there are no layers
         jassert (end > begin);
     }
@@ -181,27 +129,23 @@ void SamplerSound::setDefaultLength()
     duration.set (end - begin);
 }
 
-bool SamplerSound::appliesToNote (const int note)
-{
+bool SamplerSound::appliesToNote (const int note) {
     return note >= key.note && note <= (key.note + key.length);
 }
 
-bool SamplerSound::appliesToChannel (const int chan)
-{
-    return chan <= 0 || chan > 16 || midiChans [chan];
+bool SamplerSound::appliesToChannel (const int chan) {
+    return chan <= 0 || chan > 16 || midiChans[chan];
 }
 
-void SamplerSound::clearSources()
-{
+void SamplerSound::clearSources() {
     Lock sl (*this);
     activeLayers.clearQuick();
 }
 
 int SamplerSound::getRootNote() const { return key.note; }
 
-int64 SamplerSound::longestLayerFrames() const
-{
-    int64 longest = 0;
+int64_t SamplerSound::longestLayerFrames() const {
+    int64_t longest = 0;
 
     for (const LayerData* src : activeLayers) {
         if (src && src->lengthInSamples > longest)
@@ -211,66 +155,54 @@ int64 SamplerSound::longestLayerFrames() const
     return longest;
 }
 
-void SamplerSound::removeLayer (LayerData* data)
-{
+void SamplerSound::removeLayer (LayerData* data) {
     dataLock.lock();
     activeLayers.removeFirstMatchingValue (data);
     dataLock.unlock();
 }
 
-void SamplerSound::setMidiChannel (int chan)
-{
-    if (chan >= 1 && chan <= 16)
-    {
+void SamplerSound::setMidiChannel (int chan) {
+    if (chan >= 1 && chan <= 16) {
         dataLock.lock();
         midiChans.clear();
         midiChans.setBit (chan);
         dataLock.unlock();
-    }
-    else
-    {
+    } else {
         dataLock.lock();
         midiChans.setRange (0, 16, true);
         dataLock.unlock();
     }
 }
 
-
-void SamplerSound::setAttack (double ratio)
-{
+void SamplerSound::setAttack (double ratio) {
     const float len = ratio * ((double) length() / 4.0f);
 
     Lock sl (*this);
     key.adsr.setAttack (len);
 }
 
-void
-SamplerSound::setDecay (double ratio)
-{
+void SamplerSound::setDecay (double ratio) {
     const float len = ratio * ((double) length() / 4.0f);
 
     Lock sl (*this);
     key.adsr.setDecay (len);
 }
 
-void SamplerSound::setSustain (double level)
-{
-    level = jlimit (0.0, 1.0, level);
+void SamplerSound::setSustain (double level) {
+    level = ksp1::limit (0.0, 1.0, level);
     Lock sl (*this);
     key.adsr.setSustain (level);
 }
 
-void SamplerSound::setRelease (double ratio)
-{
+void SamplerSound::setRelease (double ratio) {
     const float len = ratio * ((double) length() / 4.0f);
 
     Lock sl (*this);
     key.adsr.setRelease (len);
 }
 
-void SamplerSound::restoreFromJSON (const var &json)
-{
-   #if 0
+void SamplerSound::restoreFromJSON (const juce::var& json) {
+#if 0
     key.volume = (float) json.getProperty (Slugs::volume, 0.0);
     key.gain = Decibels::decibelsToGain (key.volume);
     key.length = (int) json.getProperty (Slugs::length, key.length);
@@ -278,28 +210,24 @@ void SamplerSound::restoreFromJSON (const var &json)
     key.pitch = (double) json.getProperty (Slugs::pitch, key.pitch);
     key.voiceGroup = (int) json.getProperty (Tags::voiceGroup, -1);
     key.triggerMode = (int) json.getProperty (Tags::triggerMode, (int) TriggerMode::Retrigger);
-   #endif
+#endif
 }
 
-void SamplerSound::setRootNote (int note)
-{
+void SamplerSound::setRootNote (int note) {
     jassert (isPositiveAndBelow (note, 128));
-    key.note = note;
+    key.note  = note;
     int index = 0;
 
-    for (LayerData* layer : activeLayers)
-    {
-        if (layer)
-        {
+    for (LayerData* layer : activeLayers) {
+        if (layer) {
             layer->note  = key.note;
             layer->index = index++;
         }
     }
 }
 
-#if defined (HAVE_LVTK)
-void SamplerSound::setProperty (const URIs &uris, const PatchSet &set)
-{
+#if defined(HAVE_LVTK)
+void SamplerSound::setProperty (const URIs& uris, const PatchSet& set) {
     const uint32_t prop (set.property.as_urid());
 
     if (uris.slugs_voiceGroup == prop) {
@@ -317,22 +245,27 @@ void SamplerSound::setProperty (const URIs &uris, const PatchSet &set)
     }
 }
 
-ForgeRef SamplerSound::writeAtomObject (Forge &forge)
-{
+ForgeRef SamplerSound::writeAtomObject (Forge& forge) {
     const URIs& uris (forge.uris);
     ForgeFrame frame;
 
     ForgeRef ref = forge.write_object (frame, static_cast<uint32_t> (id), uris.ksp1_SamplerSound);
-    forge.write_key (uris.slugs_note); forge.write_int (key.note);
-    forge.write_key (uris.slugs_length); forge.write_int (key.length);
-    forge.write_key (uris.slugs_volume); forge.write_double (key.volume);
-    forge.write_key (uris.slugs_pitch); forge.write_double (key.pitch);
-    forge.write_key (uris.slugs_triggerMode); forge.write_int (static_cast<int> (key.triggerMode));
-    forge.write_key (uris.slugs_voiceGroup); forge.write_int (key.voiceGroup);
+    forge.write_key (uris.slugs_note);
+    forge.write_int (key.note);
+    forge.write_key (uris.slugs_length);
+    forge.write_int (key.length);
+    forge.write_key (uris.slugs_volume);
+    forge.write_double (key.volume);
+    forge.write_key (uris.slugs_pitch);
+    forge.write_double (key.pitch);
+    forge.write_key (uris.slugs_triggerMode);
+    forge.write_int (static_cast<int> (key.triggerMode));
+    forge.write_key (uris.slugs_voiceGroup);
+    forge.write_int (key.voiceGroup);
     forge.pop_frame (frame);
 
     return ref;
 }
 #endif
 
-}
+} // namespace ksp1

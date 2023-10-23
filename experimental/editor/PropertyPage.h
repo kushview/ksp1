@@ -24,31 +24,25 @@
 
 namespace KSP1 {
 
-    class PropertyPage :  public Component
-    {
-    public:
+class PropertyPage : public Component {
+public:
+    PropertyPage() {
+        addAndMakeVisible (&panel);
+    }
 
-        PropertyPage()
-        {
-            addAndMakeVisible (&panel);
-        }
+    ~PropertyPage() {
+    }
 
-        ~PropertyPage()
-        {
+    void resized() {
+        panel.setBounds (getLocalBounds());
+    }
 
-        }
+    PropertyPanel& getPanel() { return panel; }
+    const PropertyPanel& getPanel() const { return panel; }
 
-        void resized()
-        {
-            panel.setBounds (getLocalBounds());
-        }
-
-        PropertyPanel& getPanel() { return panel; }
-        const PropertyPanel& getPanel() const { return panel; }
-    private:
-        PropertyPanel panel;
-
-    };
-}
+private:
+    PropertyPanel panel;
+};
+} // namespace KSP1
 
 #endif /* KSP1_PROPERTY_PAGE_H */

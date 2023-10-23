@@ -18,57 +18,51 @@
 */
 
 #include "PortWriterInterface.h"
-#include "Ports.h"
 #include "PortWriter.h"
+#include "Ports.h"
 
 namespace KSP1 {
 
 PortWriterInterface::PortWriterInterface (PortWriter& w)
-    : writer (w)
-{
+    : writer (w) {
     buffer.setSize (1024);
 }
 
-PortWriterInterface::~PortWriterInterface()
-{
+PortWriterInterface::~PortWriterInterface() {
 }
 
-void PortWriterInterface::getKeyForNote (const int note)
-{
+void PortWriterInterface::getKeyForNote (const int note) {
     writer.getKey (note, 0);
 }
 
-void PortWriterInterface::handleMidi (const MidiMessage &midi) {
+void PortWriterInterface::handleMidi (const MidiMessage& midi) {
     if (frozen)
         return;
 
     writer.writeMidi (Port::AtomInput, midi);
 }
 
-bool PortWriterInterface::addKey (const KeyItem& key)
-{
+bool PortWriterInterface::addKey (const KeyItem& key) {
     if (frozen)
         return true;
 
     Forge& forge (writer.getForge (buffer));
-    const LV2_Atom_URID _subject = { { sizeof(LV2_URID), forge.uris.atom_URID },
-                                      forge.uris.ksp1_Instrument };
+    const LV2_Atom_URID _subject = { { sizeof (LV2_URID), forge.uris.atom_URID },
+                                     forge.uris.ksp1_Instrument };
     const lvtk::Atom subject (&_subject);
     const lvtk::Atom value (key.writeAtomObject (forge));
     writer.addProperty (subject, forge.uris.slugs_key, value);
     return true;
 }
 
-bool PortWriterInterface::removeKey (const KeyItem& key)
-{
+bool PortWriterInterface::removeKey (const KeyItem& key) {
     if (frozen)
         return true;
 
     return true;
 }
 
-bool PortWriterInterface::addLayer (const LayerItem& layer)
-{
+bool PortWriterInterface::addLayer (const LayerItem& layer) {
     if (frozen)
         return true;
 
@@ -80,8 +74,7 @@ bool PortWriterInterface::addLayer (const LayerItem& layer)
     return true;
 }
 
-void PortWriterInterface::loadFile (const File& file)
-{
+void PortWriterInterface::loadFile (const File& file) {
     if (frozen)
         return;
 
@@ -89,8 +82,7 @@ void PortWriterInterface::loadFile (const File& file)
         writer.setInstrument (file);
 }
 
-bool PortWriterInterface::removeLayer (const LayerItem& layer)
-{
+bool PortWriterInterface::removeLayer (const LayerItem& layer) {
     if (frozen)
         return true;
 
@@ -99,16 +91,14 @@ bool PortWriterInterface::removeLayer (const LayerItem& layer)
     return true;
 }
 
-void PortWriterInterface::clearKeyboard()
-{
+void PortWriterInterface::clearKeyboard() {
     if (frozen)
         return;
 
     DBG ("AtomPortInterface::clearKeyboard");
 }
 
-void PortWriterInterface::mutate (const Instrument& i, const Identifier& prop)
-{
+void PortWriterInterface::mutate (const Instrument& i, const Identifier& prop) {
     if (frozen)
         return;
 
@@ -116,17 +106,15 @@ void PortWriterInterface::mutate (const Instrument& i, const Identifier& prop)
     writer.setObjectProperty (
         f.uris.ksp1_Instrument,
         URIs::slugToURID (f, prop.toString().toRawUTF8()),
-        i.getProperty (prop), false
-    );
+        i.getProperty (prop),
+        false);
 }
 
-void PortWriterInterface::mutate (const KeyItem& k, const Identifier& prop)
-{
+void PortWriterInterface::mutate (const KeyItem& k, const Identifier& prop) {
     if (frozen)
         return;
 
     if (prop == Slugs::note) {
-
     }
 
     Forge& f = writer.getForge (buffer);
@@ -134,12 +122,11 @@ void PortWriterInterface::mutate (const KeyItem& k, const Identifier& prop)
     writer.setObjectProperty (
         subject.cobj(),
         URIs::slugToURID (f, prop.toString().toRawUTF8()),
-        k.getProperty (prop), true
-    );
+        k.getProperty (prop),
+        true);
 }
 
-void PortWriterInterface::mutate (const LayerItem& l, const Identifier& prop)
-{
+void PortWriterInterface::mutate (const LayerItem& l, const Identifier& prop) {
     if (frozen)
         return;
 
@@ -149,8 +136,8 @@ void PortWriterInterface::mutate (const LayerItem& l, const Identifier& prop)
     writer.setObjectProperty (
         subject.cobj(),
         URIs::slugToURID (f, prop.toString().toRawUTF8()),
-        l.getProperty (prop), false
-    );
+        l.getProperty (prop),
+        false);
 }
 
-}
+} // namespace KSP1

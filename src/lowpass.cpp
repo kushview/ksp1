@@ -17,30 +17,26 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "LowPassFilter.h"
+#include "lowpass.hpp"
 
-namespace KSP1 {
+namespace ksp1 {
 
 LowPassFilter::LowPassFilter()
     : cutoff (1.0f),
-      resonance (0.0f)
-{
+      resonance (0.0f) {
     resetBuffers();
 }
 
-LowPassFilter::LowPassFilter(const LowPassFilter& lpf)
-    : cutoff( lpf.cutoff )
-    , resonance( lpf.resonance )
-{
+LowPassFilter::LowPassFilter (const LowPassFilter& lpf)
+    : cutoff (lpf.cutoff), resonance (lpf.resonance) {
     resetBuffers();
 }
 
-void LowPassFilter::resetBuffers()
-{
+void LowPassFilter::resetBuffers() {
     bandPassBuffer_L = 0.0f;
     bandPassBuffer_R = 0.0f;
     lowPassBuffer_L  = 0.0f;
     lowPassBuffer_R  = 0.0f;
 }
 
-}
+} // namespace ksp1

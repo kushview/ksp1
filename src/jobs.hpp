@@ -20,44 +20,49 @@
 #ifndef KSP1_JOBS_H
 #define KSP1_JOBS_H
 
-#include "Forge.h"
-#include "KSP1.h"
-#include "URIs.h"
-#include "engine/SamplerSynth.h"
-#include "../../libs/lvtk/lvtk/ext/atom.hpp"
-#include "../../libs/lvtk/lvtk/ext/worker.hpp"
+#include "juce.hpp"
 
-namespace KSP1 {
+#include <lvtk/ext/atom.hpp>
+#include <lvtk/ext/worker.hpp>
+#include <lvtk/memory.hpp>
 
+#include "ksp1.hpp"
+#include "urids.hpp"
+
+namespace ksp1 {
+
+class Disposable;
 class JobManager;
 class LV2Plugin;
+class SampleCache;
+class SamplerSynth;
 
 class Job {
 public:
-    virtual ~Job() { }
+    virtual ~Job() {}
 
 protected:
-    Job () : workerRespond (nullptr), forge(nullptr), cache(nullptr) { }
-    Forge* getForge() const { return forge; }
+    Job() noexcept {}
+    LV2_Atom_Forge* getForge() const { return forge; }
     SampleCache* getSampleCache() const { return cache; }
 
     void respond (const lvtk::Atom& atom);
     void respond (uint32_t, const void*);
     virtual void work (const URIs& uris, const lvtk::Atom& atom) = 0;
 
-    JobManager* jobs;
+    JobManager* jobs { nullptr };
 
 private:
-    lvtk::WorkerRespond* workerRespond;
-    Forge* forge;
-    SampleCache* cache;
+    lvtk::WorkerRespond* workerRespond { nullptr };
+    LV2_Atom_Forge* forge { nullptr };
+    SampleCache* cache { nullptr };
 
     void executeWork (const URIs& uris, const lvtk::Atom& atom) {
         work (uris, atom);
     }
+
     friend class JobManager;
 };
-
 
 struct SamplerSynthMessage {
     LV2_Atom atom;
@@ -66,10 +71,11 @@ struct SamplerSynthMessage {
 
 class JobType {
 public:
-    JobType() { }
-    virtual ~JobType() { }
-    virtual bool canWork (const URIs&  uris, const lvtk::Atom&) = 0;
-    virtual void createJobsFor (const URIs& uris, const lvtk::Atom&, Array<Job*>& jobs) = 0;
+    JobType() {}
+    virtual ~JobType() {}
+    virtual bool canWork (const URIs& uris, const lvtk::Atom&)              = 0;
+    virtual void createJobsFor (const URIs& uris,
+                                const lvtk::Atom&, juce::Array<Job*>& jobs) = 0;
 };
 
 class JobManager {
@@ -83,21 +89,21 @@ public:
 
     void dispose (Disposable*);
 
-    Forge& getWorkForge ()
-    {
+    LV2_Atom_Forge& getWorkForge() {
         if (workForgeBuf.getSize() == 0)
-            workForgeBuf.setSize (2048);
-
-        workForge.set_buffer ((uint8*) workForgeBuf.getData(), workForgeBuf.getSize());
+            workForgeBuf.setSize (4096);
+        lv2_atom_forge_set_buffer (&workForge,
+                                   (uint8_t*) workForgeBuf.getData(),
+                                   workForgeBuf.getSize());
         return workForge;
     }
 
 private:
     LV2Plugin& plugin;
-    Forge forge, workForge;
-    MemoryBlock workForgeBuf;
-    OwnedArray<JobType> types;
-    OwnedArray<Job> working;
+    LV2_Atom_Forge forge, workForge;
+    juce::MemoryBlock workForgeBuf;
+    juce::OwnedArray<JobType> types;
+    juce::OwnedArray<Job> working;
     void scheduleWork (uint32_t, const void*);
     void scheduleWork (const lvtk::Atom& atom);
 };
@@ -111,29 +117,31 @@ struct ObjectRef : public lvtk::Atom {
         in Forge must have already called lvtk::AtomForge::set_buffer
         before using this ctor
      */
-    ObjectRef (Forge& forge, uint32_t class_type, void* ptr)
-        : lvtk::Atom (write_object (forge, class_type, ptr))
-    {
-        p_class_ptr = (intptr_t) ptr;
+    ObjectRef (LV2_Atom_Forge& forge, const URIs& urids, uint32_t class_type, void* ptr)
+        : lvtk::Atom (write_object (forge, urids, class_type, ptr)) {
+        p_class_ptr = lvtk::read_unaligned<intptr_t> (ptr);
     }
 
     /** Read an ObjectRef from an AtomObject */
-    ObjectRef (const URIs& uris, const lvtk::AtomObject& object)
-        : lvtk::Atom (object)
-    {
-        jassert (object.otype() == uris.jobs_ObjectRef);
-        const lvtk::Atom class_type, object_ptr;
+    ObjectRef (const URIs& uris, const LV2_Atom_Object* object)
+        : lvtk::Atom (object) {
+        jassert (object->body.otype == uris.jobs_ObjectRef);
+        const LV2_Atom* class_type = nullptr;
+        const LV2_Atom* object_ptr = nullptr;
         lv2_atom_object_get (object,
-            uris.slugs_type, &class_type,
-            uris.slugs_object, &object_ptr,
-        0);
+                             uris.slugs_type,
+                             &class_type,
+                             uris.slugs_object,
+                             &object_ptr,
+                             0);
 
-        p_class_ptr  = (object_ptr) ? *static_cast<intptr_t*> (object_ptr.body()) : 0;
-        m_class_type = (class_type) ? class_type.as_urid() : 0;
+        p_class_ptr  = (object_ptr) ? lvtk::read_unaligned<intptr_t> (LV2_ATOM_BODY (object_ptr)) : 0;
+        m_class_type = (class_type) ? lvtk::read_unaligned<uint32_t> (LV2_ATOM_BODY (class_type)) : 0;
     }
 
     /** Returns the stored class pointer casted to an OType */
-    template<class OType> OType* get() const { return static_cast<OType*> ((void*) p_class_ptr); }
+    template <class OType>
+    OType* get() const { return static_cast<OType*> ((void*) p_class_ptr); }
 
     /** Returns the stored class type URID */
     uint32_t get_class_type() const { return m_class_type; }
@@ -146,26 +154,29 @@ struct ObjectRef : public lvtk::Atom {
     /** Returns the required space in bytes that an ObjectRef needs
         to write an atom object with
      */
-    static uint32_t required_space () { return 64; }
+    static uint32_t required_space() { return 64; }
 
 private:
     intptr_t p_class_ptr;
     uint32_t m_class_type;
-    static ForgeRef write_object (Forge& f, uint32_t class_type, void *ptr)
-    {
-        ForgeFrame frame;
-        ForgeRef ref (f.write_object (frame, 0, f.uris.jobs_ObjectRef));
 
-        f.write_key (f.uris.slugs_type);
-        f.write_urid (class_type);
-        f.write_key (f.uris.slugs_object);
-        f.write_long ((intptr_t) ptr); //!!! not exactly right, but it works.
-        f.pop (frame);
+    static LV2_Atom_Forge_Ref write_object (LV2_Atom_Forge& f,
+                                            const URIs& uris,
+                                            uint32_t class_type,
+                                            void* ptr) {
+        LV2_Atom_Forge_Frame frame;
+
+        auto ref = lv2_atom_forge_object (&f, &frame, 0, uris.jobs_ObjectRef);
+        lv2_atom_forge_key (&f, uris.slugs_type);
+        lv2_atom_forge_urid (&f, class_type);
+        lv2_atom_forge_key (&f, uris.slugs_object);
+        lv2_atom_forge_long (&f, (intptr_t) ptr); //!!! not exactly right, but it works.
+        lv2_atom_forge_pop (&f, &frame);
 
         return ref;
     }
 };
 
-}
+} // namespace ksp1
 
 #endif // KSP1_JOBS_H

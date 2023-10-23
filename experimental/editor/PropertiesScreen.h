@@ -24,15 +24,14 @@
 
 namespace KSP1 {
 
-    class KitScreen :  public Screen
-    {
-    public:
-        KitScreen (SamplerDisplay& d);
-        ~KitScreen();
-        void keySelectedEvent (const KeyItem& key);
-        Screen::ID type() const { return Screen::kitScreen; }
-    };
+class KitScreen : public Screen {
+public:
+    KitScreen (SamplerDisplay& d);
+    ~KitScreen();
+    void keySelectedEvent (const KeyItem& key);
+    Screen::ID type() const { return Screen::kitScreen; }
+};
 
-}
+} // namespace KSP1
 
 #endif /* KSP1_KIT_SCREEN_H */

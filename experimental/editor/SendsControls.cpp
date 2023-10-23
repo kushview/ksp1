@@ -22,15 +22,13 @@
 
 #include "SendsControls.h"
 
-
 namespace KSP1 {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-SendsControls::SendsControls ()
-{
+SendsControls::SendsControls() {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
@@ -53,7 +51,7 @@ SendsControls::SendsControls ()
     slider2->setBounds (96, 24, 63, 48);
 
     label.reset (new Label ("new label",
-                            TRANS("Aux 1")));
+                            TRANS ("Aux 1")));
     addAndMakeVisible (label.get());
     label->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     label->setJustificationType (Justification::centredLeft);
@@ -64,7 +62,7 @@ SendsControls::SendsControls ()
     label->setBounds (32, 66, 71, 24);
 
     label2.reset (new Label ("new label",
-                             TRANS("Aux 2")));
+                             TRANS ("Aux 2")));
     addAndMakeVisible (label2.get());
     label2->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     label2->setJustificationType (Justification::centredLeft);
@@ -75,42 +73,37 @@ SendsControls::SendsControls ()
     label2->setBounds (105, 68, 48, 21);
 
     groupComponent.reset (new GroupComponent ("new group",
-                                              TRANS("effects")));
+                                              TRANS ("effects")));
     addAndMakeVisible (groupComponent.get());
     groupComponent->setTextLabelPosition (Justification::centredLeft);
     groupComponent->setColour (GroupComponent::outlineColourId, Colour (0x66949494));
     groupComponent->setColour (GroupComponent::textColourId, Colour (0xffe3f5ff));
-
 
     //[UserPreSize]
     //[/UserPreSize]
 
     setSize (160, 100);
 
-
     //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
 }
 
-SendsControls::~SendsControls()
-{
+SendsControls::~SendsControls() {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    slider = nullptr;
-    slider2 = nullptr;
-    label = nullptr;
-    label2 = nullptr;
+    slider         = nullptr;
+    slider2        = nullptr;
+    label          = nullptr;
+    label2         = nullptr;
     groupComponent = nullptr;
-
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void SendsControls::paint (Graphics& g)
-{
+void SendsControls::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
@@ -118,8 +111,7 @@ void SendsControls::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void SendsControls::resized()
-{
+void SendsControls::resized() {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
@@ -128,18 +120,14 @@ void SendsControls::resized()
     //[/UserResized]
 }
 
-void SendsControls::sliderValueChanged (Slider* sliderThatWasMoved)
-{
+void SendsControls::sliderValueChanged (Slider* sliderThatWasMoved) {
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == slider.get())
-    {
+    if (sliderThatWasMoved == slider.get()) {
         //[UserSliderCode_slider] -- add your slider handling code here..
         //[/UserSliderCode_slider]
-    }
-    else if (sliderThatWasMoved == slider2.get())
-    {
+    } else if (sliderThatWasMoved == slider2.get()) {
         //[UserSliderCode_slider2] -- add your slider handling code here..
         //[/UserSliderCode_slider2]
     }
@@ -148,11 +136,8 @@ void SendsControls::sliderValueChanged (Slider* sliderThatWasMoved)
     //[/UsersliderValueChanged_Post]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -195,10 +180,7 @@ END_JUCER_METADATA
 */
 #endif
 
-
-
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

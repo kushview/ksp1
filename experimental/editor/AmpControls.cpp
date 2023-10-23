@@ -22,15 +22,13 @@
 
 #include "AmpControls.h"
 
-
 namespace KSP1 {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-AmpControls::AmpControls ()
-{
+AmpControls::AmpControls() {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
@@ -70,35 +68,30 @@ AmpControls::AmpControls ()
 
     slider4->setBounds (80, 8, 24, 80);
 
-
     //[UserPreSize]
     //[/UserPreSize]
 
     setSize (200, 100);
 
-
     //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
 }
 
-AmpControls::~AmpControls()
-{
+AmpControls::~AmpControls() {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    slider = nullptr;
+    slider  = nullptr;
     slider2 = nullptr;
     slider3 = nullptr;
     slider4 = nullptr;
-
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void AmpControls::paint (Graphics& g)
-{
+void AmpControls::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
@@ -108,8 +101,7 @@ void AmpControls::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void AmpControls::resized()
-{
+void AmpControls::resized() {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
@@ -117,28 +109,20 @@ void AmpControls::resized()
     //[/UserResized]
 }
 
-void AmpControls::sliderValueChanged (Slider* sliderThatWasMoved)
-{
+void AmpControls::sliderValueChanged (Slider* sliderThatWasMoved) {
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == slider.get())
-    {
+    if (sliderThatWasMoved == slider.get()) {
         //[UserSliderCode_slider] -- add your slider handling code here..
         //[/UserSliderCode_slider]
-    }
-    else if (sliderThatWasMoved == slider2.get())
-    {
+    } else if (sliderThatWasMoved == slider2.get()) {
         //[UserSliderCode_slider2] -- add your slider handling code here..
         //[/UserSliderCode_slider2]
-    }
-    else if (sliderThatWasMoved == slider3.get())
-    {
+    } else if (sliderThatWasMoved == slider3.get()) {
         //[UserSliderCode_slider3] -- add your slider handling code here..
         //[/UserSliderCode_slider3]
-    }
-    else if (sliderThatWasMoved == slider4.get())
-    {
+    } else if (sliderThatWasMoved == slider4.get()) {
         //[UserSliderCode_slider4] -- add your slider handling code here..
         //[/UserSliderCode_slider4]
     }
@@ -147,11 +131,8 @@ void AmpControls::sliderValueChanged (Slider* sliderThatWasMoved)
     //[/UsersliderValueChanged_Post]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -192,10 +173,7 @@ END_JUCER_METADATA
 */
 #endif
 
-
-
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

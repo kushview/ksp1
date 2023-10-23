@@ -19,27 +19,22 @@
 
 #pragma once
 
-namespace KSP1 {
+namespace ksp1 {
 
-class LowPassFilter
-{
+class LowPassFilter {
 public:
-
     LowPassFilter();
     LowPassFilter (const LowPassFilter& lpf);
 
-    float getCutoff() const             { return cutoff; }
-    float getResonance() const          { return resonance; }
-    void setCutoff (float c)            { cutoff = c; }
-    void setResonance (float r)         { resonance = r; }
+    float getCutoff() const { return cutoff; }
+    float getResonance() const { return resonance; }
+    void setCutoff (float c) { cutoff = c; }
+    void setResonance (float r) { resonance = r; }
 
     /** Pass a value through the filter updating the buffer values. */
-    inline void processMono (float* sample, int count)
-    {
-        while (true)
-        {
-            bandPassBuffer_L = resonance * bandPassBuffer_L + cutoff
-                    * ((*sample) - lowPassBuffer_L);
+    inline void processMono (float* sample, int count) {
+        while (true) {
+            bandPassBuffer_L = resonance * bandPassBuffer_L + cutoff * ((*sample) - lowPassBuffer_L);
 
             lowPassBuffer_L += cutoff * bandPassBuffer_L;
 
@@ -53,13 +48,10 @@ public:
         }
     }
 
-    inline void processStereo (float* sampleL, float* sampleR, int count)
-    {
+    inline void processStereo (float* sampleL, float* sampleR, int count) {
         int c = count;
-        while (1)
-        {
-            bandPassBuffer_L = resonance * bandPassBuffer_L + cutoff
-                    * ((*sampleL) - lowPassBuffer_L);
+        while (1) {
+            bandPassBuffer_L = resonance * bandPassBuffer_L + cutoff * ((*sampleL) - lowPassBuffer_L);
 
             lowPassBuffer_L += cutoff * bandPassBuffer_L;
 
@@ -73,10 +65,8 @@ public:
         }
 
         c = count;
-        while (1)
-        {
-            bandPassBuffer_R = resonance * bandPassBuffer_R + cutoff
-                    * ((*sampleR) - lowPassBuffer_R);
+        while (1) {
+            bandPassBuffer_R = resonance * bandPassBuffer_R + cutoff * ((*sampleR) - lowPassBuffer_R);
 
             lowPassBuffer_R += cutoff * bandPassBuffer_R;
 
@@ -94,12 +84,12 @@ public:
     void resetBuffers();
 
 private:
-    float cutoff;               ///< Filter cutoff (0..1)
-    float resonance;            ///< Filter resonant frequency (0..1)
-    float lowPassBuffer_L;		///< Low pass filter buffer
-    float lowPassBuffer_R;		///< Low pass filter buffer
-    float bandPassBuffer_L;		///< Band pass filter buffer
-    float bandPassBuffer_R;		///< Band pass filter buffer
+    float cutoff;           ///< Filter cutoff (0..1)
+    float resonance;        ///< Filter resonant frequency (0..1)
+    float lowPassBuffer_L;  ///< Low pass filter buffer
+    float lowPassBuffer_R;  ///< Low pass filter buffer
+    float bandPassBuffer_L; ///< Band pass filter buffer
+    float bandPassBuffer_R; ///< Band pass filter buffer
 };
 
-} /* namespace KSP1 */
+} // namespace ksp1

@@ -20,12 +20,10 @@
 #ifndef KSP1_MENU_BUTTON_H
 #define KSP1_MENU_BUTTON_H
 
-
 namespace KSP1 {
 
-    class MenuButton { };
+class MenuButton {};
 
-}
-
+} // namespace KSP1
 
 #endif /* KSP1_MENU_BUTTON_H */

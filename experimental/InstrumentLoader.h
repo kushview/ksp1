@@ -22,128 +22,111 @@
 #include "KSP1.h"
 
 namespace juce {
-    class File;
+class File;
 }
-
 
 namespace KSP1 {
 
-    /** A listener for progress reports from something */
-    class ProgressSink {
-    public:
-        virtual ~ProgressSink() { }
-        virtual void handleProgress (float p) = 0;
-        virtual void handleStatus (const String& msg) = 0;
-        virtual void handleProgressStart() { }
-        virtual void handleProgressFinished() { }
-    };
+/** A listener for progress reports from something */
+class ProgressSink {
+public:
+    virtual ~ProgressSink() {}
+    virtual void handleProgress (float p)         = 0;
+    virtual void handleStatus (const String& msg) = 0;
+    virtual void handleProgressStart() {}
+    virtual void handleProgressFinished() {}
+};
 
-    class DummyProgress :  public ProgressSink {
-    public:
+class DummyProgress : public ProgressSink {
+public:
+    DummyProgress() {}
+    ~DummyProgress() {}
+    void handleProgress (float) override {}
+    void handleStatus (const String&) override {}
+};
 
-        DummyProgress() { }
-        ~DummyProgress() { }
-        void handleProgress (float) override { }
-        void handleStatus (const String&) override { }
-    };
+class Instrument;
 
+class AssetLoader {
+public:
+    AssetLoader()
+        : statusMessage(),
+          currentStep (0),
+          usingSink (false) {}
 
-    class Instrument;
+    virtual ~AssetLoader() {}
 
-    class AssetLoader {
-    public:
+    virtual void loadFile (const File& file)      = 0;
+    virtual void loadResource (const String& res) = 0;
+    virtual void loadXml (const XmlElement& e) {}
 
-        AssetLoader()
-            : statusMessage(),
-              currentStep (0),
-              usingSink (false) { }
+    virtual int getNumSteps() { return -1; }
+    inline int getCurrentStep() const { return currentStep; }
 
-        virtual ~AssetLoader() { }
-
-        virtual void loadFile (const File& file) =0;
-        virtual void loadResource (const String& res) = 0;
-        virtual void loadXml (const XmlElement& e) { }
-
-        virtual int getNumSteps() { return -1; }
-        inline int getCurrentStep() const { return currentStep; }
-
-        inline void tickProgress()
-        {
-            if (getNumSteps() < 0) {
-                notifyProgress (-1.0f);
-                return;
-            }
-
-            if (currentStep < 0)
-                return;
-
-            if (currentStep == 0) {
-                currentStep = 1;
-            }
-
-            notifyProgress ((float) currentStep / (float) getNumSteps());
-
-            if (++currentStep > getNumSteps()) {
-                currentStep = -1;
-            }
+    inline void tickProgress() {
+        if (getNumSteps() < 0) {
+            notifyProgress (-1.0f);
+            return;
         }
 
-        void setStatusMessage (const String& msg)
-        {
-            if (statusMessage != msg)
-            {
-                statusMessage = msg;
-                notifyStatus (statusMessage);
-            }
+        if (currentStep < 0)
+            return;
+
+        if (currentStep == 0) {
+            currentStep = 1;
         }
 
-        void startLoading()
-        {
-            notifyStart();
+        notifyProgress ((float) currentStep / (float) getNumSteps());
+
+        if (++currentStep > getNumSteps()) {
+            currentStep = -1;
         }
+    }
 
-        void finishedLoading()
-        {
-            notifyFinished();
+    void setStatusMessage (const String& msg) {
+        if (statusMessage != msg) {
+            statusMessage = msg;
+            notifyStatus (statusMessage);
         }
+    }
 
-        template<class SinkType>
-        inline void setSink (SinkType& sink)
-        {
-            if (! usingSink) {
-                notifyProgress.connect (boost::bind (&SinkType::handleProgress, &sink, ::_1));
-                notifyStatus.connect (boost::bind (&SinkType::handleStatus, &sink, ::_1));
-                notifyStart.connect (boost::bind (&SinkType::handleProgressStart, &sink));
-                notifyFinished.connect (boost::bind (&SinkType::handleProgressFinished, &sink));
-                usingSink = true;
-            }
+    void startLoading() {
+        notifyStart();
+    }
+
+    void finishedLoading() {
+        notifyFinished();
+    }
+
+    template <class SinkType>
+    inline void setSink (SinkType& sink) {
+        if (! usingSink) {
+            notifyProgress.connect (boost::bind (&SinkType::handleProgress, &sink, ::_1));
+            notifyStatus.connect (boost::bind (&SinkType::handleStatus, &sink, ::_1));
+            notifyStart.connect (boost::bind (&SinkType::handleProgressStart, &sink));
+            notifyFinished.connect (boost::bind (&SinkType::handleProgressFinished, &sink));
+            usingSink = true;
         }
+    }
 
-    private:
+private:
+    boost::signals2::signal<void()> notifyStart;
+    boost::signals2::signal<void()> notifyFinished;
+    boost::signals2::signal<void (float)> notifyProgress;
+    boost::signals2::signal<void (const String&)> notifyStatus;
 
-        boost::signals2::signal<void()> notifyStart;
-        boost::signals2::signal<void()> notifyFinished;
-        boost::signals2::signal<void(float)> notifyProgress;
-        boost::signals2::signal<void(const String&)> notifyStatus;
+    String statusMessage;
+    int currentStep;
+    bool usingSink;
+};
 
-        String statusMessage;
-        int currentStep;
-        bool usingSink;
+class InstrumentLoader : public AssetLoader {
+public:
+    InstrumentLoader (Instrument& i)
+        : instrument (i) {}
 
-    };
+protected:
+    Instrument& instrument;
+};
 
-    class InstrumentLoader : public AssetLoader
-    {
-    public:
-
-        InstrumentLoader (Instrument& i)
-            : instrument (i)
-        { }
-
-    protected:
-
-        Instrument& instrument;
-
-    };
-
-}
+} // namespace KSP1

@@ -23,15 +23,13 @@
 
 #include "LayerCell.h"
 
-
 namespace KSP1 {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-LayerCell::LayerCell ()
-{
+LayerCell::LayerCell() {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
@@ -39,31 +37,25 @@ LayerCell::LayerCell ()
     internalPath1.lineTo (static_cast<float> (-8), 0.0f);
     internalPath1.closeSubPath();
 
-
     //[UserPreSize]
     //[/UserPreSize]
 
     setSize (500, 300);
 
-
     //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
 }
 
-LayerCell::~LayerCell()
-{
+LayerCell::~LayerCell() {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
-
-
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
 //==============================================================================
-void LayerCell::paint (Graphics& g)
-{
+void LayerCell::paint (Graphics& g) {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
@@ -75,15 +67,14 @@ void LayerCell::paint (Graphics& g)
         //[UserPaintCustomArguments] Customize the painting arguments here..
         //[/UserPaintCustomArguments]
         g.setColour (fillColour);
-        g.fillPath (internalPath1, AffineTransform::translation(x, y));
+        g.fillPath (internalPath1, AffineTransform::translation (x, y));
     }
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
 }
 
-void LayerCell::resized()
-{
+void LayerCell::resized() {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
@@ -91,35 +82,28 @@ void LayerCell::resized()
     //[/UserResized]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void LayerCell::setLayer (const LayerItem& item)
-{
+void LayerCell::setLayer (const LayerItem& item) {
     layer = item;
 
-    if (layer.isValid() && ! layer.isEmpty())
-    {
+    if (layer.isValid() && ! layer.isEmpty()) {
         String nextResource = layer.fileString();
-        if (! peak || nextResource != lastResource)
-        {
+        if (! peak || nextResource != lastResource) {
             //FIXME: peak = box->data.createPeak (File (nextResource));
             lastResource = nextResource;
         }
     }
 }
 
-LayersListBox* LayerCell::getListBox()
-{
+LayersListBox* LayerCell::getListBox() {
     LayersListBox* box = findParentComponentOfClass<LayersListBox>();
     assert (box);
     return box;
 }
 
-void LayerCell::setSelected (bool yn)
-{
+void LayerCell::setSelected (bool yn) {
     const bool changed = (yn != isSelected);
-    isSelected = yn;
+    isSelected         = yn;
 
     if (isSelected && changed) {
         //std::clog << "layer selected: " << layer.index() << std::endl;
@@ -131,10 +115,8 @@ void LayerCell::setSelected (bool yn)
         repaint();
 }
 
-void LayerCell::mouseWheelMove (const MouseEvent&, const MouseWheelDetails &d)
-{
-    if (LayersListBox* box = getListBox())
-    {
+void LayerCell::mouseWheelMove (const MouseEvent&, const MouseWheelDetails& d) {
+    if (LayersListBox* box = getListBox()) {
         std::clog << "layer mouse\n";
         if (d.deltaY < 0)
             box->keyPressed (KeyPress (KeyPress::pageDownKey));
@@ -143,7 +125,6 @@ void LayerCell::mouseWheelMove (const MouseEvent&, const MouseWheelDetails &d)
     }
 }
 //[/MiscUserCode]
-
 
 //==============================================================================
 #if 0
@@ -167,10 +148,7 @@ END_JUCER_METADATA
 */
 #endif
 
-
-
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

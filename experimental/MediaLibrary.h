@@ -24,8 +24,7 @@
 
 namespace KSP1 {
 
-class MediaLibrary
-{
+class MediaLibrary {
 public:
     MediaLibrary();
     virtual ~MediaLibrary();
@@ -34,6 +33,6 @@ public:
     void initialize();
 };
 
-}
+} // namespace KSP1
 
 #endif // KSP1_MEDIA_LIBRARY_H

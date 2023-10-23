@@ -21,13 +21,11 @@
 
 #include <iostream>
 
-namespace KSP1 {
+namespace ksp1 {
 
-class ADSR
-{
+class ADSR {
 public:
-    enum State
-    {
+    enum State {
         Attack,
         Decay,
         Sustain,
@@ -42,14 +40,13 @@ public:
     ADSR& operator= (const ADSR& other);
     ~ADSR();
 
-    inline float attack()  const { return attackTime; }
-    inline float decay()   const { return decayTime; }
+    inline float attack() const { return attackTime; }
+    inline float decay() const { return decayTime; }
     inline float sustain() const { return sustainLevel; }
     inline float release() const { return releaseTime; }
 
     /** Set the attack time */
-    inline void setAttack (float attack)
-    {
+    inline void setAttack (float attack) {
         attackTime = attack;
         if (attack != 0.0f)
             invAttack = 1.0f / attack;
@@ -58,8 +55,7 @@ public:
     }
 
     /** Set the decay time */
-    inline void setDecay (float decay)
-    {
+    inline void setDecay (float decay) {
         decayTime = decay;
         if (decay != 0.0f)
             invDecay = 1.0f / decay;
@@ -68,14 +64,12 @@ public:
     }
 
     /** Set the sustain level */
-    inline void setSustain (float sustain)
-    {
+    inline void setSustain (float sustain) {
         sustainLevel = sustain;
     }
 
     /** Set the release time */
-    inline void setRelease (float release)
-    {
+    inline void setRelease (float release) {
         releaseTime = release;
 
         if (release != 0.0f)
@@ -111,12 +105,8 @@ public:
 
     /** Compares ADSR values only. Tick positions are ignored. This is
         so the ADSR can be processed my multiple sources. @see ADSR::sync */
-    inline bool operator== (const ADSR& other)
-    {
-        return attackTime == other.attackTime &&
-                decayTime == other.decayTime &&
-                sustainLevel == other.sustainLevel &&
-                releaseTime == other.releaseTime;
+    inline bool operator== (const ADSR& other) {
+        return attackTime == other.attackTime && decayTime == other.decayTime && sustainLevel == other.sustainLevel && releaseTime == other.releaseTime;
     }
 
     inline bool operator!= (const ADSR& other) {
@@ -124,29 +114,26 @@ public:
     }
 
 private:
+    float attackTime;   ///< Attack time (Unit depends on context)
+    float decayTime;    ///< Decay time (Unit depends on context)
+    float sustainLevel; ///< Sustain level (ratio 0.0 - 1.0)
+    float releaseTime;  ///< Release time (Unit depends on context)
 
-    float attackTime;    ///< Attack time (Unit depends on context)
-    float decayTime;     ///< Decay time (Unit depends on context)
-    float sustainLevel;  ///< Sustain level (ratio 0.0 - 1.0)
-    float releaseTime;   ///< Release time (Unit depends on context)
+    float invAttack;  ///< cached inverse attack
+    float invDecay;   ///< cached inverse decay
+    float invRelease; ///< cached inverse release
 
-    float invAttack;     ///< cached inverse attack
-    float invDecay;      ///< cached inverse decay
-    float invRelease;    ///< cached inverse release
-
-    State adsrState;     ///< Current ADSR state
-    float adsrValue;     ///< Current ADSR value
+    State adsrState; ///< Current ADSR state
+    float adsrValue; ///< Current ADSR value
 
     float releaseValue;  ///< Release value
     float futureRelease; ///< Release phase will be entered when totalTicks >= this value.
 
-    float modeTicks;     ///< This counts the number of ticks in each mode of the ADSR.
-    float totalTicks;    ///< The number of ticks from the beginning, regardless of mode.
-
+    float modeTicks;  ///< This counts the number of ticks in each mode of the ADSR.
+    float totalTicks; ///< The number of ticks from the beginning, regardless of mode.
 };
 
-inline void ADSR::processBuffer (int count, float buffer[])
-{
+inline void ADSR::processBuffer (int count, float buffer[]) {
     short duration;
     short future = static_cast<short> (count) + 1;
     short iMax;
@@ -156,97 +143,78 @@ inline void ADSR::processBuffer (int count, float buffer[])
         if (count + totalTicks >= futureRelease)
             future = static_cast<short> (futureRelease - (count + totalTicks));
 
-    for (int i = 0; i < count; i++)
-    {
-        switch (adsrState)
-        {
-            case Attack:
-            {
+    for (int i = 0; i < count; i++) {
+        switch (adsrState) {
+            case Attack: {
                 duration = static_cast<short> (attackTime);
-                for(; ticks < duration && i < count && i < future; i++)
-                {
+                for (; ticks < duration && i < count && i < future; i++) {
                     adsrValue = ticks * invAttack;
                     ticks++;
                     buffer[i] = adsrValue;
                 }
-                if (i >= future)
-                {
-                    adsrState = Release;
+                if (i >= future) {
+                    adsrState     = Release;
                     futureRelease = 0.0f;
-                    releaseValue = adsrValue;
-                    ticks = 0;
-                }
-                else if (ticks >= duration)
-                {
+                    releaseValue  = adsrValue;
+                    ticks         = 0;
+                } else if (ticks >= duration) {
                     adsrState = Decay;
                     adsrValue = 1.0f;
-                    ticks = 0;
+                    ticks     = 0;
                 }
                 break;
             }
-            case Decay:
-            {
+            case Decay: {
                 duration = static_cast<short> (decayTime);
-                for(; ticks < duration && i < count && i < future; i++)
-                {
+                for (; ticks < duration && i < count && i < future; i++) {
                     adsrValue = 1.0f - (ticks * invDecay) * (1.0f - sustainLevel);
                     ticks++;
                     buffer[i] = adsrValue;
                 }
-                if (i >= future)
-                {
-                    adsrState = Release;
+                if (i >= future) {
+                    adsrState     = Release;
                     futureRelease = 0.0f;
-                    releaseValue = adsrValue;
-                    ticks = 0;
-                }
-                else if (ticks >= duration)
-                {
+                    releaseValue  = adsrValue;
+                    ticks         = 0;
+                } else if (ticks >= duration) {
                     adsrState = Sustain;
                     adsrValue = sustainLevel;
-                    ticks = 0;
+                    ticks     = 0;
                 }
                 break;
             }
-            case Sustain:
-            {
+            case Sustain: {
                 iMax = (count < future ? count : future);
-                for(; i < iMax; i++)
-                {
+                for (; i < iMax; i++) {
                     buffer[i] = sustainLevel;
                 }
-                if (i >= future)
-                {
-                    adsrState = Release;
+                if (i >= future) {
+                    adsrState     = Release;
                     futureRelease = 0.0f;
-                    releaseValue = adsrValue;
-                    ticks = 0;
+                    releaseValue  = adsrValue;
+                    ticks         = 0;
                 }
                 break;
             }
-            case Release:
-            {
+            case Release: {
                 duration = static_cast<short> (releaseTime);
-                for(; ticks < duration && i < count; i++)
-                {
+                for (; ticks < duration && i < count; i++) {
                     adsrValue = (1.0f - ticks * invRelease) * releaseValue;
                     ticks++;
                     buffer[i] = adsrValue;
                 }
-                if (ticks >= duration)
-                {
+                if (ticks >= duration) {
                     adsrState = Idle;
                     adsrValue = 1.0f;
-                    ticks = 0;
+                    ticks     = 0;
                 }
                 break;
             }
             case Idle:
-            default:
-            {
+            default: {
                 // Fill with zeros to end
-                for(; i < count; i++)
-                    buffer [i] = 0.0f;
+                for (; i < count; i++)
+                    buffer[i] = 0.0f;
                 ticks = 0;
             }
         }
@@ -256,27 +224,22 @@ inline void ADSR::processBuffer (int count, float buffer[])
     modeTicks = static_cast<float> (ticks);
 }
 
-inline float ADSR::setFutureRelease (float when)
-{
-    if (adsrState == Idle ) {
+inline float ADSR::setFutureRelease (float when) {
+    if (adsrState == Idle) {
         return 0.0f;
     }
 
-    if (0.0f == when)
-    {
-        if (adsrState != Release)
-        {
+    if (0.0f == when) {
+        if (adsrState != Release) {
             releaseValue = adsrValue;
-            adsrState = Release;
-            modeTicks = 0.f;
+            adsrState    = Release;
+            modeTicks    = 0.f;
 
             return releaseValue;
         }
 
         return 1.0f;
-    }
-    else
-    {
+    } else {
         if (0.0f == futureRelease)
             futureRelease = totalTicks + when;
 
@@ -284,33 +247,29 @@ inline float ADSR::setFutureRelease (float when)
     }
 }
 
-inline void ADSR::forceRelease (float maxRelease)
-{
-    if( adsrState == Idle)
+inline void ADSR::forceRelease (float maxRelease) {
+    if (adsrState == Idle)
         return;
 
-    if( adsrState != Release )
-    {
+    if (adsrState != Release) {
         releaseValue = adsrValue;
-        adsrState = Release;
-        modeTicks = 0.0f;
+        adsrState    = Release;
+        modeTicks    = 0.0f;
     }
 
-    if (maxRelease < releaseTime && maxRelease > 0.0 )
-    {
+    if (maxRelease < releaseTime && maxRelease > 0.0) {
         setRelease (maxRelease);
-        releaseValue = adsrValue;  // Avoid discontinuity
-        modeTicks = 0.0f;
+        releaseValue = adsrValue; // Avoid discontinuity
+        modeTicks    = 0.0f;
     }
 }
 
-inline void ADSR::reset()
-{
-    adsrState = Attack;
-    adsrValue = 0.0f;
-    modeTicks = 0.0f;
-    totalTicks = 0.0f;
+inline void ADSR::reset() {
+    adsrState     = Attack;
+    adsrValue     = 0.0f;
+    modeTicks     = 0.0f;
+    totalTicks    = 0.0f;
     futureRelease = 0.0f;
 }
 
-}
+} // namespace ksp1

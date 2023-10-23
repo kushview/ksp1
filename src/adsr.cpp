@@ -17,57 +17,51 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/ADSR.h"
+#include "adsr.hpp"
 
-namespace KSP1 {
+namespace ksp1 {
 
 ADSR::ADSR (float a, float d, float s, float r)
     : adsrState (Attack),
-        adsrValue (0.0f),
-        futureRelease (0.0f),
-        modeTicks (0.0f),
-        totalTicks (0.0f)
-{
+      adsrValue (0.0f),
+      futureRelease (0.0f),
+      modeTicks (0.0f),
+      totalTicks (0.0f) {
     setAttack (a);
     setDecay (d);
     setSustain (s);
     setRelease (r);
 }
 
-
-ADSR::ADSR (const ADSR& other)
-{
+ADSR::ADSR (const ADSR& other) {
     copy (other);
 }
 
-ADSR::~ADSR() { }
+ADSR::~ADSR() {}
 
-ADSR& ADSR::operator= (const ADSR& other)
-{
+ADSR& ADSR::operator= (const ADSR& other) {
     copy (other);
     return *this;
 }
 
-void ADSR::copy (const ADSR& other)
-{
-    adsrState  = other.adsrState;
-    adsrValue  = other.adsrValue;
+void ADSR::copy (const ADSR& other) {
+    adsrState     = other.adsrState;
+    adsrValue     = other.adsrValue;
     futureRelease = other.futureRelease;
-    modeTicks  = other.modeTicks;
-    totalTicks = other.totalTicks;
+    modeTicks     = other.modeTicks;
+    totalTicks    = other.totalTicks;
 
     sync (other, false);
 }
 
-void ADSR::sync (const ADSR &other, bool resetTicks)
-{
+void ADSR::sync (const ADSR& other, bool resetTicks) {
     if (resetTicks)
         reset();
 
-    setAttack  (other.attackTime);
-    setDecay   (other.decayTime);
+    setAttack (other.attackTime);
+    setDecay (other.decayTime);
     setSustain (other.sustainLevel);
     setRelease (other.releaseTime);
 }
 
-}
+} // namespace ksp1

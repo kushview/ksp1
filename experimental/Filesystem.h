@@ -22,57 +22,54 @@
 
 #include "KSP1.h"
 
-namespace KSP1
-{
-    /** A data structure which contains information about BeatThang data paths.
+namespace KSP1 {
+/** A data structure which contains information about BeatThang data paths.
         This class should ONLY be used when working Beat Thang mkI content */
-    struct Filesystem
-    {
-        Filesystem (const String& uuid_,  const File& path_,  const String& name_);
-        bool valid() const { return path.exists(); }
-        inline uint32 hashCode() const { return (uint32) path.hashCode(); }
-        operator uint32() const { return hashCode(); }
-        uint32 urid;
-        String uuid;
-        File   path;
-        String name;
-    };
+struct Filesystem {
+    Filesystem (const String& uuid_, const File& path_, const String& name_);
+    bool valid() const { return path.exists(); }
+    inline uint32 hashCode() const { return (uint32) path.hashCode(); }
+    operator uint32() const { return hashCode(); }
+    uint32 urid;
+    String uuid;
+    File path;
+    String name;
+};
 
-    /** Maintains a list of filesystems on the system */
-    class KnownFilesystems
-    {
-    public:
-        typedef OwnedArray<Filesystem> ArrayType;
+/** Maintains a list of filesystems on the system */
+class KnownFilesystems {
+public:
+    typedef OwnedArray<Filesystem> ArrayType;
 
-        KnownFilesystems();
-        ~KnownFilesystems();
+    KnownFilesystems();
+    ~KnownFilesystems();
 
-        /** Add a new filesystem
+    /** Add a new filesystem
             @param uuid the Filesystem UUID
             @param path the Filesystem root path
             @param name the Filesystem name
         */
-        void add (const String& uuid, const File& path, const String& name);
-        void buildAssetTreeIndexes();
-        
-        /** Get all filesystem names
+    void add (const String& uuid, const File& path, const String& name);
+    void buildAssetTreeIndexes();
+
+    /** Get all filesystem names
             @param names The array to fill with names
          */
-        void getNames (StringArray& names);
-        
-        /** Get a Filesystem path by urid */
-        const File& getPathForID (uint32 urid) const;
-        
-        /** Get a Filesystem path by UUID string */
-        const File& getPathForUUID (const String& uuid) const;
+    void getNames (StringArray& names);
 
-        /** Get a file from a uuid and path
+    /** Get a Filesystem path by urid */
+    const File& getPathForID (uint32 urid) const;
+
+    /** Get a Filesystem path by UUID string */
+    const File& getPathForUUID (const String& uuid) const;
+
+    /** Get a file from a uuid and path
             @param uuid The FSID to look for
             @param path The file path within the filysystem
          */
-        File getFile (const String& uuid, const String& path) const;
+    File getFile (const String& uuid, const String& path) const;
 
-        /** Get a file from an asset node
+    /** Get a file from an asset node
 
             The value tree passed in should have the properties 'fsid' and
             'path'.  fsid should be the filesystem id and path should be the
@@ -82,33 +79,35 @@ namespace KSP1
             Xml of the tree would look like this...
             <asset fsid="some-uuid-number" path="pattern/Nifty-Pattern.btpt" />
          */
-        File getFile (const ValueTree& assetNode) const;
+    File getFile (const ValueTree& assetNode) const;
 
-        Filesystem* findByName (const String& name) const;
-        Filesystem* get (uint32 index) const;
+    Filesystem* findByName (const String& name) const;
+    Filesystem* get (uint32 index) const;
 
-        inline const FileSearchPath& searchPath() const { return locations; }
-        inline void addSearchPath (const File& path) { jassert(path.isDirectory()); locations.addIfNotAlreadyThere (path); }
+    inline const FileSearchPath& searchPath() const { return locations; }
+    inline void addSearchPath (const File& path) {
+        jassert (path.isDirectory());
+        locations.addIfNotAlreadyThere (path);
+    }
 
-        inline ArrayType& array() { return llist; }
-        inline const ArrayType& array() const { return llist; }
-        inline uint32 size() const { return llist.size(); }
-        inline Filesystem* operator[] (const size_t i) const { return llist.getUnchecked(i); }
-        inline const Filesystem* const* begin() const { return llist.begin(); }
-        inline const Filesystem* const* end() const { return llist.end(); }
+    inline ArrayType& array() { return llist; }
+    inline const ArrayType& array() const { return llist; }
+    inline uint32 size() const { return llist.size(); }
+    inline Filesystem* operator[] (const size_t i) const { return llist.getUnchecked (i); }
+    inline const Filesystem* const* begin() const { return llist.begin(); }
+    inline const Filesystem* const* end() const { return llist.end(); }
 
-    private:
-        FileSearchPath locations;
-        ArrayType llist;
-    };
+private:
+    FileSearchPath locations;
+    ArrayType llist;
+};
 
-    /** A scanner for sampler (beatthang) file systems */
-    class FilesystemScanner
-    {
-    public:
-        FilesystemScanner (KnownFilesystems& fses, const FileSearchPath& searchPaths);
-        ~FilesystemScanner() { }
-    };
-}
+/** A scanner for sampler (beatthang) file systems */
+class FilesystemScanner {
+public:
+    FilesystemScanner (KnownFilesystems& fses, const FileSearchPath& searchPaths);
+    ~FilesystemScanner() {}
+};
+} // namespace KSP1
 
 #endif /* KSP1_FILESYSTEM_H */

@@ -23,15 +23,12 @@
 
 namespace KSP1 {
 
-class Monitor
-{
+class Monitor {
 public:
-
     Monitor (const Array<int>& p, const int pt)
-        : path (p), port (pt), value (0.0f)
-    { }
+        : path (p), port (pt), value (0.0f) {}
 
-    ~Monitor() { }
+    ~Monitor() {}
 
     const Array<int> path;
     const int port;
@@ -47,7 +44,6 @@ public:
 
 private:
     AtomicValue<float> value;
-
 };
 
-}
+} // namespace KSP1

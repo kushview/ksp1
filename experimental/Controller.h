@@ -20,30 +20,28 @@
 #ifndef KSP1_GLOBALS_H
 #define KSP1_GLOBALS_H
 
-
 namespace KSP1 {
 
-    class Locations;
-    class MediaLibrary;
-    class Programming;
-    class SampleCache;
+class Locations;
+class MediaLibrary;
+class Programming;
+class SampleCache;
 
+class Controller {
+public:
+    Controller();
+    virtual ~Controller();
 
-    class Controller {
-    public:
-        Controller();
-        virtual ~Controller();
+    virtual void initialize();
+    Locations& locations();
+    MediaLibrary& media();
+    Programming& programs();
+    // SampleCache& sampleCache();
 
-        virtual void initialize();
-        Locations& locations();
-        MediaLibrary& media();
-        Programming& programs();
-        // SampleCache& sampleCache();
-
-    private:
-        class Impl;
-        Impl* impl;
-    };
-}
+private:
+    class Impl;
+    Impl* impl;
+};
+} // namespace KSP1
 
 #endif // GLOBALS_H

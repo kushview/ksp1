@@ -28,11 +28,9 @@ class Instrument;
 class Programming;
 class Screen;
 
-}
+} // namespace KSP1
 
 //[/Headers]
-
-
 
 namespace KSP1 {
 
@@ -44,9 +42,8 @@ namespace KSP1 {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class QuickBrowser  : public Component,
-                      public Button::Listener
-{
+class QuickBrowser : public Component,
+                     public Button::Listener {
 public:
     //==============================================================================
     QuickBrowser (Programming& progs);
@@ -62,8 +59,6 @@ public:
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
 
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     Programming& programs;
@@ -76,13 +71,11 @@ private:
     std::unique_ptr<ProgramsListBox> listBox;
     std::unique_ptr<TextButton> textButton;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (QuickBrowser)
 };
 
-} /* KSP1 */
+} // namespace KSP1
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

@@ -14,18 +14,16 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-@prefix doap:  <http://usefulinc.com/ns/doap#> .
-@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
 @prefix ui:    <http://lv2plug.in/ns/extensions/ui#> .
 
-<http://kushview.net/ns/ksp1>
+<https://kushview.net/plugins/ksp1>
         a lv2:Plugin ;
-        lv2:binary <plugin.so> ;
-        rdfs:seeAlso <KSP1.ttl> .
+        lv2:binary <@BINARY@> ;
+        rdfs:seeAlso <ksp1.ttl> .
 
-<http://kushview.net/ns/ksp1/ui/x11>
-        a ui:X11UI ;
-        ui:binary <ui.so> ;
-        rdfs:seeAlso <KSP1.ttl> .
+<https://kushview.net/plugins/ksp1/ui>
+        a ui:@UI_TYPE@ ;
+        ui:binary <@UI_BINARY> ;
+        rdfs:seeAlso <ksp1.ttl> .

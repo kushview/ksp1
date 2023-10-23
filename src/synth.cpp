@@ -17,28 +17,32 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/LayerData.h"
-#include "engine/SampleCache.h"
-#include "engine/SamplerKeys.h"
-#include "engine/SamplerSounds.h"
-#include "engine/SamplerSynth.h"
-#include "engine/SamplerVoice.h"
-#include "Instrument.h"
+#include "juce.hpp"
 
-namespace Slugs = kv::Slugs;
+#include "cache.hpp"
+#include "layerdata.hpp"
+#include "samplerkeys.hpp"
+#include "sounds.hpp"
+#include "synth.hpp"
+#include "voice.hpp"
 
-namespace KSP1 {
+namespace ksp1 {
 
-static std::unique_ptr<AudioFormatManager> sAudioFormats;
-static std::unique_ptr<AudioThumbnailCache> sAudioThumbnails;
+using Decibels    = juce::Decibels;
+using File        = juce::File;
+using JSON        = juce::JSON;
+using String      = juce::String;
+using var         = juce::var;
+using XmlDocument = juce::XmlDocument;
+using XmlElement  = juce::XmlElement;
+
+static std::unique_ptr<juce::AudioFormatManager> sAudioFormats;
 static std::unique_ptr<SampleCache> sSampleCache;
 
-static Array<SamplerSynth*> sCacheUsers;
+static juce::Array<SamplerSynth*> sCacheUsers;
 
-struct ZoneSorter
-{
-    static int compareElements (const SamplerSound* first, const SamplerSound* second)
-    {
+struct ZoneSorter {
+    static int compareElements (const SamplerSound* first, const SamplerSound* second) {
         if (first->getRootNote() < second->getRootNote())
             return -1;
         else if (first->getRootNote() == second->getRootNote())
@@ -51,32 +55,28 @@ struct ZoneSorter
     }
 };
 
-class JSONSynthLoader : public SamplerSynth::DataLoader
-{
+class JSONSynthLoader : public SamplerSynth::DataLoader {
 public:
     JSONSynthLoader (const var& json, SampleCache& c)
-        : SamplerSynth::DataLoader (c), data (json)
-    { }
+        : SamplerSynth::DataLoader (c), data (json) {}
 
-    bool createSounds() override
-    {
-//            for (int i = 0; i < data.size(); ++i)
+    bool createSounds() override {
+        //            for (int i = 0; i < data.size(); ++i)
         {
-            const var sounds = data.getProperty ("sounds", var::null);
+            const var sounds = data.getProperty ("sounds", var());
 
-            for (int si = 0; si < sounds.size(); ++ si)
-            {
-                const var sound = sounds [si];
-                SamplerSound* ssound = createSound (sound.getProperty (Slugs::note, -1),
-                                                    sound.getProperty (Slugs::id, 0));
+            for (int si = 0; si < sounds.size(); ++si) {
+                const var sound      = sounds[si];
+                SamplerSound* ssound = createSound (sound.getProperty ("note", -1),
+                                                    sound.getProperty ("id", 0));
                 if (! ssound)
                     continue;
 
                 ssound->restoreFromJSON (sound);
 
-                const var layers = sound.getProperty ("layers", var::null);
+                const var layers = sound.getProperty ("layers", var());
                 for (int li = 0; li < layers.size(); ++li) {
-                    const var layer (layers [li]);
+                    const var layer (layers[li]);
                     if (LayerData* ld = createLayerData (*ssound))
                         ld->restoreFromJSON (layer);
                 }
@@ -92,21 +92,17 @@ private:
     const var& data;
 };
 
-class ValueTreeXmlSynthLoader : public SamplerSynth::DataLoader
-{
+class ValueTreeXmlSynthLoader : public SamplerSynth::DataLoader {
 public:
     ValueTreeXmlSynthLoader (const XmlElement& e, SampleCache& c)
-        : SamplerSynth::DataLoader (c), data (e)
-    { }
+        : SamplerSynth::DataLoader (c), data (e) {}
 
-    ~ValueTreeXmlSynthLoader() { }
+    ~ValueTreeXmlSynthLoader() {}
 
-    bool createSounds() override
-    {
+    bool createSounds() override {
         bool res = true;
 
-        for (int i = data.getNumChildElements(); --i >= 0;)
-        {
+        for (int i = data.getNumChildElements(); --i >= 0;) {
             const XmlElement* c = data.getChildElement (i);
             if (c->hasTagName ("key"))
                 res = createKey (*c);
@@ -122,34 +118,30 @@ public:
 
 protected:
     const XmlElement& data;
-    bool createKey (const XmlElement& key)
-    {
+    bool createKey (const XmlElement& key) {
         bool res = false;
 
-        if (SamplerSound* sound = createSound (key.getIntAttribute ("note", -1)))
-        {
-            sound->setVolume (key.getDoubleAttribute (Slugs::volume, 0));
-            sound->setTriggerMode (key.getIntAttribute (Tags::triggerMode, TriggerMode::Retrigger));
-            sound->setVoiceGroup (key.getIntAttribute (Tags::voiceGroup, -1));
-            sound->setKeyLength (key.getIntAttribute (Slugs::length, 0));
+        if (SamplerSound* sound = createSound (key.getIntAttribute ("note", -1))) {
+            sound->setVolume (key.getDoubleAttribute ("volume", 0));
+            sound->setTriggerMode (key.getIntAttribute ("triggerMode", TriggerMode::Retrigger));
+            sound->setVoiceGroup (key.getIntAttribute ("voiceGroup", -1));
+            sound->setKeyLength (key.getIntAttribute ("length", 0));
 
-            for (int i = 0; i < key.getNumChildElements(); ++i)
-            {
+            for (int i = 0; i < key.getNumChildElements(); ++i) {
                 XmlElement* c = key.getChildElement (i);
                 if (c->hasTagName ("layer"))
                     res = createLayer (*sound, *c);
             }
 
             sound->setDefaultLength();
+            res = true;
         }
 
-        return true;
+        return res;
     }
 
-    bool createLayer (SamplerSound& sound, const XmlElement& layer)
-    {
-        if (LayerData* data = DataLoader::createLayerData (sound))
-        {
+    bool createLayer (SamplerSound& sound, const XmlElement& layer) {
+        if (LayerData* data = DataLoader::createLayerData (sound)) {
             data->restoreFromXml (layer);
             return true;
         }
@@ -159,26 +151,22 @@ protected:
     }
 };
 
-SamplerSynth::DataLoader::DataLoader (SampleCache& c) : cache (c) { }
-SamplerSynth::DataLoader::~DataLoader()
-{
-    for (auto *s : sounds)
+SamplerSynth::DataLoader::DataLoader (SampleCache& c) : cache (c) {}
+SamplerSynth::DataLoader::~DataLoader() {
+    for (auto* s : sounds)
         s->layerSources().clearQuick();
     sounds.clear();
     layers.clear();
 }
 
-SamplerSound* SamplerSynth::DataLoader::createSound (int note, int id)
-{
+SamplerSound* SamplerSynth::DataLoader::createSound (int note, int id) {
     if (SamplerSound* s = new SamplerSound (note, id))
         return sounds.add (s);
     return nullptr;
 }
 
-LayerData* SamplerSynth::DataLoader::createLayerData (SamplerSound &sound)
-{
-    if (LayerData* source = cache.getLayerData (true))
-    {
+LayerData* SamplerSynth::DataLoader::createLayerData (SamplerSound& sound) {
+    if (LayerData* source = cache.getLayerData (true)) {
         layers.add (source);
         source->note = sound.getRootNote();
         jassert (sounds.contains (&sound));
@@ -191,69 +179,53 @@ LayerData* SamplerSynth::DataLoader::createLayerData (SamplerSound &sound)
 
 //=============================================================================
 SamplerSynth::SamplerSynth (SampleCache& c)
-    : cache (c), masterGain (1.0f),
-      soundMap (256), layerMap (256)
-{
+    : cache (c), masterGain (1.0f), soundMap (256), layerMap (256) {
     midiChannel.set (0);
 
     for (int i = 0; i < 32; ++i)
         addVoice (new SamplerVoice (*this, i + 1));
 }
 
-SamplerSynth::~SamplerSynth()
-{
+SamplerSynth::~SamplerSynth() {
     sCacheUsers.removeFirstMatchingValue (this);
 
-    if (sCacheUsers.size() == 0)
-    {
+    if (sCacheUsers.size() == 0) {
         sSampleCache.reset();
-        sAudioThumbnails.reset();
         sAudioFormats.reset();
     }
 }
 
-void SamplerSynth::clearAllSounds()
-{
+void SamplerSynth::clearAllSounds() {
     allNotesOff (0, false);
     for (int note = 0; note < 128; ++note)
         if (auto* sound = findSound (note, false))
             sound->clearSources();
 }
 
-SamplerSynth* SamplerSynth::create (SampleCache& c)
-{
-    try
-    {
+SamplerSynth* SamplerSynth::create (SampleCache& c) {
+    try {
         SamplerSynth* synth = new SamplerSynth (c);
         sCacheUsers.add (synth);
         return synth;
-    }
-    catch (...)
-    {
+    } catch (...) {
         return nullptr;
     }
 }
 
-SamplerSynth* SamplerSynth::create()
-{
-    if (! sSampleCache)
-    {
-        sAudioFormats.reset (new AudioFormatManager());
+SamplerSynth* SamplerSynth::create() {
+    if (! sSampleCache) {
+        sAudioFormats.reset (new juce::AudioFormatManager());
         sAudioFormats->registerBasicFormats();
-        sAudioThumbnails.reset (new AudioThumbnailCache (64));
-        sSampleCache.reset (new SampleCache (*sAudioFormats, *sAudioThumbnails));
+        sSampleCache.reset (new SampleCache (*sAudioFormats));
     }
 
     return SamplerSynth::create (*sSampleCache);
 }
 
-bool SamplerSynth::insertLayerData (uint32 soundId, LayerData *data)
-{
+bool SamplerSynth::insertLayerData (uint32_t soundId, LayerData* data) {
     jassert (data);
-    if (SamplerSound* sound = getSoundForObjectId (soundId))
-    {
-        if (sound->insertLayerData (data))
-        {
+    if (SamplerSound* sound = getSoundForObjectId (soundId)) {
+        if (sound->insertLayerData (data)) {
             layerMap.set (data->id, data);
             return true;
         }
@@ -262,19 +234,16 @@ bool SamplerSynth::insertLayerData (uint32 soundId, LayerData *data)
     return false;
 }
 
-SamplerSound* SamplerSynth::findSound (int note, bool createIt)
-{        
+SamplerSound* SamplerSynth::findSound (int note, bool createIt) {
     return nullptr;
 }
 
-void SamplerSynth::setVolume (const double val)
-{
+void SamplerSynth::setVolume (const double val) {
     const double gain (Decibels::decibelsToGain (val));
     masterGain.set (gain);
 }
 
-void SamplerSynth::setMidiChannel (int chan)
-{
+void SamplerSynth::setMidiChannel (int chan) {
     midiChannel.set (chan);
     SoundIterator iter (soundMap);
 
@@ -283,22 +252,11 @@ void SamplerSynth::setMidiChannel (int chan)
             iter.getValue()->setMidiChannel (chan);
 }
 
-bool SamplerSynth::load (const ValueTree& data)
-{
-    if (! data.hasType (Tags::instrument))
-        return false;
-    return false;
-}
-
-bool SamplerSynth::loadFile (const File &file)
-{
-    if (file.hasFileExtension (".xml"))
-    {
+bool SamplerSynth::loadFile (const File& file) {
+    if (file.hasFileExtension (".xml")) {
         if (auto xml = std::unique_ptr<XmlElement> (XmlDocument::parse (file)))
             return loadValueTreeXml (*xml);
-    }
-    else if (file.hasFileExtension (".json"))
-    {
+    } else if (file.hasFileExtension (".json")) {
         var json = JSON::parse (file);
         JSONSynthLoader loader (json, getSampleCache());
         if (loader.createSounds())
@@ -308,8 +266,7 @@ bool SamplerSynth::loadFile (const File &file)
     return false;
 }
 
-bool SamplerSynth::loadJSON (const String& jsonString)
-{
+bool SamplerSynth::loadJSON (const String& jsonString) {
     const var json (JSON::fromString (jsonString));
     JSONSynthLoader loader (json, getSampleCache());
     if (loader.createSounds())
@@ -317,21 +274,17 @@ bool SamplerSynth::loadJSON (const String& jsonString)
     return false;
 }
 
-bool SamplerSynth::loadValueTreeXml (const XmlElement& e)
-{
+bool SamplerSynth::loadValueTreeXml (const XmlElement& e) {
     bool res = false;
 
-    if (e.hasTagName ("instrument") || e.hasTagName ("instruments"))
-    {
+    if (e.hasTagName ("instrument") || e.hasTagName ("instruments")) {
         ValueTreeXmlSynthLoader loader (e, getSampleCache());
         if (loader.createSounds()) {
             res = installLoadedData (loader);
             if (! res) {
                 DBG ("Could not install new data");
             }
-        }
-        else
-        {
+        } else {
             DBG ("Could not create Sounds and Layers from XML data");
         }
     }
@@ -339,14 +292,12 @@ bool SamplerSynth::loadValueTreeXml (const XmlElement& e)
     return res;
 }
 
-bool SamplerSynth::installLoadedData (DataLoader &loader)
-{
+bool SamplerSynth::installLoadedData (DataLoader& loader) {
     layerMap.clear();
     soundMap.clear();
     Synthesiser::clearSounds(); //!!! deletes sounds that aren't referenced elsewhere.
 
-    for (SamplerSound* sound : loader.sounds)
-    {
+    for (SamplerSound* sound : loader.sounds) {
         addSound (sound);
         soundMap.set (sound->id, sound);
 
@@ -357,8 +308,7 @@ bool SamplerSynth::installLoadedData (DataLoader &loader)
         sound->setDefaultLength();
     }
 
-    const bool loaded = (layerMap.size() == loader.layers.size() &&
-                         soundMap.size() == loader.sounds.size());
+    const bool loaded = (layerMap.size() == loader.layers.size() && soundMap.size() == loader.sounds.size());
 
     loader.sounds.clearQuick (false);
     loader.layers.clearQuick();
@@ -366,15 +316,13 @@ bool SamplerSynth::installLoadedData (DataLoader &loader)
     return loaded;
 }
 
-void SamplerSynth::recycleLayerData (LayerData* data)
-{
+void SamplerSynth::recycleLayerData (LayerData* data) {
     jassert (data);
     layerMap.removeValue (data);
     data->reset();
 }
 
-bool SamplerSynth::insertSound (SamplerSound *sound)
-{
+bool SamplerSynth::insertSound (SamplerSound* sound) {
     jassert (! soundMap.contains (sound->id));
     soundMap.set (sound->id, sound);
     addSound (sound);
@@ -382,47 +330,43 @@ bool SamplerSynth::insertSound (SamplerSound *sound)
     return true;
 }
 
-SamplerSound* SamplerSynth::getSoundForObjectId (uint32_t oid) const
-{
-    return (oid != 0) ? soundMap [static_cast<int> (oid)] : nullptr;
+SamplerSound* SamplerSynth::getSoundForObjectId (uint32_t oid) const {
+    return (oid != 0) ? soundMap[static_cast<int> (oid)] : nullptr;
 }
 
-void SamplerSynth::noteOn (const int channel, const int note, const float velocity)
-{
+void SamplerSynth::noteOn (const int channel, const int note, const float velocity) {
 #if 1
     Synthesiser::noteOn (channel, note, velocity);
 #else
 
     const int numSounds = zones.size();
-    for (int i = 0; i < numSounds; ++i)
-    {
+    for (int i = 0; i < numSounds; ++i) {
         SynthesiserSound* const sound = zones.getUnchecked (i);
 
         if (sound->appliesToNote (note)
-                && sound->appliesToChannel (channel))
-        {
+            && sound->appliesToChannel (channel)) {
             // If hitting a note that's still ringing, stop it first (it could be
             // still playing because of the sustain or sostenuto pedal).
-            for (int j = voices.size(); --j >= 0;)
-            {
+            for (int j = voices.size(); --j >= 0;) {
                 SynthesiserVoice* const voice = voices.getUnchecked (j);
 
                 if (voice->getCurrentlyPlayingNote() == note
-                        && voice->isPlayingChannel (channel))
+                    && voice->isPlayingChannel (channel))
                     stopVoice (voice, 1.0f, true);
             }
 
             startVoice (findFreeVoice (sound, channel, note, shouldStealNotes),
-                        sound, channel, note, velocity);
+                        sound,
+                        channel,
+                        note,
+                        velocity);
         }
     }
 #endif
 }
 
-SamplerSound* SamplerSynth::moveSound (uint32_t oid, int newNote)
-{
-    if (SamplerSound* sound = getSoundForObjectId (oid))
-    {
+SamplerSound* SamplerSynth::moveSound (uint32_t oid, int newNote) {
+    if (SamplerSound* sound = getSoundForObjectId (oid)) {
         sound->setRootNote (newNote);
         return sound;
     }
@@ -430,21 +374,18 @@ SamplerSound* SamplerSynth::moveSound (uint32_t oid, int newNote)
     return nullptr;
 }
 
-LayerData* SamplerSynth::getLayerData (const int note, const int index)
-{
+LayerData* SamplerSynth::getLayerData (const int note, const int index) {
     jassertfalse; // remove this function;
     return nullptr;
 }
 
-LayerData* SamplerSynth::getLayerDataForObjectId (uint32_t oid) const
-{
-    return (oid != 0) ? layerMap [static_cast<int> (oid)]
+LayerData* SamplerSynth::getLayerDataForObjectId (uint32_t oid) const {
+    return (oid != 0) ? layerMap[static_cast<int> (oid)]
                       : nullptr;
 }
 
-bool SamplerSynth::getNestedVariant (var& json)
-{
-   #if 0
+bool SamplerSynth::getNestedVariant (var& json) {
+#if 0
     DynamicObject::Ptr synth = new DynamicObject();
     synth->setProperty (Slugs::id, (int) 0);
     synth->setProperty (Slugs::volume, Decibels::gainToDecibels ((double) getMasterGain()));
@@ -464,22 +405,20 @@ bool SamplerSynth::getNestedVariant (var& json)
     json = synth->gerVar;
 
     return true;
-   #endif
+#endif
     jassertfalse; // FIXME:
     return false;
 }
 
-#if defined (HAVE_LVTK)
+#if defined(HAVE_LVTK)
 
-void SamplerSynth::setProperty (const URIs& uris, const PatchSet& set)
-{
+void SamplerSynth::setProperty (const URIs& uris, const PatchSet& set) {
     if (uris.slugs_volume == set.property.as_urid()) {
         setVolume (set.value.as_double());
     }
 }
 
-SamplerSound* SamplerSynth::getSound (const URIs& uris, const lvtk::AtomObject& key)
-{
+SamplerSound* SamplerSynth::getSound (const URIs& uris, const lvtk::AtomObject& key) {
     if (SamplerSound* s = getSoundForObjectId (key.id()))
         return s;
 
@@ -490,8 +429,7 @@ SamplerSound* SamplerSynth::getSound (const URIs& uris, const lvtk::AtomObject& 
     }
 
     const int noteNumber = note.as_int();
-    for (int i = getNumSounds(); --i >= 0;)
-    {
+    for (int i = getNumSounds(); --i >= 0;) {
         SynthesiserSound* s = Synthesiser::getSound (i);
         if (s->appliesToNote (noteNumber))
             return dynamic_cast<SamplerSound*> (s);
@@ -500,16 +438,17 @@ SamplerSound* SamplerSynth::getSound (const URIs& uris, const lvtk::AtomObject& 
     return nullptr;
 }
 
-LayerData* SamplerSynth::getLayerData (const URIs& uris, const lvtk::AtomObject& obj)
-{
+LayerData* SamplerSynth::getLayerData (const URIs& uris, const lvtk::AtomObject& obj) {
     if (LayerData* layer = getLayerDataForObjectId (obj.id()))
         return layer;
 
     const lvtk::Atom index, parent;
     lv2_atom_object_get (obj,
-            uris.slugs_index, &index,
-            uris.slugs_parent, &parent,
-    0);
+                         uris.slugs_index,
+                         &index,
+                         uris.slugs_parent,
+                         &parent,
+                         0);
 
     if (parent && index) {
         if (SamplerSound* sound = getSoundForObjectId (parent.as_urid()))
@@ -529,4 +468,4 @@ LayerData* SamplerSynth::getLayerData (const URIs& uris, const lvtk::AtomObject&
 }
 #endif
 
-}
+} // namespace ksp1

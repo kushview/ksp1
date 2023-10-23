@@ -23,19 +23,17 @@
 namespace KSP1 {
 
 ContentScanner::ContentScanner (Database& _db)
-    : db (_db)
-{ }
+    : db (_db) {}
 
 ContentScanner::~ContentScanner() {}
 
-void ContentScanner::scanLocation (const File &dir)
-{
+void ContentScanner::scanLocation (const File& dir) {
     if (! dir.isDirectory())
         return;
 
     bool isDirectory = false;
-    bool isHidden = false;
-    int64 fileSize = 0;
+    bool isHidden    = false;
+    int64 fileSize   = 0;
     Time modTime;
     Time creationTime;
     bool isReadOnly = false;
@@ -43,17 +41,15 @@ void ContentScanner::scanLocation (const File &dir)
     DirectoryIterator iter (dir, true, "*.wav;", File::findFilesAndDirectories);
 
     const int numRecords = 1;
-    int recordNum = 0;
+    int recordNum        = 0;
     String query;
     String assetType = "sample";
 
-    while (iter.next (&isDirectory, &isHidden, &fileSize, &modTime, &creationTime, &isReadOnly))
-    {
+    while (iter.next (&isDirectory, &isHidden, &fileSize, &modTime, &creationTime, &isReadOnly)) {
         if (isDirectory)
             continue;
 
-        if (recordNum == 0)
-        {
+        if (recordNum == 0) {
             query.clear();
             query << "INSERT INTO assets (name, path, type) VALUES ";
         }
@@ -63,36 +59,31 @@ void ContentScanner::scanLocation (const File &dir)
         query << "('" << file.getFileNameWithoutExtension() << "', '" << relPath << "', '" << assetType << "')";
 
         ++recordNum;
-        
-        if (recordNum == numRecords)
-        {
+
+        if (recordNum == numRecords) {
             query << ";";
             db.executeUpdate (query);
             recordNum = 0;
-        }
-        else
-        {
+        } else {
             query << ", ";
         }
     }
 
-    if (0 != recordNum)
-    {
+    if (0 != recordNum) {
         query = query.upToLastOccurrenceOf (", ", false, false);
         query << ";";
-        
+
         db.executeUpdate (query);
     }
 }
 
-void ContentScanner::scanContentPack (const File &dir)
-{
+void ContentScanner::scanContentPack (const File& dir) {
     if (! dir.isDirectory())
         return;
 
     bool isDirectory = false;
-    bool isHidden = false;
-    int64 fileSize = 0;
+    bool isHidden    = false;
+    int64 fileSize   = 0;
     Time modTime;
     Time creationTime;
     bool isReadOnly = false;
@@ -100,12 +91,11 @@ void ContentScanner::scanContentPack (const File &dir)
     DirectoryIterator iter (dir, true, "*", File::findFilesAndDirectories);
 
     const int numRecords = 256;
-    int recordNum = 0;
+    int recordNum        = 0;
     String query;
     String assetType = "sample";
 
-    while (iter.next (&isDirectory, &isHidden, &fileSize, &modTime, &creationTime, &isReadOnly))
-    {
+    while (iter.next (&isDirectory, &isHidden, &fileSize, &modTime, &creationTime, &isReadOnly)) {
         if (isDirectory)
             continue;
 
@@ -128,8 +118,7 @@ void ContentScanner::scanContentPack (const File &dir)
         }
     }
 
-    if (0 != recordNum)
-    {
+    if (0 != recordNum) {
         query = query.fromLastOccurrenceOf (", ", false, false);
         query << ";";
         db.executeUpdate (query);

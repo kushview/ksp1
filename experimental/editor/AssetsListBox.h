@@ -24,55 +24,54 @@
 
 namespace KSP1 {
 
-    class AssetsListBoxHeader;
+class AssetsListBoxHeader;
 
-    class AssetsListBox : public ListBoxModel,
-                          public ListBox
-                          //public DragAndDropContainer
-    {
-    public:
+class AssetsListBox : public ListBoxModel,
+                      public ListBox
+//public DragAndDropContainer
+{
+public:
+    typedef boost::signals2::signal<void (const AssetItem&)> AssetSignal;
+    AssetSignal signalSelected;
 
-        typedef boost::signals2::signal<void(const AssetItem&)> AssetSignal;
-        AssetSignal signalSelected;
+    AssetsListBox();
+    ~AssetsListBox();
 
-        AssetsListBox();
-        ~AssetsListBox();
+    void setRootItem (const AssetItem& asset);
+    AssetItem getAsset (int32 row) const;
+    AssetItem getSelectedAsset() const;
 
-        void setRootItem (const AssetItem& asset);
-        AssetItem getAsset (int32 row) const;
-        AssetItem getSelectedAsset() const;
+    bool keyPressed (const KeyPress& key);
 
-        bool keyPressed (const KeyPress& key);
+    // ListBox / ListBoxModel
+    int getNumRows();
+    void paintListBoxItem (int row, Graphics& g, int w, int h, bool selected);
+    Component* refreshComponentForRow (int row, bool selected, Component* existing);
+    void listBoxItemClicked (int row, const MouseEvent& e);
+    void listBoxItemDoubleClicked (int row, const MouseEvent& e);
+    void backgroundClicked (const MouseEvent&);
+    void selectedRowsChanged (int lastRowSelected);
+    void deleteKeyPressed (int lastRowSelected);
+    void returnKeyPressed (int lastRowSelected);
+    void listWasScrolled();
+    var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows);
+    String getTooltipForRow (int row);
+    MouseCursor getMouseCursorForRow (int row);
 
-        // ListBox / ListBoxModel
-        int getNumRows();
-        void paintListBoxItem (int row, Graphics& g, int w, int h, bool selected);
-        Component* refreshComponentForRow (int row, bool selected, Component* existing);
-        void listBoxItemClicked (int row, const MouseEvent& e);
-        void listBoxItemDoubleClicked (int row, const MouseEvent& e);
-        void backgroundClicked (const MouseEvent&);
-        void selectedRowsChanged (int lastRowSelected);
-        void deleteKeyPressed (int lastRowSelected);
-        void returnKeyPressed (int lastRowSelected);
-        void listWasScrolled();
-        var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows);
-        String getTooltipForRow (int row);
-        MouseCursor getMouseCursorForRow (int row);
+private:
+    Scoped<AssetItem> root;
+    Scoped<AssetsListBoxHeader> header;
+    void setResults (const ValueTree& newData);
+    var results;
 
-    private:
-        Scoped<AssetItem> root;
-        Scoped<AssetsListBoxHeader> header;
-        void setResults (const ValueTree& newData);
-        var results;
+    // Element::Icon getIcon() const;
+    bool isRootItemValid() const { return root != nullptr && root->isValid(); }
 
-        // Element::Icon getIcon() const;
-        bool isRootItemValid() const { return root != nullptr && root->isValid(); }
+    void handleAssetSelected (const AssetItem& item);
 
-        void handleAssetSelected (const AssetItem& item);
+    friend class AssetsListBoxHeader;
+};
 
-        friend class AssetsListBoxHeader;
-    };
-
-}
+} // namespace KSP1
 
 #endif /* KSP1_ASSETS_LIST_BOX_H */

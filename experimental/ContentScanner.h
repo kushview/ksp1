@@ -26,8 +26,7 @@ namespace KSP1 {
 
 class Database;
 
-class ContentScanner
-{
+class ContentScanner {
 public:
     ContentScanner (Database&);
     virtual ~ContentScanner();
@@ -38,6 +37,6 @@ private:
     Database& db;
 };
 
-}
+} // namespace KSP1
 
 #endif // KSP1_CONTENT_SCANNER_H
