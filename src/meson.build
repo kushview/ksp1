@@ -78,3 +78,5 @@ lv2_validate = find_program ('lv2_validate', required : false)
 if lv2_validate.found()
     test ('lv2_validate', lv2_validate, args : [ manifest_ttl, ksp1_ttl ])
 endif
+
+summary ('Bundle', lv2_install_dir, section : 'LV2')
