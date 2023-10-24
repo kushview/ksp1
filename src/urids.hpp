@@ -34,8 +34,8 @@
 #define KSP1_URI "https://kushview.net/plugins/ksp1"
 #define NS_KSP1  KSP1_URI "#"
 
-#define KSP1_GUI_URI "https://kushview.net/plugins/ksp1/ui"
-#define NS_KSP1_GUI  KSP1_GUI_URI "#"
+#define KSP1_UI_URI "https://kushview.net/plugins/ksp1/ui"
+#define NS_KSP1_GUI KSP1_UI_URI "#"
 
 #define KSP1__Instrument   NS_KSP1 "Instrument"
 #define KSP1__Key          NS_KSP1 "Key"

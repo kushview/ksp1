@@ -19,11 +19,11 @@
 @prefix ui:    <http://lv2plug.in/ns/extensions/ui#> .
 
 <https://kushview.net/plugins/ksp1>
-        a lv2:Plugin ;
-        lv2:binary <@BINARY@> ;
-        rdfs:seeAlso <ksp1.ttl> .
+    a lv2:Plugin ;
+    lv2:binary <@BINARY@> ;
+    rdfs:seeAlso <ksp1.ttl> .
 
 <https://kushview.net/plugins/ksp1/ui>
-        a ui:@UI_TYPE@ ;
-        ui:binary <@UI_BINARY> ;
-        rdfs:seeAlso <ksp1.ttl> .
+    a ui:@UI_TYPE@ ;
+    lv2:binary <@UI_BINARY@> ;
+    rdfs:seeAlso <ksp1.ttl> .

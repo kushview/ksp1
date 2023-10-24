@@ -36,8 +36,7 @@
 #include <lvtk/options.hpp>
 
 #include "ports.hpp"
-
-#define KSP1_UI_URI "https://kushview.net/plugins/ksp1/ui"
+#include "urids.hpp"
 
 class Content : public lvtk::Widget {
 public:
@@ -45,6 +44,7 @@ public:
 
     Content() {
         set_opaque (true);
+        set_size (640, 360);
     }
 
     ~Content() {}
@@ -128,5 +128,5 @@ private:
     std::unique_ptr<Content> content;
 };
 
-static lvtk::UIDescriptor<KSP1UI> __eVerbUI (
+static lvtk::UIDescriptor<KSP1UI> _KSP1UI (
     KSP1_UI_URI, { LV2_UI__parent });

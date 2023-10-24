@@ -57,10 +57,10 @@ LV2Plugin::LV2Plugin (const lvtk::Args& args)
 }
 
 LV2Plugin::~LV2Plugin() {
-    jobs    = nullptr;
-    sampler = nullptr;
-    forge   = nullptr;
-    uris    = nullptr;
+    jobs     = nullptr;
+    retainer = nullptr;
+    sampler  = nullptr;
+    uris     = nullptr;
 }
 
 void LV2Plugin::activate() {

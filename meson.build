@@ -52,7 +52,7 @@ juce_dep = juce_proj.get_variable ('juce_dep')
 
 lv2_install_dir = get_option ('lv2dir').strip()
 if lv2_install_dir != ''
-    install_dir = s.expanduser (lv2_install_dir)
+    lv2_install_dir = fs.expanduser (lv2_install_dir)
 endif
 
 if lv2_install_dir == ''
