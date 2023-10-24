@@ -17,31 +17,33 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef KSP1_LV2_PLUGIN_H
-#define KSP1_LV2_PLUGIN_H
+#include <lvtk/plugin.hpp>
 
-#include "../../libs/lvtk/lvtk/plugin.hpp"
-#include "Forge.h"
-#include "KSP1.h"
+#include <lvtk/ext/atom.hpp>
+#include <lvtk/ext/state.hpp>
+#include <lvtk/ext/urid.hpp>
+#include <lvtk/ext/worker.hpp>
 
-namespace KSP1 {
+#include "urids.hpp"
+
+namespace ksp1 {
 
 struct PatchMessage {
-    PatchMessage (const URIs& u, const lvtk::AtomObject& o) : uris (u), object (o) {}
+    PatchMessage (const URIs& u, const lvtk::Object& o) : uris (u), object (o) {}
     const URIs& uris;
-    const lvtk::AtomObject object;
+    const lvtk::Object object;
     const lvtk::Atom subject;
 };
 
 struct PatchDelete : public PatchMessage {
-    PatchDelete (const URIs& u, const lvtk::AtomObject& o)
+    PatchDelete (const URIs& u, const lvtk::Object& o)
         : PatchMessage (u, o) {
         lv2_atom_object_get (o, uris.patch_subject, &subject, 0);
     }
 };
 
 struct PatchGet : public PatchMessage {
-    PatchGet (const URIs& u, const lvtk::AtomObject& o)
+    PatchGet (const URIs& u, const lvtk::Object& o)
         : PatchMessage (u, o) {
         lv2_atom_object_get (o,
                              uris.patch_subject,
@@ -51,7 +53,7 @@ struct PatchGet : public PatchMessage {
 };
 
 struct PatchSet : public PatchMessage {
-    inline PatchSet (const URIs& uris, const lvtk::AtomObject& obj)
+    inline PatchSet (const URIs& uris, const lvtk::Object& obj)
         : PatchMessage (uris, obj) {
         lv2_atom_object_get (obj,
                              uris.patch_subject,
@@ -67,7 +69,7 @@ struct PatchSet : public PatchMessage {
 };
 
 struct Patch : public PatchMessage {
-    Patch (const URIs& uris, const lvtk::AtomObject& obj)
+    Patch (const URIs& uris, const lvtk::Object& obj)
         : PatchMessage (uris, obj) {
         lv2_atom_object_get (obj,
                              uris.patch_subject,
@@ -83,7 +85,7 @@ struct Patch : public PatchMessage {
 };
 
 struct PatchResponse {
-    PatchResponse (const URIs& uris, const AtomObject& o)
+    PatchResponse (const URIs& uris, const lvtk::Object& o)
         : object (o) {
         assert (object.otype() == uris.patch_Response);
         lv2_atom_object_get (object,
@@ -96,21 +98,20 @@ struct PatchResponse {
                              0);
     }
 
-    const AtomObject object;
-    const Atom body, request, sequenceNumber;
+    const lvtk::Object object;
+    const lvtk::Atom body, request, sequenceNumber;
 };
 
 class JobManager;
 class LV2Plugin;
 class SampleCache;
 class SamplerSynth;
-typedef lvtk::Plugin<LV2Plugin, lvtk::URID<true>, lvtk::Worker<true>,
-                     lvtk::State<false>>
-    LV2PluginType;
 
-class LV2Plugin : public LV2PluginType {
+using PluginBase = lvtk::Plugin<LV2Plugin, lvtk::URID, lvtk::Worker, lvtk::State>;
+
+class LV2Plugin : public PluginBase {
 public:
-    LV2Plugin (double _sampleRate);
+    explicit LV2Plugin (const lvtk::Args&);
     ~LV2Plugin();
 
     void activate();
@@ -129,24 +130,25 @@ public:
     lvtk::WorkerStatus end_run();
 
     // LV2 State Callbacks
-    lvtk::StateStatus save (lvtk::StateStore& store, uint32_t flags, const lvtk::FeatureVec& features);
-    lvtk::StateStatus restore (lvtk::StateRetrieve& retrieve, uint32_t flags, const lvtk::FeatureVec& features);
+    lvtk::StateStatus save (lvtk::StateStore& store, uint32_t flags, const lvtk::FeatureList& features);
+    lvtk::StateStatus restore (lvtk::StateRetrieve& retrieve, uint32_t flags, const lvtk::FeatureList& features);
 
 private:
     double sampleRate;
     float lastGain;
-    ForgeFrame notifyFrame;
-    LV2_Atom_Sequence* notifyPort;
-    ScopedPointer<SamplerSynth> retainer;
-    ScopedPointer<Forge> forge;
-    ScopedPointer<SamplerSynth> sampler;
-    ScopedPointer<KSP1::URIs> uris;
-    ScopedPointer<JobManager> jobs;
+    lvtk::ForgeFrame notifyFrame;
+    LV2_Atom_Sequence* atomIn  = nullptr;
+    LV2_Atom_Sequence* atomOut = nullptr;
+    std::unique_ptr<SamplerSynth> retainer;
+    lvtk::Forge forge;
+    std::unique_ptr<SamplerSynth> sampler;
+    std::unique_ptr<ksp1::URIs> uris;
+    std::unique_ptr<JobManager> jobs;
     int32_t procFrame;
     float* audioIns[2];
     float* audioOuts[2];
-    MidiBuffer midiIn;
-    AtomicValue<int> wasRestored;
+    juce::MidiBuffer midiIn;
+    std::atomic<int> wasRestored;
 
     void handle_patch_get (const PatchGet& obj);
     void handle_patch_set (const PatchSet& obj);
@@ -155,6 +157,4 @@ private:
     void handle_patch_set_root_level (const PatchSet& set);
 };
 
-} /* namespace KSP1 */
-
-#endif // KSP1_LV2_PLUGIN_H
+} // namespace ksp1

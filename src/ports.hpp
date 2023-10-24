@@ -17,20 +17,19 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef PORTS_H
-#define PORTS_H
+#pragma once
 
-namespace KSP1 {
+#include <cstdint>
+
+namespace ksp1 {
 
 class Port {
 public:
-    enum Index {
+    enum Index : uint32_t {
         AtomInput  = 0,
         AtomOutput = 1,
         MainLeft   = 2,
         MainRight  = 3
     };
 };
-} // namespace KSP1
-
-#endif // PORTS_H
+} // namespace ksp1

@@ -69,6 +69,27 @@
         "cinttypes": "cpp",
         "hashtable": "cpp",
         "*.mm": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "clocale": "cpp",
+        "*.ipp": "cpp",
+        "strstream": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "codecvt": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "condition_variable": "cpp",
+        "unordered_set": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "regex": "cpp",
+        "fstream": "cpp",
+        "future": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "shared_mutex": "cpp",
+        "stop_token": "cpp",
+        "cfenv": "cpp"
     }
 }
