@@ -23,6 +23,7 @@
 
 #include "plugin.hpp"
 #include "ports.hpp"
+#include "cache.hpp"
 #include "synth.hpp"
 
 namespace ksp1 {
@@ -64,20 +65,11 @@ LV2Plugin::~LV2Plugin() {
 }
 
 void LV2Plugin::activate() {
-#if 0
-    if (DataPath::defaultDatabaseFile().existsAsFile())
-        DataPath::defaultDatabaseFile().deleteFile();
-
-    Database db (DataPath::defaultDatabaseFile());
-    { DatabaseSchema schema (db); }
-    {
-        ContentScanner scanner (db);
-        scanner.scanLocation (DataPath::factoryContentPath());
-    }
-#endif
     lastGain = 1.0f;
     sampler->setCurrentPlaybackSampleRate (sampleRate);
     midiIn.ensureSize (2048);
+
+    auto& c = sampler->getSampleCache();
 }
 
 void LV2Plugin::connect_port (uint32_t port, void* ptr) {

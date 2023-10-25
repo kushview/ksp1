@@ -116,10 +116,6 @@ public:
     void noteOn (const int midiChannel, const int midiNoteNumber, const float velocity) override;
 
 #if defined(HAVE_LVTK)
-    /** Set a property with an LV2 Patch set wrapper
-            This method assumes the subject either is a URID and equals URIS::ksp1_Instrument,
-            or an atom_Object with an otype of ksp1_Instrument
-         */
     void setProperty (const URIs& uris, const PatchSet& set);
     SamplerSound* getSound (const URIs& uris, const lvtk::AtomObject& key);
     LayerData* getLayerData (const URIs& uris, const lvtk::AtomObject& layer);
