@@ -94,6 +94,9 @@ void LV2Plugin::deactivate() {
 
 void LV2Plugin::run (uint32_t nframes) {
     const int numSamples = static_cast<int> (nframes);
+    lv2_atom_forge_set_buffer (&forge, (uint8_t*)atomOut, ((LV2_Atom*)atomOut)->size);
+    lv2_atom_forge_sequence_head (&forge, &notifyFrame, 0);
+
     const lvtk::Sequence seq (atomIn);
 
 #if 0
