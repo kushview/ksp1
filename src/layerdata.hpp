@@ -132,6 +132,7 @@ private:
 
     void startNote (int voice, const KeyInfo& key);
     const float* getSampleData (int chan, int frame) const;
+    void restoreFromJSON (const juce::File& kitDir, const juce::var& json);
 };
 
 using LayerPtr = juce::ReferenceCountedObjectPtr<LayerData>;

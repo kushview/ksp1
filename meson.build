@@ -68,3 +68,5 @@ if lv2_install_dir == ''
 endif
 
 subdir ('src')
+# subdir ('kits/sn-r8-04')
+# subdir ('kits/sn-r8-11')

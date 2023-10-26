@@ -21,6 +21,7 @@
 #include "cache.hpp"
 #include "lowpass.hpp"
 #include "sounds.hpp"
+#include "tags.hpp"
 
 namespace ksp1 {
 
@@ -84,24 +85,69 @@ void LayerData::reset() {
     scratch.reset();
 }
 
-void LayerData::restoreFromJSON (const juce::var& json) {
-#if 0
-    index = json.getProperty (kv::Slugs::index, index);
-    note = json.getProperty (Slugs::note, note);
-    setVolume ((double) json.getProperty (Slugs::volume, 0.0));
-    panning.set (json.getProperty (Tags::panning, panning.get()));
-    pitch.set (json.getProperty (Slugs::pitch, pitch.get()));
-    velocityRange.setStart (json.getProperty ("velocityLower", 0.0));
-    velocityRange.setEnd (json.getProperty ("velocityUpper", 1.0));
-    const File file (json.getProperty (Slugs::file, String::empty).toString());
-    if (file.existsAsFile()) {
-        loadAudioFile (file);
+bool LayerData::loadAudioFile (const juce::File& audioFile) {
+    if (! audioFile.existsAsFile())
+        return false;
+
+    BufferPtr old = scratch;
+    scratch       = cache.loadAudioFile (audioFile);
+
+    if (auto reader = cache.createReaderFor (audioFile)) {
+        sampleRate      = reader->sampleRate;
+        lengthInSamples = reader->lengthInSamples;
+        numChannels     = reader->numChannels;
+        start           = 0;
+        offset          = 0;
+        length          = lengthInSamples;
+        delete reader;
     }
 
-    start  = (sampleRate * (double) json.getProperty (Slugs::start, 0));
-    offset = (sampleRate * (double) json.getProperty (Slugs::offset, 0));
-    length = (sampleRate * (double) json.getProperty (Slugs::length, 0));
-#endif
+    currentFile = audioFile;
+
+    if (scratch) {
+        in.set (0);
+        out.set (scratch->getNumSamples());
+        renderBuffer = scratch.get();
+    } else {
+        DBG ("[KSP1] buffer not acquired");
+        renderBuffer = nullptr;
+    }
+
+    old.reset();
+    return renderBuffer != nullptr;
+}
+
+void LayerData::restoreFromJSON (const juce::File& kitDir, const juce::var& json) {
+    index = json.getProperty (tags::index, index);
+    note  = json.getProperty (tags::note, note);
+    setVolume ((double) json.getProperty (tags::volume, 0.0));
+    panning.set (json.getProperty (tags::panning, panning.get()));
+    pitch.set (json.getProperty (tags::pitch, pitch.get()));
+
+    velocityRange.setStart (json.getProperty (tags::velocityLower, 0.0));
+    velocityRange.setEnd (json.getProperty (tags::velocityUpper, 1.0));
+
+    const auto fileStr = json.getProperty (tags::file, juce::String()).toString();
+    juce::File file    = juce::File::isAbsolutePath (fileStr)
+                             ? juce::File (fileStr)
+                             : juce::File();
+
+    if (! file.existsAsFile())
+        file = kitDir.getChildFile (fileStr);
+    if (! file.existsAsFile())
+        file = cache.resolvePath (fileStr);
+
+    if (file.existsAsFile()) {
+        std::clog << loadAudioFile (file);
+    }
+
+    start  = (sampleRate * (double) json.getProperty (tags::start, 0));
+    offset = (sampleRate * (double) json.getProperty (tags::offset, 0));
+    length = (sampleRate * (double) json.getProperty (tags::length, 0));
+}
+
+void LayerData::restoreFromJSON (const juce::var& json) {
+    restoreFromJSON (juce::File(), json);
 }
 
 void LayerData::restoreFromXml (const juce::XmlElement& e) {
@@ -136,58 +182,30 @@ void LayerData::setVolume (const double vol) {
 void LayerData::bindTo (const LayerItem& _item) {}
 
 juce::DynamicObject::Ptr LayerData::createDynamicObject() const {
-    juce::DynamicObject::Ptr object = new juce::DynamicObject();
-#if 0
-    object->setProperty (Slugs::id, id);
-    object->setProperty (Slugs::index, index);
-    object->setProperty (Slugs::note, note);
-    object->setProperty (Slugs::volume, Decibels::gainToDecibels ((double) gain.get()));
-    object->setProperty (Slugs::pitch, pitch.get());
-    object->setProperty (Tags::panning, panning.get());
-    object->setProperty (Tags::velocityLower, velocityRange.getStart());
-    object->setProperty (Tags::velocityUpper, velocityRange.getEnd());
-    object->setProperty (Slugs::start, (double) in.get() / sampleRate);
-    object->setProperty (Slugs::length, (double)(out.get() - in.get()) / sampleRate);
-    object->setProperty (Slugs::file, currentFile.getFullPathName());
-    object->setProperty (Slugs::name, currentFile.getFileNameWithoutExtension());
-#endif
+    using juce::DynamicObject;
+    using juce::var;
+
+    DynamicObject::Ptr object = new DynamicObject();
+
+    object->setProperty (tags::ID, id);
+    object->setProperty (tags::index, index);
+    object->setProperty (tags::note, note);
+    object->setProperty (tags::volume, juce::Decibels::gainToDecibels ((double) gain.get()));
+    object->setProperty (tags::pitch, pitch.get());
+    object->setProperty (tags::panning, panning.get());
+    object->setProperty (tags::velocityLower, velocityRange.getStart());
+    object->setProperty (tags::velocityUpper, velocityRange.getEnd());
+    object->setProperty (tags::start, (double) in.get() / sampleRate);
+    object->setProperty (tags::length, (double) (out.get() - in.get()) / sampleRate);
+    object->setProperty (tags::file, currentFile.getFullPathName());
+    object->setProperty (tags::name, currentFile.getFileNameWithoutExtension());
+
     return object;
 }
 
 const float* LayerData::getSampleData (int chan, int frame) const {
     return renderBuffer != nullptr ? renderBuffer->getReadPointer (chan, frame)
                                    : nullptr;
-}
-
-bool LayerData::loadAudioFile (const juce::File& audioFile) {
-    if (! audioFile.existsAsFile())
-        return false;
-
-    BufferPtr old = scratch;
-    scratch       = cache.loadAudioFile (audioFile);
-
-    if (auto reader = cache.createReaderFor (audioFile)) {
-        sampleRate      = reader->sampleRate;
-        lengthInSamples = reader->lengthInSamples;
-        numChannels     = reader->numChannels;
-        start           = 0;
-        offset          = 0;
-        length          = lengthInSamples;
-    }
-
-    currentFile = audioFile;
-
-    if (scratch) {
-        in.set (0);
-        out.set (scratch->getNumSamples());
-        renderBuffer = scratch.get();
-    } else {
-        DBG ("[KSP1] buffer not acquired");
-        renderBuffer = nullptr;
-    }
-
-    old.reset();
-    return renderBuffer != nullptr;
 }
 
 #if defined(HAVE_LVTK)

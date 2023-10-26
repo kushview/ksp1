@@ -111,6 +111,17 @@ LayerData* SampleCache::findLayerData (const int layerId) const {
     return nullptr;
 }
 
+juce::File SampleCache::resolvePath (const juce::String& path) const noexcept {
+    if (juce::File::isAbsolutePath (path))
+        return { path };
+    for (int i = 0; i < _searchPath.getNumPaths(); ++i) {
+        auto child = _searchPath[i].getChildFile (path);
+        if (child.existsAsFile())
+            return child;
+    }
+    return {};
+}
+
 LayerData* SampleCache::getLayerData (const bool createIfNeeded) {
     for (auto* const data : layers) {
         if (data && data->note < 0 && data->index < 0)

@@ -134,6 +134,7 @@ public:
     lvtk::StateStatus restore (lvtk::StateRetrieve& retrieve, uint32_t flags, const lvtk::FeatureList& features);
 
 private:
+    std::string _bundlePath;
     double sampleRate;
     float lastGain;
     lvtk::ForgeFrame notifyFrame;

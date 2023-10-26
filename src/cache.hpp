@@ -38,6 +38,10 @@ public:
     SampleCache (FormatManager&);
     ~SampleCache();
 
+    void addSearchPath (const juce::File& path) noexcept { _searchPath.add (path); }
+    const juce::FileSearchPath& searchPath() const noexcept { return _searchPath; }
+    juce::File resolvePath (const juce::String& path) const noexcept;
+
     LayerData* getLayerData (const bool createIfNeeded = false);
 
     /** Returns true if the cache can load a given file in one way
@@ -80,6 +84,8 @@ private:
     juce::ReferenceCountedArray<LayerData> layers;
     juce::OwnedArray<FormatReader> readers;
     int threadPriority { 3 };
+
+    juce::FileSearchPath _searchPath;
 };
 
 } // namespace ksp1

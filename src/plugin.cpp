@@ -21,9 +21,11 @@
 
 #include "jobs.hpp"
 
+#include "cache.hpp"
+#include "layerdata.hpp"
 #include "plugin.hpp"
 #include "ports.hpp"
-#include "cache.hpp"
+#include "sounds.hpp"
 #include "synth.hpp"
 
 namespace ksp1 {
@@ -38,14 +40,18 @@ public:
 
 LV2Plugin::LV2Plugin (const lvtk::Args& args)
     : PluginBase (args),
+      _bundlePath (args.bundle),
       sampleRate (args.sample_rate),
       lastGain (1.0f),
       wasRestored (0) {
     sampler.reset (SamplerSynth::create());
     retainer.reset (SamplerSynth::create (sampler->getSampleCache()));
 
-    var json;
-    sampler->getNestedVariant (json);
+    // var json;
+    // sampler->getNestedVariant (json);
+
+    auto& c = sampler->getSampleCache();
+    c.addSearchPath (juce::File (_bundlePath));
 
     for (const auto& f : args.features) {
         if (std::strcmp (f.URI, LV2_URID__map) == 0)
@@ -69,7 +75,92 @@ void LV2Plugin::activate() {
     sampler->setCurrentPlaybackSampleRate (sampleRate);
     midiIn.ensureSize (2048);
 
-    auto& c = sampler->getSampleCache();
+    if (true) {
+#if 1
+        juce::Array<juce::File> paths = {
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 conga.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 cowbell.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 maracas.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8flange k.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8elec ride bell.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8high q.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 k.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808s stick.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 clave.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8elec crash.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8slap2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8elec k.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8elec s.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8elec tom.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 hh c.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8flange s.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8rap noise.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 hh o.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 tom.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8synth bass.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 ride.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8reverb s2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8808 s.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8cntrl k.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8wood box.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-04/R-8bend tom.wav"),
+        };
+#else
+        juce::Array<juce::File> paths = {
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Bell CYM 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Bowl.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Can 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 CHH 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Chime.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Bell CYM 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Crash CYM 7.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Short Chinese CYM.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Crash CYM 8.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 OHH 3.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 CHH 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Crash CYM 6.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Ride Bell CYM 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Cowbell 3.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Spoons.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Pedal CHH 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Slay Bell.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Bowl.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 OHH 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Can 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 RNB CRS.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Pedal CHH 3.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Hand CYM 1.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Splash CYM 3.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Flex Tone.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Ride CYM 2.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Steel Lite Drum.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Mute Maracas.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 CHH 3.wav"),
+            juce::File (_bundlePath).getChildFile ("kits/sn-r8-11/R8 Mute Castanets.wav")
+        };
+#endif
+
+        int startNote = 54;
+        for (const auto& file : paths) {
+            auto data = sampler->getSampleCache().getLayerData (true);
+            data->loadAudioFile (file);
+            auto sound = new SamplerSound (startNote, 1);
+            // sound->setRootNote (0);
+            // sound->setKeyLength (127);
+            // sound->setMidiChannel (1);
+            if (sound->insertLayerData (data)) {
+                sampler->insertSound (sound);
+                sound->setDefaultLength();
+                startNote++;
+            } else {
+                std::clog << "could not load: " << file.getFullPathName() << std::endl;
+                delete data;
+                delete sound;
+            }
+        }
+    } else {
+        std::clog << "couldn't load test buffer\n";
+    }
 }
 
 void LV2Plugin::connect_port (uint32_t port, void* ptr) {
@@ -94,7 +185,7 @@ void LV2Plugin::deactivate() {
 
 void LV2Plugin::run (uint32_t nframes) {
     const int numSamples = static_cast<int> (nframes);
-    lv2_atom_forge_set_buffer (&forge, (uint8_t*)atomOut, ((LV2_Atom*)atomOut)->size);
+    lv2_atom_forge_set_buffer (&forge, (uint8_t*) atomOut, ((LV2_Atom*) atomOut)->size);
     lv2_atom_forge_sequence_head (&forge, &notifyFrame, 0);
 
     const lvtk::Sequence seq (atomIn);

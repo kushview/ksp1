@@ -31,3 +31,5 @@ content/
 testpack/
 data/factory/
 .meson-subproject-wrap-hash.txt
+
+!/kits/**/*.wav

@@ -24,6 +24,7 @@
 #include "samplerkeys.hpp"
 #include "sounds.hpp"
 #include "synth.hpp"
+#include "tags.hpp"
 #include "voice.hpp"
 
 namespace ksp1 {
@@ -58,23 +59,25 @@ struct ZoneSorter {
 class JSONSynthLoader : public SamplerSynth::DataLoader {
 public:
     JSONSynthLoader (const var& json, SampleCache& c)
-        : SamplerSynth::DataLoader (c), data (json) {}
+        : SamplerSynth::DataLoader (c), file(), data (json) {}
+    // JSONSynthLoader (const var& json, SampleCache& c)
+    //     : SamplerSynth::DataLoader (c), file(), data (json) {}
 
     bool createSounds() override {
         //            for (int i = 0; i < data.size(); ++i)
         {
-            const var sounds = data.getProperty ("sounds", var());
+            const var sounds = data.getProperty (tags::sounds, var());
 
             for (int si = 0; si < sounds.size(); ++si) {
                 const var sound      = sounds[si];
-                SamplerSound* ssound = createSound (sound.getProperty ("note", -1),
-                                                    sound.getProperty ("id", 0));
+                SamplerSound* ssound = createSound (sound.getProperty (tags::note, -1),
+                                                    sound.getProperty (tags::ID, 0));
                 if (! ssound)
                     continue;
 
                 ssound->restoreFromJSON (sound);
 
-                const var layers = sound.getProperty ("layers", var());
+                const var layers = sound.getProperty (tags::layers, var());
                 for (int li = 0; li < layers.size(); ++li) {
                     const var layer (layers[li]);
                     if (LayerData* ld = createLayerData (*ssound))
@@ -89,6 +92,7 @@ public:
     }
 
 private:
+    const File file;
     const var& data;
 };
 

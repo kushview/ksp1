@@ -22,6 +22,7 @@
 #include "layerdata.hpp"
 #include "sounds.hpp"
 #include "synth.hpp"
+#include "tags.hpp"
 #include "util.hpp"
 
 namespace ksp1 {
@@ -56,15 +57,17 @@ SamplerSound::SamplerSound (int noteNumber, int soundID)
 SamplerSound::~SamplerSound() {}
 
 DynamicObject::Ptr SamplerSound::createDynamicObject() const {
+    using juce::DynamicObject;
+    using juce::var;
+
     DynamicObject::Ptr object = new DynamicObject();
-    jassertfalse;
-#if 0
-    object->setProperty (Slugs::id, id);
-    object->setProperty (Slugs::note, key.note);
-    object->setProperty (Slugs::length, key.length);
-    object->setProperty (Slugs::volume, (double) key.volume);
-    object->setProperty (Tags::voiceGroup, key.voiceGroup);
-    object->setProperty (Tags::triggerMode, (int) key.triggerMode);
+
+    object->setProperty (tags::ID, id);
+    object->setProperty (tags::note, key.note);
+    object->setProperty (tags::length, key.length);
+    object->setProperty (tags::volume, (double) key.volume);
+    object->setProperty (tags::voiceGroup, key.voiceGroup);
+    object->setProperty (tags::triggerMode, (int) key.triggerMode);
 
     var layers;
     for (LayerData* ld : activeLayers) {
@@ -73,8 +76,8 @@ DynamicObject::Ptr SamplerSound::createDynamicObject() const {
     }
 
     if (layers.size() > 0)
-        object->setProperty ("layers", layers);
-#endif
+        object->setProperty (tags::layers, layers);
+
     return object;
 }
 
@@ -183,7 +186,6 @@ void SamplerSound::setAttack (double ratio) {
 
 void SamplerSound::setDecay (double ratio) {
     const float len = ratio * ((double) length() / 4.0f);
-
     Lock sl (*this);
     key.adsr.setDecay (len);
 }
@@ -202,15 +204,13 @@ void SamplerSound::setRelease (double ratio) {
 }
 
 void SamplerSound::restoreFromJSON (const juce::var& json) {
-#if 0
-    key.volume = (float) json.getProperty (Slugs::volume, 0.0);
-    key.gain = Decibels::decibelsToGain (key.volume);
-    key.length = (int) json.getProperty (Slugs::length, key.length);
-    key.note = (int) json.getProperty (Slugs::note, key.note);
-    key.pitch = (double) json.getProperty (Slugs::pitch, key.pitch);
-    key.voiceGroup = (int) json.getProperty (Tags::voiceGroup, -1);
-    key.triggerMode = (int) json.getProperty (Tags::triggerMode, (int) TriggerMode::Retrigger);
-#endif
+    key.volume      = (float) json.getProperty (tags::volume, 0.0);
+    key.gain        = Decibels::decibelsToGain (key.volume);
+    key.length      = (int) json.getProperty (tags::length, key.length);
+    key.note        = (int) json.getProperty (tags::note, key.note);
+    key.pitch       = (double) json.getProperty (tags::pitch, key.pitch);
+    key.voiceGroup  = (int) json.getProperty (tags::voiceGroup, -1);
+    key.triggerMode = (int) json.getProperty (tags::triggerMode, (int) TriggerMode::Retrigger);
 }
 
 void SamplerSound::setRootNote (int note) {
