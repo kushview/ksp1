@@ -45,10 +45,7 @@ LV2Plugin::LV2Plugin (const lvtk::Args& args)
       lastGain (1.0f),
       wasRestored (0) {
     sampler.reset (SamplerSynth::create());
-    retainer.reset (SamplerSynth::create (sampler->getSampleCache()));
-
-    // var json;
-    // sampler->getNestedVariant (json);
+    retainer.reset (SamplerSynth::create());
 
     auto& c = sampler->getSampleCache();
     c.addSearchPath (juce::File (_bundlePath));
@@ -158,6 +155,11 @@ void LV2Plugin::activate() {
                 delete sound;
             }
         }
+
+        auto obj       = sampler->createDynamicObject();
+        juce::var json = obj.get();
+        std::clog << juce::JSON::toString (json, false) << std::endl;
+
     } else {
         std::clog << "couldn't load test buffer\n";
     }
@@ -430,6 +432,11 @@ lvtk::WorkerStatus LV2Plugin::work_response (uint32_t size, const void* body) {
 }
 
 lvtk::StateStatus LV2Plugin::save (lvtk::StateStore& store, uint32_t /*flags*/, const lvtk::FeatureList& features) {
+    using juce::FileOutputStream;
+    using juce::JSON;
+    using juce::String;
+    using juce::File;
+
     LV2_State_Make_Path* make_path = nullptr;
     LV2_State_Map_Path* map_path   = nullptr;
 
@@ -443,16 +450,17 @@ lvtk::StateStatus LV2Plugin::save (lvtk::StateStore& store, uint32_t /*flags*/, 
         }
     }
 
-#if 0
-    var json;
-    if (sampler->getNestedVariant (json)) {
+#if 1
+
+    if (auto obj = sampler->createDynamicObject()) {
+        var json = obj.get();
         if (map_path && make_path) {
             if (char* absolute = make_path->path (make_path->handle, "data.json")) {
                 if (char* abstract = map_path->abstract_path (map_path->handle, absolute)) {
                     const File file (String::fromUTF8 (absolute));
                     FileOutputStream fos (file);
                     JSON::writeToStream (fos, json);
-                    store (uris->slugs_file, abstract, strlen (abstract) + 1, forge->Path, STATE_IS_POD);
+                    store (uris->slugs_file, abstract, strlen (abstract) + 1, forge.Path, LV2_STATE_IS_POD);
 
                     std::free (abstract);
                 }
@@ -461,7 +469,11 @@ lvtk::StateStatus LV2Plugin::save (lvtk::StateStore& store, uint32_t /*flags*/, 
             }
         } else {
             const String data = JSON::toString (json, true);
-            store (uris->ksp1_SamplerSynth, data.toRawUTF8(), data.length() + 1, forge->String, STATE_IS_POD);
+            store (uris->ksp1_SamplerSynth,
+                   data.toRawUTF8(),
+                   data.length() + 1,
+                   forge.String,
+                   LV2_STATE_IS_POD);
         }
     }
 #else
@@ -474,6 +486,7 @@ lvtk::StateStatus LV2Plugin::save (lvtk::StateStore& store, uint32_t /*flags*/, 
 lvtk::StateStatus LV2Plugin::restore (lvtk::StateRetrieve& retrieve,
                                       uint32_t flags,
                                       const lvtk::FeatureList& features) {
+#if 0
     LV2_State_Make_Path* make_path = nullptr;
     lvtk::ignore (make_path);
     LV2_State_Map_Path* map_path = nullptr;
@@ -508,6 +521,7 @@ lvtk::StateStatus LV2Plugin::restore (lvtk::StateRetrieve& retrieve,
     }
 
     trigger_restored();
+#endif
     return LV2_STATE_SUCCESS;
 }
 

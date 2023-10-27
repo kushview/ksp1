@@ -109,8 +109,9 @@ public:
     LayerData* getLayerDataForObjectId (uint32_t oid) const;
 
     /** Creates a var object representation that is suitable to use
-            as JSON serializing and parsing */
-    bool getNestedVariant (juce::var& output);
+        as JSON serializing and parsing.
+     */
+    juce::DynamicObject::Ptr createDynamicObject () const noexcept;
 
     /** Triggers a note-on event */
     void noteOn (const int midiChannel, const int midiNoteNumber, const float velocity) override;

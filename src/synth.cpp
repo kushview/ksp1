@@ -388,30 +388,27 @@ LayerData* SamplerSynth::getLayerDataForObjectId (uint32_t oid) const {
                       : nullptr;
 }
 
-bool SamplerSynth::getNestedVariant (var& json) {
-#if 0
+juce::DynamicObject::Ptr SamplerSynth::createDynamicObject() const noexcept {
+    using juce::DynamicObject;
+    using juce::var;
+
     DynamicObject::Ptr synth = new DynamicObject();
-    synth->setProperty (Slugs::id, (int) 0);
-    synth->setProperty (Slugs::volume, Decibels::gainToDecibels ((double) getMasterGain()));
-    var sound;
+    synth->setProperty (tags::ID, (int) 0);
+    synth->setProperty (tags::volume, Decibels::gainToDecibels ((double) getMasterGain()));
+    var sounds;
     SoundIterator iter (soundMap);
+    
     while (iter.next())
     {
         if (SamplerSound* s = iter.getValue())
             if (DynamicObject::Ptr d = s->createDynamicObject())
-                sound.append (d.get());
+                sounds.append (d.get());
     }
 
-    if (sound.size() > 0)
-        synth->setProperty ("sounds", sound);
+    if (sounds.size() > 0)
+        synth->setProperty (tags::sounds, sounds);
 
-    synth->write
-    json = synth->gerVar;
-
-    return true;
-#endif
-    jassertfalse; // FIXME:
-    return false;
+    return synth;
 }
 
 #if defined(HAVE_LVTK)
