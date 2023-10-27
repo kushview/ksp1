@@ -26,10 +26,10 @@
 namespace ksp1 {
 
 class LayerData;
-class PatchSet;
+struct PatchSet;
 class SampleCache;
 class SamplerSound;
-class URIs;
+struct URIs;
 
 class SamplerSynth : public juce::Synthesiser,
                      public Disposable {
