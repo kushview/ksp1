@@ -58,7 +58,7 @@ protected:
         g.set_color (0xffffffff);
         g.draw_text ("KSP1",
                      bounds().at (0).smaller (3, 4).as<float>(),
-                     lvtk::Align::CENTERED);
+                     lvtk::Justify::CENTERED);
     }
 };
 
