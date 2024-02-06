@@ -24,7 +24,7 @@
 
 #include <lvtk/ui.hpp>
 #include <lvtk/ui/button.hpp>
-#include <lvtk/ui/opengl.hpp>
+#include <lvtk/ui/cairo.hpp>
 #include <lvtk/ui/slider.hpp>
 #include <lvtk/ui/widget.hpp>
 
@@ -58,7 +58,7 @@ protected:
         g.set_color (0xffffffff);
         g.draw_text ("KSP1",
                      bounds().at (0).smaller (3, 4).as<float>(),
-                     lvtk::Align::CENTERED);
+                     lvtk::Justify::CENTERED);
     }
 };
 
@@ -77,7 +77,7 @@ class KSP1UI final : public lvtk::UI<KSP1UI, lvtk::Parent, lvtk::Idle, lvtk::URI
 public:
     KSP1UI (const lvtk::UIArgs& args)
         : UI (args),
-          _main (lvtk::Mode::MODULE, std::make_unique<lvtk::OpenGL>()) {
+          _main (lvtk::Mode::MODULE, std::make_unique<lvtk::Cairo>()) {
         for (const auto& opt : lvtk::OptionArray (options())) {
             if (opt.key == map_uri (LV2_UI__scaleFactor))
                 m_scale_factor = *(float*) opt.value;
