@@ -34,7 +34,7 @@ SampleCache::SampleCache (FormatManager& f)
 SampleCache::~SampleCache() {}
 
 void SampleCache::activate (double samplerate, int buffersize) {
-    lvtk::ignore (samplerate, buffersize);
+    juce::ignoreUnused (samplerate, buffersize);
 }
 
 void SampleCache::deacitvate() {

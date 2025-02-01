@@ -477,7 +477,7 @@ lvtk::StateStatus LV2Plugin::save (lvtk::StateStore& store, uint32_t /*flags*/, 
         }
     }
 #else
-    lvtk::ignore (map_path, make_path);
+     (map_path, make_path);
 #endif
 
     return LV2_STATE_SUCCESS;
@@ -488,7 +488,7 @@ lvtk::StateStatus LV2Plugin::restore (lvtk::StateRetrieve& retrieve,
                                       const lvtk::FeatureList& features) {
 #if 0
     LV2_State_Make_Path* make_path = nullptr;
-    lvtk::ignore (make_path);
+     (make_path);
     LV2_State_Map_Path* map_path = nullptr;
 
     for (const auto& f : features) {

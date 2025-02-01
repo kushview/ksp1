@@ -23,10 +23,10 @@
 #include <lvtk/memory.hpp>
 
 #include <lvtk/ui.hpp>
-#include <lvtk/ui/button.hpp>
-#include <lvtk/ui/cairo.hpp>
-#include <lvtk/ui/slider.hpp>
-#include <lvtk/ui/widget.hpp>
+#include <lui/button.hpp>
+#include <lui/cairo.hpp>
+#include <lui/slider.hpp>
+#include <lui/widget.hpp>
 
 #include <lvtk/ext/idle.hpp>
 #include <lvtk/ext/parent.hpp>
@@ -38,7 +38,7 @@
 #include "ports.hpp"
 #include "urids.hpp"
 
-class Content : public lvtk::Widget {
+class Content : public lui::Slider {
 public:
     std::function<void (uint32_t, float)> on_control_changed;
 
@@ -52,13 +52,13 @@ public:
 protected:
     void resized() override {}
 
-    void paint (lvtk::Graphics& g) override {
+    void paint (lui::Graphics& g) override {
         g.set_color (0xff242222);
         g.fill_rect (bounds().at (0));
         g.set_color (0xffffffff);
         g.draw_text ("KSP1",
                      bounds().at (0).smaller (3, 4).as<float>(),
-                     lvtk::Justify::CENTERED);
+                     lui::Justify::CENTERED);
     }
 };
 
@@ -77,7 +77,7 @@ class KSP1UI final : public lvtk::UI<KSP1UI, lvtk::Parent, lvtk::Idle, lvtk::URI
 public:
     KSP1UI (const lvtk::UIArgs& args)
         : UI (args),
-          _main (lvtk::Mode::MODULE, std::make_unique<lvtk::Cairo>()) {
+          _main (lui::Mode::MODULE, std::make_unique<lui::Cairo>()) {
         for (const auto& opt : lvtk::OptionArray (options())) {
             if (opt.key == map_uri (LV2_UI__scaleFactor))
                 m_scale_factor = *(float*) opt.value;
@@ -124,7 +124,7 @@ public:
 
 private:
     float m_scale_factor { 1.f };
-    lvtk::Main _main;
+    lui::Main _main;
     std::unique_ptr<Content> content;
 };
 
