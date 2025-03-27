@@ -17,6 +17,10 @@ public:
     inline StrokeType() noexcept : type (SingleStroke) {}
     inline StrokeType (const StrokeType::ID ot) noexcept : type (ot) {}
     inline StrokeType (const StrokeType& ot) noexcept : type (ot.type) {}
+    inline StrokeType& operator= (const StrokeType& ot) {
+        this->type = ot.type;
+        return *this;
+    }
 
     inline bool operator== (const StrokeType& o) const noexcept { return type == o.type; }
     inline bool operator== (const ID& o) const noexcept { return type == o; }

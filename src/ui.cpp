@@ -21,46 +21,16 @@
 #include <iostream>
 
 #include <lvtk/memory.hpp>
-
+#include <lvtk/options.hpp>
 #include <lvtk/ui.hpp>
-#include <lui/button.hpp>
-#include <lui/cairo.hpp>
-#include <lui/slider.hpp>
-#include <lui/widget.hpp>
 
 #include <lvtk/ext/idle.hpp>
 #include <lvtk/ext/parent.hpp>
 #include <lvtk/ext/resize.hpp>
 #include <lvtk/ext/urid.hpp>
 
-#include <lvtk/options.hpp>
-
 #include "ports.hpp"
 #include "urids.hpp"
-
-class Content : public lui::Slider {
-public:
-    std::function<void (uint32_t, float)> on_control_changed;
-
-    Content() {
-        set_opaque (true);
-        set_size (640, 360);
-    }
-
-    ~Content() {}
-
-protected:
-    void resized() override {}
-
-    void paint (lui::Graphics& g) override {
-        g.set_color (0xff242222);
-        g.fill_rect (bounds().at (0));
-        g.set_color (0xffffffff);
-        g.draw_text ("KSP1",
-                     bounds().at (0).smaller (3, 4).as<float>(),
-                     lui::Justify::CENTERED);
-    }
-};
 
 struct ScopedFlag {
     ScopedFlag (bool& val, bool set) : original (val), value (val) {
@@ -76,22 +46,17 @@ private:
 class KSP1UI final : public lvtk::UI<KSP1UI, lvtk::Parent, lvtk::Idle, lvtk::URID, lvtk::Options> {
 public:
     KSP1UI (const lvtk::UIArgs& args)
-        : UI (args),
-          _main (lui::Mode::MODULE, std::make_unique<lui::Cairo>()) {
+        : UI (args) {
         for (const auto& opt : lvtk::OptionArray (options())) {
             if (opt.key == map_uri (LV2_UI__scaleFactor))
                 m_scale_factor = *(float*) opt.value;
         }
-
-        widget();
     }
 
     void cleanup() {
-        content.reset();
     }
 
     int idle() {
-        _main.loop (0);
         return 0;
     }
 
@@ -111,21 +76,11 @@ public:
     }
 
     LV2UI_Widget widget() {
-        if (content == nullptr) {
-            content = std::make_unique<Content>();
-            _main.elevate (*content, 0, (uintptr_t) parent.get());
-            content->set_visible (true);
-            content->on_control_changed = std::bind (
-                &KSP1UI::send_control, this, std::placeholders::_1, std::placeholders::_2);
-        }
-
-        return (LV2UI_Widget) content->find_handle();
+        return (LV2UI_Widget) nullptr;
     }
 
 private:
     float m_scale_factor { 1.f };
-    lui::Main _main;
-    std::unique_ptr<Content> content;
 };
 
 static lvtk::UIDescriptor<KSP1UI> _KSP1UI (

@@ -17,8 +17,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <lvtk/lvtk.hpp>
-
 #include "layerdata.hpp"
 #include "samplerkeys.hpp"
 
@@ -90,7 +88,7 @@ BufferPtr SampleCache::loadAudioFile (const juce::File& sampleFile) {
 
     if (auto reader = std::unique_ptr<FormatReader> (getAudioFormats().createReaderFor (sampleFile))) {
         DBG ("[ksp1] loading: " << sampleFile.getFileName());
-        buffer.reset (new SampleBuffer (reader->numChannels, reader->lengthInSamples));
+        buffer.reset (new SampleBuffer ((int) reader->numChannels, reader->lengthInSamples));
         reader->read (buffer.get(), 0, reader->lengthInSamples, 0, false, false);
         audioBuffers.set (slot, buffer);
         reader.reset();
