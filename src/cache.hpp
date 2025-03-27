@@ -71,10 +71,6 @@ public:
     FormatReader* createReaderFor (const juce::XmlElement& item);
     FormatReader* createReaderFor (const juce::File& file);
 
-#if defined(HAVE_LVTK)
-    LayerData* getLayerData (const URIs& uris, const lvtk::AtomObject& layer, bool realtime);
-#endif
-
 private:
     LayerData* findLayerData (const int id) const;
     juce::HashMap<int, BufferPtr> audioBuffers;

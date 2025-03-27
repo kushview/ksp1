@@ -152,6 +152,7 @@ public:
     }
 
     void renderSingleStroke (NoteData* d, MidiBuffer& out, int start, int nframes) {
+        juce::ignoreUnused (nframes);
         if (! d->triggered) {
             d->midi = MidiMessage::noteOn (d->midi.getChannel(),
                                            d->midi.getNoteNumber(),
@@ -318,7 +319,8 @@ private:
     }
 
     NoteData* getNoteData (int note) {
-        return note < 128 ? data[note] : nullptr;
+        auto i = static_cast<size_t> (note);
+        return note < 128 ? data[i] : nullptr;
     }
 };
 
@@ -329,6 +331,7 @@ Articulator::Articulator() {
 Articulator::~Articulator() {}
 
 void Articulator::prepareToPlay (double sampleRate, int blockSize) {
+    juce::ignoreUnused (blockSize);
     impl->setSampleRate (sampleRate);
     impl->activate();
 }
